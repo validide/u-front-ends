@@ -9,3 +9,4 @@ Micro Front Ends
 A framework for developing micro front ends that would support inecting the compoents as:
 * `iframe`
 * `webcomponent`
+* `script`
