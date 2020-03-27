@@ -1,12 +1,10 @@
-# STATUS: WORK IN PROGRESS
-In the process of defining the component contracts
+# javascript-browser-utilities
+JavaScript Browser Utilities
 
-# u-front-ends 
-Micro Front Ends
+## Status
+[![Coverage Status](https://coveralls.io/repos/github/validide/javascript-browser-utilities/badge.svg?branch=master)](https://coveralls.io/github/validide/javascript-browser-utilities?branch=master)
+[![npm version](https://img.shields.io/npm/v/@validide/javascript-browser-utilities)](https://www.npmjs.com/package/@validide/javascript-browser-utilities)
 
+## Demo
 
-## A framework for composing micro front ends
-A framework for developing micro front ends that would support inecting the compoents as:
-* `iframe`
-* `webcomponent`
-* `script`
+[Demo site](https://validide.github.io/javascript-browser-utilities/)
