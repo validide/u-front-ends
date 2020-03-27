@@ -2,7 +2,7 @@ import 'mocha';
 import { generateUniqueId } from '../../../src/index';
 import { expect } from 'chai';
 import { JSDOM } from 'jsdom';
-import { falsies } from '../../utils';
+import { values_falsies } from '../../utils';
 
 function getNewDocument(): Document { return new JSDOM(`<!DOCTYPE html>`).window.document };
 
@@ -26,7 +26,7 @@ export function test_generateUniqueId() {
     })
 
     it('should not fail for falsies', () => {
-      const ids: Array<string> = falsies.map((f) => generateUniqueId(doc, <string>(<unknown>f)));
+      const ids: Array<string> = values_falsies.map((f: any) => generateUniqueId(doc, <string>(<unknown>f)));
 
       ids.forEach((id: string, idx: number) => {
         expect(id.length).to.be.greaterThan(0);
@@ -39,11 +39,11 @@ export function test_generateUniqueId() {
       let called = 0;
       const fake = {
         getElementById: function (elementId: string): HTMLElement | null {
-          if (called >= falsies.length) {
+          if (called >= values_falsies.length) {
             return doc.createElement('div');
           }
           called++;
-          return <HTMLElement>(<unknown>falsies[called - 1]);
+          return <HTMLElement>(<unknown>values_falsies[called - 1]);
         }
       };
       const id = generateUniqueId(<Document>(<unknown>fake), '');

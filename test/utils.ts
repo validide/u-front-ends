@@ -1,1 +1,1 @@
-export const falsies = [undefined, null, false, ''];
+export const values_falsies = [undefined, null, false, ''];
