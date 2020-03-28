@@ -1,1 +1,3 @@
-export * from './baseComponent';
+export * from './component';
+export * from './componentEvent';
+export * from './componentOptions';
