@@ -1,6 +1,6 @@
 import { ComponentOptions } from './componentOptions';
 import { ComponentEvent, ComponentEventType } from './componentEvent';
-import { generateUniqueId } from '..';
+import { generateUniqueId } from '../dom/index';
 
 export abstract class Component {
   public id: string;
@@ -8,7 +8,7 @@ export abstract class Component {
   public isMounted: boolean;
   protected window: Window | null;
   protected options: ComponentOptions;
-  protected rootElement: HTMLDivElement | null;
+  protected rootElement: HTMLElement | null;
   private disposed: boolean;
 
   constructor(window: Window, options: ComponentOptions) {
@@ -32,7 +32,7 @@ export abstract class Component {
       return;
 
     const parent = this.getParentElement();
-    this.rootElement = this.getDocument().createElement('div');
+    this.rootElement = this.getDocument().createElement(this.getOptions().tag);
     this.id = generateUniqueId(this.getDocument(), 'ufe-');
     this.rootElement.id = this.id;
     parent.appendChild(this.rootElement);

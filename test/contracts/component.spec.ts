@@ -30,7 +30,7 @@ class StubComponent extends Component {
     return this.getOptions();
   }
 
-  public rootElementAccessor(): HTMLDivElement | null {
+  public rootElementAccessor(): HTMLElement | null {
     return this.rootElement;
   }
 
