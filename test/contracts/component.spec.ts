@@ -2,7 +2,7 @@ import 'mocha';
 import { JSDOM } from 'jsdom';
 import { expect } from 'chai';
 import { Component, ComponentEvent, ComponentEventType } from '../../src';
-import { values_falsies } from '../utils';
+import { values_falsies, getDelayPromise } from '../utils';
 import { ComponentOptions, ComponentEventHandlers } from '../../src/contracts/componentOptions';
 
 class StubComponent extends Component {
@@ -38,28 +38,46 @@ class StubComponent extends Component {
     return super.callHandler(type);
   }
 
-  protected initializeCore(): Promise<void> {
+  protected async initializeCore(): Promise<void> {
     this.timesInitializedCalled++;
     if (this.throwError)
       throw this.testError;
 
-    return super.initializeCore();
+    await getDelayPromise();
+
+    await super.initializeCore();
   }
 
-  protected mountCore(): Promise<void> {
+  protected async mountCore(): Promise<void> {
     this.timesMountedCalled++;
     if (this.throwError)
       throw this.testError;
 
-    return super.mountCore();
+    await getDelayPromise();
+
+    await super.mountCore();
+
+    await getDelayPromise();
+
+    super.callHandler(ComponentEventType.Mounted);
   }
 
-  protected disposeCore(): Promise<void> {
+  protected async disposeCore(): Promise<void> {
     this.timesDisposedCalled++;
     if (this.throwError)
       throw this.testError;
 
-    return super.disposeCore();
+    await getDelayPromise();
+
+    await super.disposeCore();
+  }
+
+  public async simulateUpdate(): Promise<void> {
+    this.callHandler(ComponentEventType.BeforeUpdate);
+
+    await getDelayPromise();
+
+    this.callHandler(ComponentEventType.Updated);
   }
 }
 
@@ -129,7 +147,6 @@ export function test_Component() {
       it(`callHandler calls correct handler`, async () => {
         let called = false;
         const options = new ComponentOptions();
-        options.handlers = new ComponentEventHandlers();
         options.handlers.beforeUpdate = (evt: ComponentEvent) => {
           if (evt.type === ComponentEventType.BeforeUpdate) {
             called = true;
@@ -144,7 +161,6 @@ export function test_Component() {
       it(`callHandler calls error handler if other handler fails`, async () => {
         let called = false;
         const options = new ComponentOptions();
-        options.handlers = new ComponentEventHandlers();
         options.handlers.beforeUpdate = (evt: ComponentEvent) => {
           throw new Error('Test Error!');
 
@@ -164,7 +180,9 @@ export function test_Component() {
 
     describe('Initialize', () => {
       it('Creates the root element', async () => {
-        const comp = new StubComponent(_win, _options);
+        const opt = new ComponentOptions();
+        opt.handlers = <ComponentEventHandlers><unknown>undefined;
+        const comp = new StubComponent(_win, opt);
 
         expect(comp.id).to.be.empty;
         await comp.initialize();
@@ -244,7 +262,6 @@ export function test_Component() {
             let err: Error | null = null
             let errHandlerCalled = true;
             options.parent = <string><unknown>f;
-            options.handlers = new ComponentEventHandlers();
             options.handlers.error = (e: ComponentEvent) => {
               errHandlerCalled = true;
             }
@@ -266,7 +283,6 @@ export function test_Component() {
       it('Raises error if called before "initialize"', async () => {
         const options = new ComponentOptions();
         let err: Error | null = null
-        options.handlers = new ComponentEventHandlers();
         options.handlers.error = (e: ComponentEvent) => {
           err = e.error;
         }
@@ -293,9 +309,8 @@ export function test_Component() {
       })
 
       it('Calling and failing raises an error', async () => {
-        let err: Error| null = null;
+        let err: Error | null = null;
         const opt = new ComponentOptions();
-        opt.handlers = new ComponentEventHandlers();
         opt.handlers.error = (evt: ComponentEvent) => {
           err = evt.error;
         }
@@ -360,6 +375,82 @@ export function test_Component() {
 
     })
 
+    describe('Events', () => {
+
+      it(`Should fire the following events`, async () => {
+        const parent = _win.document.createElement('div');
+        _win.document.body.appendChild(parent);
+        const opt = new ComponentOptions();
+        opt.parent = parent;
+        let timesCallHandlerCalled = 0;
+        const events: { [key: string]: Array<ComponentEvent> } = {}
+        const handler = (evt: ComponentEvent) => {
+          timesCallHandlerCalled++;
+          if (!events[evt.type.toString()]) {
+            events[evt.type.toString()] = new Array<ComponentEvent>();
+          }
+          events[evt.type.toString()].push(evt);
+        }
+        opt.handlers.beforeCreate = handler;
+        opt.handlers.beforeMount = handler;
+        opt.handlers.beforeUpdate = handler;
+        opt.handlers.beforeDestroy = handler;
+        opt.handlers.created = handler;
+        opt.handlers.mounted = handler;
+        opt.handlers.updated = handler;
+        opt.handlers.destroyed = handler;
+        opt.handlers.error = handler;
+
+        const comp = new StubComponent(_win, opt);
+
+        // INITIALIZE
+        let prom = comp.initialize();
+
+        expect(events[ComponentEventType.BeforeCreate.toString()].length).to.eq(1);
+        expect(timesCallHandlerCalled).to.eq(1);
+
+        await prom;
+
+        expect(events[ComponentEventType.Created.toString()].length).to.eq(1);
+        expect(timesCallHandlerCalled).to.eq(2);
+
+        // MOUNT
+        prom = comp.mount();
+
+        expect(events[ComponentEventType.BeforeMount.toString()].length).to.eq(1);
+        expect(timesCallHandlerCalled).to.eq(3);
+
+        await prom;
+
+        expect(events[ComponentEventType.Mounted.toString()].length).to.eq(1);
+        expect(timesCallHandlerCalled).to.eq(4);
+
+        // UPDATE
+        prom = comp.simulateUpdate();
+
+        expect(events[ComponentEventType.BeforeUpdate.toString()].length).to.eq(1);
+        expect(timesCallHandlerCalled).to.eq(5);
+
+        await prom;
+
+        expect(events[ComponentEventType.Updated.toString()].length).to.eq(1);
+        expect(timesCallHandlerCalled).to.eq(6);
+
+        // DISPOSE
+        prom  = comp.dispose();
+
+        expect(events[ComponentEventType.BeforeDestroy.toString()].length).to.eq(1);
+        expect(timesCallHandlerCalled).to.eq(7);
+
+        await prom;
+
+        expect(events[ComponentEventType.Destroyed.toString()].length).to.eq(1);
+        expect(timesCallHandlerCalled).to.eq(8);
+
+      });
+
+    })
+
     describe('Misc', () => {
       it(`if error handler fails we log using the "log" method`, async () => {
         let consoleLog = new Array<any>();
@@ -402,6 +493,7 @@ export function test_Component() {
       it(`if error is not registered we log using the "log" method - 2`, async () => {
         let consoleLog = new Array<any>();
         const options = new ComponentOptions();
+        options.handlers = <ComponentEventHandlers><unknown>undefined;
         const comp = new StubComponent(_win, options);
         comp.throwError = true;
         _win.console.log = function (message?: any, ...optionalParams: any[]) {

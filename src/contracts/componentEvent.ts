@@ -13,11 +13,12 @@ export enum ComponentEventType {
 export type ComponentEventHandler = (event: ComponentEvent) => void;
 
 export class ComponentEvent {
-  id: string;
-  type: ComponentEventType;
-  el: HTMLElement | null;
-  parentEl: HTMLElement;
-  error: Error | null;
+  public id: string;
+  public type: ComponentEventType;
+  public el: HTMLElement | null;
+  public parentEl: HTMLElement;
+  public error: Error | null;
+  public timestamp: Date;
 
   constructor(
     id: string,
@@ -31,5 +32,6 @@ export class ComponentEvent {
     this.el = el;
     this.parentEl = parentEl;
     this.error = error;
+    this.timestamp = new Date();
   }
 }

@@ -14,5 +14,5 @@ export class ComponentEventHandlers {
 
 export class ComponentOptions {
   public parent: string | HTMLElement = 'body';
-  public handlers?: ComponentEventHandlers
+  public handlers: ComponentEventHandlers = new ComponentEventHandlers();
 }
