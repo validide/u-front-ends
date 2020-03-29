@@ -1,6 +1,7 @@
 import { ComponentOptions } from './componentOptions';
 import { ComponentEvent, ComponentEventType } from './componentEvent';
 import { generateUniqueId } from '../dom/index';
+import { loadResource } from '../dom/document/loadResource';
 
 export abstract class Component {
   public id: string;
@@ -9,6 +10,7 @@ export abstract class Component {
   protected window: Window | null;
   protected options: ComponentOptions;
   protected rootElement: HTMLElement | null;
+  protected resourcesLoaded: boolean;
   private disposed: boolean;
 
   constructor(window: Window, options: ComponentOptions) {
@@ -20,6 +22,7 @@ export abstract class Component {
 
     this.isInitialized = false;
     this.isMounted = false;
+    this.resourcesLoaded = false;
     this.id = '';
     this.rootElement = null;
     this.window = window;
@@ -57,6 +60,23 @@ export abstract class Component {
     return parent;
   }
 
+  protected async loadResources(): Promise<void> {
+    if (this.resourcesLoaded)
+      return;
+
+    this.resourcesLoaded = true;
+    const options = this.getOptions();
+    if (options.resources && options.resources.length > 0) {
+      const document = this.getDocument();
+      for (let index = 0; index < options.resources.length; index++) {
+        const resource = options.resources[index];
+        // DO NOT LOAD ALL T ONCE AS YOU MIHGT HAVE DEPENDENCIES
+        // AND LA RESOURCE MIGHT LOAD BEFORE IT'S DEPENDENCY
+        await loadResource(document, resource.url, resource.isScript, resource.attributes);
+      }
+    }
+  }
+
   protected getOptions(): ComponentOptions {
     return (<ComponentOptions>this.options);
   }
@@ -67,7 +87,11 @@ export abstract class Component {
 
   protected initializeCore(): Promise<void> { return Promise.resolve(); }
 
-  protected mountCore(): Promise<void> { return Promise.resolve(); }
+  protected mountCore(): Promise<void> {
+    // This needs to be handled by each component
+    // this.callHandler(ComponentEventType.Mounted);
+    return Promise.resolve();
+  }
 
   protected disposeCore(): Promise<void> { return Promise.resolve(); }
 
@@ -119,29 +143,31 @@ export abstract class Component {
       logMethod(message, optionalParams);
   }
 
-  public async initialize(): Promise<void> {
+  public async initialize(): Promise<Component> {
     if (this.isInitialized)
-      return;
+      return this;
 
     this.callHandler(ComponentEventType.BeforeCreate)
     this.isInitialized = true;
     try {
+      await this.loadResources();
       this.createRootElement();
       await this.initializeCore();
     } catch (e) {
       this.callErrorHandler(e);
     }
-    this.callHandler(ComponentEventType.Created)
+    this.callHandler(ComponentEventType.Created);
+    return this;
   }
 
-  public async mount(): Promise<void> {
+  public async mount(): Promise<Component> {
     if (!this.isInitialized) {
       this.callErrorHandler(new Error(`Call "initialize" before calling "mount".`));
-      return;
+      return this;
     }
 
     if (this.isMounted)
-      return;
+      return this;
 
     this.callHandler(ComponentEventType.BeforeMount)
     this.isMounted = true;
@@ -150,8 +176,7 @@ export abstract class Component {
     } catch (e) {
       this.callErrorHandler(e);
     }
-    // This should be called by the component implementations.
-    //this.callHandler(ComponentEventType.BeforeMount)
+    return this;
   }
 
   public async dispose(): Promise<void> {
@@ -170,6 +195,7 @@ export abstract class Component {
     this.id = '';
     this.isInitialized = false;
     this.isMounted = false;
+    this.resourcesLoaded = false;
     this.rootElement?.parentElement?.removeChild(this.rootElement);
     this.rootElement = null;
     this.window = null;

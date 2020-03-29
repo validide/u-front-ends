@@ -3,7 +3,7 @@ import { JSDOM } from 'jsdom';
 import { expect } from 'chai';
 import { Component, ComponentEvent, ComponentEventType } from '../../src';
 import { values_falsies, getDelayPromise } from '../utils';
-import { ComponentOptions, ComponentEventHandlers } from '../../src/contracts/componentOptions';
+import { ComponentOptions, ComponentEventHandlers } from '../../src/base/componentOptions';
 
 class StubComponent extends Component {
   public timesDisposedCalled: number;
@@ -72,12 +72,13 @@ class StubComponent extends Component {
     await super.disposeCore();
   }
 
-  public async simulateUpdate(): Promise<void> {
+  public async simulateUpdate(): Promise<Component> {
     this.callHandler(ComponentEventType.BeforeUpdate);
 
     await getDelayPromise();
 
     this.callHandler(ComponentEventType.Updated);
+    return this;
   }
 }
 
@@ -404,7 +405,7 @@ export function test_Component() {
         const comp = new StubComponent(_win, opt);
 
         // INITIALIZE
-        let prom = comp.initialize();
+        let prom: Promise<any> = comp.initialize();
 
         expect(events[ComponentEventType.BeforeCreate.toString()].length).to.eq(1);
         expect(timesCallHandlerCalled).to.eq(1);

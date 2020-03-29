@@ -27,7 +27,9 @@
     "build": "tsc --module es2015 && rollup --config ./rollup.config.js && node ./.build/minify.js",
     "test": "nyc mocha",
     "predocs": "npm run test && npm run build",
-    "docs": "rollup --config ./rollup.config.js --dir ./docs/demo/lib/bundle/"
+    "docs": "rollup --config ./rollup.config.js --dir ./docs/demo/lib/bundle/",
+    "predocs_dev": "npm run build",
+    "docs_dev": "rollup --config ./rollup.config.js --dir ./docs/demo/lib/bundle/"
   },
   "repository": {
     "type": "git",

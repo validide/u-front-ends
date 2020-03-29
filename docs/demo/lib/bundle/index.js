@@ -80,6 +80,8 @@
      */
     function getRandomString() { return Math.random().toString(36).substring(2); }
 
+    function noop() { }
+
     /**
      * Generate a random id that is not present in the document at this time
      * @param document The reference to the document object
@@ -94,6 +96,30 @@
                 return id;
             }
         }
+    }
+
+    function loadResource(document, url, isScript = true, attributes) {
+        return new Promise((resolve, reject) => {
+            let resource;
+            if (isScript) {
+                resource = document.createElement('script');
+                resource.src = url;
+            }
+            else {
+                resource = document.createElement('link');
+                resource.href = url;
+            }
+            if (attributes) {
+                const keys = Object.keys(attributes);
+                for (let index = 0; index < keys.length; index++) {
+                    const key = keys[index];
+                    resource.setAttribute(key, attributes[key]);
+                }
+            }
+            resource.addEventListener('load', () => resolve());
+            resource.addEventListener('error', () => reject(new Error(`Script load error for url: ${url}.`)));
+            document.head.appendChild(resource);
+        });
     }
 
     var __awaiter = (window && window.__awaiter) || function (thisArg, _arguments, P, generator) {
@@ -113,6 +139,7 @@
                 throw new Error('Missing "options" argument.');
             this.isInitialized = false;
             this.isMounted = false;
+            this.resourcesLoaded = false;
             this.id = '';
             this.rootElement = null;
             this.window = window;
@@ -143,13 +170,34 @@
                 throw new Error(`Failed to find parent "${opt.parent}".`);
             return parent;
         }
+        loadResources() {
+            return __awaiter(this, void 0, void 0, function* () {
+                if (this.resourcesLoaded)
+                    return;
+                this.resourcesLoaded = true;
+                const options = this.getOptions();
+                if (options.resources && options.resources.length > 0) {
+                    const document = this.getDocument();
+                    for (let index = 0; index < options.resources.length; index++) {
+                        const resource = options.resources[index];
+                        // DO NOT LOAD ALL T ONCE AS YOU MIHGT HAVE DEPENDENCIES
+                        // AND LA RESOURCE MIGHT LOAD BEFORE IT'S DEPENDENCY
+                        yield loadResource(document, resource.url, resource.isScript, resource.attributes);
+                    }
+                }
+            });
+        }
         getOptions() {
             return this.options;
         }
         getWindow() { return this.window; }
         getDocument() { return this.getWindow().document; }
         initializeCore() { return Promise.resolve(); }
-        mountCore() { return Promise.resolve(); }
+        mountCore() {
+            // This needs to be handled by each component
+            // this.callHandler(ComponentEventType.Mounted);
+            return Promise.resolve();
+        }
         disposeCore() { return Promise.resolve(); }
         callErrorHandler(e) {
             var _a;
@@ -190,10 +238,11 @@
         initialize() {
             return __awaiter(this, void 0, void 0, function* () {
                 if (this.isInitialized)
-                    return;
+                    return this;
                 this.callHandler(exports.ComponentEventType.BeforeCreate);
                 this.isInitialized = true;
                 try {
+                    yield this.loadResources();
                     this.createRootElement();
                     yield this.initializeCore();
                 }
@@ -201,16 +250,17 @@
                     this.callErrorHandler(e);
                 }
                 this.callHandler(exports.ComponentEventType.Created);
+                return this;
             });
         }
         mount() {
             return __awaiter(this, void 0, void 0, function* () {
                 if (!this.isInitialized) {
                     this.callErrorHandler(new Error(`Call "initialize" before calling "mount".`));
-                    return;
+                    return this;
                 }
                 if (this.isMounted)
-                    return;
+                    return this;
                 this.callHandler(exports.ComponentEventType.BeforeMount);
                 this.isMounted = true;
                 try {
@@ -219,8 +269,7 @@
                 catch (e) {
                     this.callErrorHandler(e);
                 }
-                // This should be called by the component implementations.
-                //this.callHandler(ComponentEventType.BeforeMount)
+                return this;
             });
         }
         dispose() {
@@ -240,6 +289,7 @@
                 this.id = '';
                 this.isInitialized = false;
                 this.isMounted = false;
+                this.resourcesLoaded = false;
                 (_b = (_a = this.rootElement) === null || _a === void 0 ? void 0 : _a.parentElement) === null || _b === void 0 ? void 0 : _b.removeChild(this.rootElement);
                 this.rootElement = null;
                 this.window = null;
@@ -255,18 +305,234 @@
             this.parent = 'body';
             this.tag = 'div';
             this.handlers = new ComponentEventHandlers();
+            this.resources = [];
         }
     }
 
+    class ResourceConfiguration {
+        constructor() {
+            this.url = '';
+            this.isScript = true;
+        }
+    }
+
+    var ChildComponentType;
+    (function (ChildComponentType) {
+        ChildComponentType["Script"] = "script";
+        ChildComponentType["Iframe"] = "iframe";
+        ChildComponentType["CustomElement"] = "customElement";
+    })(ChildComponentType || (ChildComponentType = {}));
+
+    class ChildContentBridge {
+        constructor(signalMounted, signalBeforeUpdate, signalUpdated, signalDispose, setDisposeAction) {
+            this.signalMounted = signalMounted;
+            this.signalBeforeUpdate = signalBeforeUpdate;
+            this.signalUpdated = signalUpdated;
+            this.signalDispose = signalDispose;
+            this.setDisposeAction = setDisposeAction;
+        }
+    }
+
+    var __awaiter$1 = (window && window.__awaiter) || function (thisArg, _arguments, P, generator) {
+        function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+        return new (P || (P = Promise))(function (resolve, reject) {
+            function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+            function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+            function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+            step((generator = generator.apply(thisArg, _arguments || [])).next());
+        });
+    };
+    class ChildComponent extends Component {
+        constructor(window, options, rootFacade) {
+            super(window, options);
+            this.rootFacade = rootFacade;
+            this.childContentBridge = new ChildContentBridge(() => this.callHandler(exports.ComponentEventType.Mounted), () => this.callHandler(exports.ComponentEventType.BeforeUpdate), () => this.callHandler(exports.ComponentEventType.Updated), () => this.signalDispose(), (cb) => this.setContentDisposeCallback(cb));
+            this.childContentDisposeAction = null;
+            this.contentDisposePromise = null;
+        }
+        getChildContentBridge() {
+            return this.childContentBridge;
+        }
+        getOptions() {
+            return super.getOptions();
+        }
+        beginContentDispose() {
+            if (this.contentDisposePromise !== null)
+                return; // Dispose was already requested.
+            if (this.childContentDisposeAction) {
+                this.contentDisposePromise = Promise
+                    .race([
+                    this.childContentDisposeAction(),
+                    new Promise((resolveTimeout, rejectTimeout) => {
+                        this
+                            .getWindow()
+                            .setTimeout(() => resolveTimeout(), this.getOptions().contentDisposeTimeout);
+                    })
+                ])
+                    .catch((err) => {
+                    this.callErrorHandler(err);
+                });
+            }
+            else {
+                this.contentDisposePromise = Promise.resolve();
+            }
+        }
+        setContentDisposeCallback(callback) {
+            if (this.childContentDisposeAction)
+                return;
+            this.childContentDisposeAction = callback;
+        }
+        signalDispose() {
+            if (this.contentDisposePromise !== null)
+                return; // Dispose was initiated by "this".
+            // Set the promise so we do not trigger it again;
+            this.contentDisposePromise = Promise.resolve();
+            this.rootFacade.signalDispose(this);
+        }
+        disposeCore() {
+            const _super = Object.create(null, {
+                disposeCore: { get: () => super.disposeCore }
+            });
+            return __awaiter$1(this, void 0, void 0, function* () {
+                this.beginContentDispose();
+                yield this.contentDisposePromise;
+                this.childContentBridge = null;
+                this.childContentDisposeAction = null;
+                this.contentDisposePromise = null;
+                yield _super.disposeCore.call(this);
+            });
+        }
+    }
+
+    var __awaiter$2 = (window && window.__awaiter) || function (thisArg, _arguments, P, generator) {
+        function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+        return new (P || (P = Promise))(function (resolve, reject) {
+            function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+            function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+            function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+            step((generator = generator.apply(thisArg, _arguments || [])).next());
+        });
+    };
+    class ScriptChildComponent extends ChildComponent {
+        constructor(window, options, rootFacade) {
+            super(window, options, rootFacade);
+        }
+        mountCore() {
+            const _super = Object.create(null, {
+                mountCore: { get: () => super.mountCore }
+            });
+            return __awaiter$2(this, void 0, void 0, function* () {
+                const options = this.getOptions();
+                options.injectBridge(this.getChildContentBridge());
+                yield _super.mountCore.call(this);
+            });
+        }
+    }
+
+    class ChildComponentFactory {
+        createComponent(window, options, rootFacade) {
+            switch (options.type) {
+                case ChildComponentType.Script:
+                    return new ScriptChildComponent(window, options, rootFacade);
+                default:
+                    throw new Error(`The "${options.type}" is not configured.`);
+            }
+        }
+    }
+
+    class RootComponentFacade {
+        constructor(signalDispose) {
+            this.signalDispose = signalDispose;
+        }
+    }
+
+    class RootComponent extends Component {
+        constructor(window, options) {
+            super(window, options);
+            this.children = {};
+        }
+        scheduleDisposeChild(child) {
+            // Schedule this later
+            this.getWindow().setTimeout(() => {
+                this.disposeChildByRef(child);
+            }, 0);
+        }
+        getChildId(child) {
+            const childIds = Object.keys(this.children);
+            for (let index = 0; index < childIds.length; index++) {
+                const id = childIds[index];
+                if (this.children[id] === child) {
+                    return id;
+                }
+            }
+            return null;
+        }
+        disposeChildByRef(child) {
+            return this.disposeChild(this.getChildId(child));
+        }
+        disposeChild(childId) {
+            const child = childId
+                ? this.children[childId]
+                : null;
+            if (!child)
+                return Promise.resolve();
+            return child
+                .dispose()
+                .then(() => {
+                this.children[childId] = null;
+            });
+        }
+        mountCore() {
+            this.callHandler(exports.ComponentEventType.Mounted);
+            return super.mountCore();
+        }
+        addChild(options) {
+            if (!this.isMounted)
+                throw new Error('Wait for the component to mount before starting to add children.');
+            const factory = new ChildComponentFactory();
+            const child = factory.createComponent(this.getWindow(), options, new RootComponentFacade((child) => this.scheduleDisposeChild(child)));
+            let id;
+            do {
+                id = 'c_' + getRandomString();
+            } while (Object.keys(this.children).indexOf(id) !== -1);
+            this.children[id] = child;
+            this.getWindow().setTimeout(() => {
+                child
+                    .initialize()
+                    .then((t) => t.mount());
+            }, 0);
+            return id;
+        }
+        removeChild(childId) {
+            this.getWindow().setTimeout(() => {
+                this.disposeChild(childId);
+            }, 0);
+        }
+    }
+
+    class RootComponentOptions extends ComponentOptions {
+        constructor() {
+            super();
+            this.tag = 'script';
+        }
+    }
+
+    exports.ChildContentBridge = ChildContentBridge;
     exports.Component = Component;
     exports.ComponentEvent = ComponentEvent;
     exports.ComponentEventHandlers = ComponentEventHandlers;
     exports.ComponentOptions = ComponentOptions;
+    exports.ResourceConfiguration = ResourceConfiguration;
+    exports.RootComponent = RootComponent;
+    exports.RootComponentFacade = RootComponentFacade;
+    exports.RootComponentOptions = RootComponentOptions;
+    exports.ScriptChildComponent = ScriptChildComponent;
     exports.generateUniqueId = generateUniqueId;
     exports.getHashCode = getHashCode;
     exports.getRandomString = getRandomString;
     exports.getUrlFullPath = getUrlFullPath;
     exports.getUrlOrigin = getUrlOrigin;
+    exports.noop = noop;
 
     Object.defineProperty(exports, '__esModule', { value: true });
 
