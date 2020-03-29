@@ -360,11 +360,15 @@
             if (this.contentDisposePromise !== null)
                 return; // Dispose was already initiated by "this.beginContentDispose".
             // Set the promise so we do not trigger it again;
-            this.contentDisposePromise = new Promise((resolveDely, rejectDelay) => {
-                this
-                    .getWindow()
-                    .setTimeout(() => resolveDely(), this.getOptions().contentDisposeDelay);
-            });
+            // this.contentDisposePromise = new Promise<void>((resolveDely, rejectDelay) => {
+            //   this
+            //     .getWindow()
+            //     .setTimeout(
+            //       () => resolveDely(),
+            //       this.getOptions().contentDisposeDelay
+            //     );
+            // });
+            this.contentDisposePromise = Promise.resolve();
             this.rootFacade.signalDispose(this);
         }
         disposeCore() {
