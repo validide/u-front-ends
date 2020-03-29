@@ -1,9 +1,9 @@
-import { ChildComponentOptions } from './childComponentOptions';
+import { RootComponentFacade } from './rootComponentFacade';
 import { ChildComponent } from './childComponent';
+import { ChildComponentOptions } from './childComponentOptions';
 import { ChildComponentType } from './childComponentType';
-import { ScriptChildComponent } from './script/index';
-import { ScriptChildComponentOptions } from './script/scriptChildComponentOptions';
-import { RootComponentFacade } from '../index';
+import { ScriptChildComponent } from './children/script/index';
+import { ScriptChildComponentOptions } from './children/script/scriptChildComponentOptions';
 
 export class ChildComponentFactory {
   public createComponent(window: Window, options: ChildComponentOptions, rootFacade: RootComponentFacade): ChildComponent {

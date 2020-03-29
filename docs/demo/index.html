@@ -6,13 +6,19 @@
   <title>Micro Front Ends</title>
   <meta name="description" content="Micro Front Ends Library">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link href="./css/app.css"/>
+  <link rel="stylesheet" href="./css/app.css"/>
   <link rel="icon" href="./favicon.ico" type="image/x-icon" />
+  <style>.d-none {display: none!important;}</style>
 </head>
 
 <body>
-  <div class="container" id="content" style="display: none;">
-    <h1 class="text-center">Micro Front Ends</h1>
+  <div class="container d-none" id="content">
+    <div class="alert alert-danger alert-dismissible fade show m-1" role="alert">
+      The demo requires ES6 features to work as for code simplicity (ES classes, lambda functions, template strings)!
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
     <div class="row">
       <div class="col-12 text-center">
         <a class="btn btn-outline-primary" href="#" role="button" data-demo-action="removeNavBar">Remove navigation bar</a>

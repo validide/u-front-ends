@@ -1,7 +1,6 @@
-import { ComponentOptions } from './componentOptions';
+import { generateUniqueId, loadResource } from '../dom/index';
 import { ComponentEvent, ComponentEventType } from './componentEvent';
-import { generateUniqueId } from '../dom/index';
-import { loadResource } from '../dom/document/loadResource';
+import { ComponentOptions } from './componentOptions';
 
 export abstract class Component {
   public id: string;

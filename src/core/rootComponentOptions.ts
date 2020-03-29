@@ -1,4 +1,4 @@
-import { ComponentOptions, ResourceConfiguration } from '../base/index';
+import { ComponentOptions } from "./componentOptions";
 
 export class RootComponentOptions extends ComponentOptions {
   constructor() {

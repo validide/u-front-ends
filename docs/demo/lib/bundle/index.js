@@ -4,54 +4,14 @@
     (global = global || self, factory(global.validide_uFrontEnds = {}));
 }(this, (function (exports) { 'use strict';
 
-    (function (ComponentEventType) {
-        ComponentEventType["BeforeCreate"] = "beforeCreate";
-        ComponentEventType["Created"] = "created";
-        ComponentEventType["BeforeMount"] = "beforeMount";
-        ComponentEventType["Mounted"] = "mounted";
-        ComponentEventType["BeforeUpdate"] = "beforeUpdate";
-        ComponentEventType["Updated"] = "updated";
-        ComponentEventType["BeforeDestroy"] = "beforeDestroy";
-        ComponentEventType["Destroyed"] = "destroyed";
-        ComponentEventType["Error"] = "error";
-    })(exports.ComponentEventType || (exports.ComponentEventType = {}));
-    class ComponentEvent {
-        constructor(id, type, el, parentEl, error) {
-            this.id = id;
-            this.type = type;
-            this.el = el;
-            this.parentEl = parentEl;
-            this.error = error;
-            this.timestamp = new Date();
+    class ChildContentBridge {
+        constructor(signalMounted, signalBeforeUpdate, signalUpdated, signalDispose, setDisposeAction) {
+            this.signalMounted = signalMounted;
+            this.signalBeforeUpdate = signalBeforeUpdate;
+            this.signalUpdated = signalUpdated;
+            this.signalDispose = signalDispose;
+            this.setDisposeAction = setDisposeAction;
         }
-    }
-
-    /**
-     * Return the origin of an url
-     * @param document The reference to the document object
-     * @param url The ´url´ for which to get the 'origin'
-     * @returns A string representing the url origin
-     */
-    function getUrlOrigin(document, url) {
-        if (!url)
-            return '';
-        const a = document.createElement('a');
-        a.setAttribute('href', url);
-        return a.protocol + "//" + a.hostname + (a.port && ":" + a.port);
-    }
-
-    /**
-     * Return the full path of an url (the origin and path name)
-     * @param document The reference to the document object
-     * @param url The ´url´ for which to get the full path
-     * @returns A string representing the url full path
-     */
-    function getUrlFullPath(document, url) {
-        if (!url)
-            return '';
-        const a = document.createElement('a');
-        a.setAttribute('href', url);
-        return a.protocol + "//" + a.hostname + (a.port && ":" + a.port) + a.pathname;
     }
 
     /**
@@ -98,6 +58,34 @@
         }
     }
 
+    /**
+     * Return the full path of an url (the origin and path name)
+     * @param document The reference to the document object
+     * @param url The ´url´ for which to get the full path
+     * @returns A string representing the url full path
+     */
+    function getUrlFullPath(document, url) {
+        if (!url)
+            return '';
+        const a = document.createElement('a');
+        a.setAttribute('href', url);
+        return a.protocol + "//" + a.hostname + (a.port && ":" + a.port) + a.pathname;
+    }
+
+    /**
+     * Return the origin of an url
+     * @param document The reference to the document object
+     * @param url The ´url´ for which to get the 'origin'
+     * @returns A string representing the url origin
+     */
+    function getUrlOrigin(document, url) {
+        if (!url)
+            return '';
+        const a = document.createElement('a');
+        a.setAttribute('href', url);
+        return a.protocol + "//" + a.hostname + (a.port && ":" + a.port);
+    }
+
     function loadResource(document, url, isScript = true, attributes) {
         return new Promise((resolve, reject) => {
             let resource;
@@ -120,6 +108,28 @@
             resource.addEventListener('error', () => reject(new Error(`Script load error for url: ${url}.`)));
             document.head.appendChild(resource);
         });
+    }
+
+    (function (ComponentEventType) {
+        ComponentEventType["BeforeCreate"] = "beforeCreate";
+        ComponentEventType["Created"] = "created";
+        ComponentEventType["BeforeMount"] = "beforeMount";
+        ComponentEventType["Mounted"] = "mounted";
+        ComponentEventType["BeforeUpdate"] = "beforeUpdate";
+        ComponentEventType["Updated"] = "updated";
+        ComponentEventType["BeforeDestroy"] = "beforeDestroy";
+        ComponentEventType["Destroyed"] = "destroyed";
+        ComponentEventType["Error"] = "error";
+    })(exports.ComponentEventType || (exports.ComponentEventType = {}));
+    class ComponentEvent {
+        constructor(id, type, el, parentEl, error) {
+            this.id = id;
+            this.type = type;
+            this.el = el;
+            this.parentEl = parentEl;
+            this.error = error;
+            this.timestamp = new Date();
+        }
     }
 
     var __awaiter = (window && window.__awaiter) || function (thisArg, _arguments, P, generator) {
@@ -297,42 +307,6 @@
         }
     }
 
-    class ComponentEventHandlers {
-    }
-    exports.ComponentEventType.BeforeCreate, exports.ComponentEventType.Created, exports.ComponentEventType.BeforeMount, exports.ComponentEventType.Mounted, exports.ComponentEventType.BeforeUpdate, exports.ComponentEventType.Updated, exports.ComponentEventType.BeforeDestroy, exports.ComponentEventType.Destroyed, exports.ComponentEventType.Error;
-    class ComponentOptions {
-        constructor() {
-            this.parent = 'body';
-            this.tag = 'div';
-            this.handlers = new ComponentEventHandlers();
-            this.resources = [];
-        }
-    }
-
-    class ResourceConfiguration {
-        constructor() {
-            this.url = '';
-            this.isScript = true;
-        }
-    }
-
-    var ChildComponentType;
-    (function (ChildComponentType) {
-        ChildComponentType["Script"] = "script";
-        ChildComponentType["Iframe"] = "iframe";
-        ChildComponentType["CustomElement"] = "customElement";
-    })(ChildComponentType || (ChildComponentType = {}));
-
-    class ChildContentBridge {
-        constructor(signalMounted, signalBeforeUpdate, signalUpdated, signalDispose, setDisposeAction) {
-            this.signalMounted = signalMounted;
-            this.signalBeforeUpdate = signalBeforeUpdate;
-            this.signalUpdated = signalUpdated;
-            this.signalDispose = signalDispose;
-            this.setDisposeAction = setDisposeAction;
-        }
-    }
-
     var __awaiter$1 = (window && window.__awaiter) || function (thisArg, _arguments, P, generator) {
         function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
         return new (P || (P = Promise))(function (resolve, reject) {
@@ -384,9 +358,13 @@
         }
         signalDispose() {
             if (this.contentDisposePromise !== null)
-                return; // Dispose was initiated by "this".
+                return; // Dispose was already initiated by "this.beginContentDispose".
             // Set the promise so we do not trigger it again;
-            this.contentDisposePromise = Promise.resolve();
+            this.contentDisposePromise = new Promise((resolveDely, rejectDelay) => {
+                this
+                    .getWindow()
+                    .setTimeout(() => resolveDely(), this.getOptions().contentDisposeDelay);
+            });
             this.rootFacade.signalDispose(this);
         }
         disposeCore() {
@@ -403,6 +381,12 @@
             });
         }
     }
+
+    (function (ChildComponentType) {
+        ChildComponentType["Script"] = "script";
+        ChildComponentType["Iframe"] = "iframe";
+        ChildComponentType["CustomElement"] = "customElement";
+    })(exports.ChildComponentType || (exports.ChildComponentType = {}));
 
     var __awaiter$2 = (window && window.__awaiter) || function (thisArg, _arguments, P, generator) {
         function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -429,10 +413,23 @@
         }
     }
 
+    class ComponentEventHandlers {
+    }
+    exports.ComponentEventType.BeforeCreate, exports.ComponentEventType.Created, exports.ComponentEventType.BeforeMount, exports.ComponentEventType.Mounted, exports.ComponentEventType.BeforeUpdate, exports.ComponentEventType.Updated, exports.ComponentEventType.BeforeDestroy, exports.ComponentEventType.Destroyed, exports.ComponentEventType.Error;
+    class ComponentOptions {
+        constructor() {
+            this.parent = 'body';
+            this.tag = 'div';
+            this.handlers = new ComponentEventHandlers();
+            this.resources = [];
+        }
+    }
+
     class ChildComponentOptions extends ComponentOptions {
         constructor() {
             super();
-            this.type = ChildComponentType.Script;
+            this.type = exports.ChildComponentType.Script;
+            this.contentDisposeDelay = 50; // Dispose is called from the content before actually beeing finished so allow a delay.
             this.contentDisposeTimeout = 3000;
         }
     }
@@ -442,18 +439,29 @@
             super();
             this.inject = () => { throw new Error('Inject method not defined!'); };
             this.skipResourceLoading = () => { return false; };
-            this.type = ChildComponentType.Script;
+            this.type = exports.ChildComponentType.Script;
         }
     }
 
     class ChildComponentFactory {
         createComponent(window, options, rootFacade) {
             switch (options.type) {
-                case ChildComponentType.Script:
+                case exports.ChildComponentType.Script:
                     return new ScriptChildComponent(window, options, rootFacade);
                 default:
                     throw new Error(`The "${options.type}" is not configured.`);
             }
+        }
+    }
+
+    const CE = 'CE';
+
+    const I = 'I';
+
+    class ResourceConfiguration {
+        constructor() {
+            this.url = '';
+            this.isScript = true;
         }
     }
 
@@ -534,11 +542,16 @@
         }
     }
 
+    exports.CE = CE;
+    exports.ChildComponent = ChildComponent;
+    exports.ChildComponentFactory = ChildComponentFactory;
+    exports.ChildComponentOptions = ChildComponentOptions;
     exports.ChildContentBridge = ChildContentBridge;
     exports.Component = Component;
     exports.ComponentEvent = ComponentEvent;
     exports.ComponentEventHandlers = ComponentEventHandlers;
     exports.ComponentOptions = ComponentOptions;
+    exports.I = I;
     exports.ResourceConfiguration = ResourceConfiguration;
     exports.RootComponent = RootComponent;
     exports.RootComponentFacade = RootComponentFacade;

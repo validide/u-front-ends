@@ -1,6 +1,6 @@
-import { ChildComponent } from '../childComponent';
+import { ChildComponent } from '../../childComponent';
+import { RootComponentFacade } from '../../rootComponentFacade';
 import { ScriptChildComponentOptions } from './scriptChildComponentOptions';
-import { RootComponentFacade } from '../../root/rootComponentFacade';
 
 export class ScriptChildComponent extends ChildComponent {
   constructor(window: Window, options: ScriptChildComponentOptions, rootFacade: RootComponentFacade) {

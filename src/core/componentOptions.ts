@@ -1,4 +1,4 @@
-import { ComponentEventType, ComponentEventHandler } from './componentEvent';
+import { ComponentEventHandler, ComponentEventType } from './componentEvent';
 import { ResourceConfiguration } from './resourceConfiguration';
 
 export class ComponentEventHandlers {

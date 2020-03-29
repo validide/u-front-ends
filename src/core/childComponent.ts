@@ -1,7 +1,8 @@
-import { Component, ComponentEventType } from '../base/index';
-import { ChildContentBridge, ChildContentDisposeAction } from './childContentBridge';
 import { ChildComponentOptions } from './childComponentOptions';
-import { RootComponentFacade } from '../root/rootComponentFacade';
+import { ChildContentBridge, ChildContentDisposeAction } from './childContentBridge';
+import { Component } from './component';
+import { ComponentEventType } from './componentEvent';
+import { RootComponentFacade } from './rootComponentFacade';
 
 export abstract class ChildComponent extends Component {
   private rootFacade: RootComponentFacade | null;
@@ -35,29 +36,29 @@ export abstract class ChildComponent extends Component {
     if (this.contentDisposePromise !== null)
       return; // Dispose was already requested.
 
-    if(this.childContentDisposeAction) {
+    if (this.childContentDisposeAction) {
       this.contentDisposePromise = Promise
-      .race<void>([
-        this.childContentDisposeAction(),
-        new Promise<void>((resolveTimeout, rejectTimeout) =>{
-          this
-            .getWindow()
-            .setTimeout(
-              () => resolveTimeout(),
-              this.getOptions().contentDisposeTimeout
-            );
+        .race<void>([
+          this.childContentDisposeAction(),
+          new Promise<void>((resolveTimeout, rejectTimeout) => {
+            this
+              .getWindow()
+              .setTimeout(
+                () => resolveTimeout(),
+                this.getOptions().contentDisposeTimeout
+              );
           })
-      ])
-      .catch((err) => {
-        this.callErrorHandler(err);
-      });
+        ])
+        .catch((err) => {
+          this.callErrorHandler(err);
+        });
     } else {
       this.contentDisposePromise = Promise.resolve();
     }
   }
 
   private setContentDisposeCallback(callback: ChildContentDisposeAction): void {
-    if(this.childContentDisposeAction)
+    if (this.childContentDisposeAction)
       return;
 
     this.childContentDisposeAction = callback;
@@ -65,11 +66,18 @@ export abstract class ChildComponent extends Component {
 
   protected signalDispose(): void {
     if (this.contentDisposePromise !== null)
-      return; // Dispose was initiated by "this".
+      return; // Dispose was already initiated by "this.beginContentDispose".
 
 
     // Set the promise so we do not trigger it again;
-    this.contentDisposePromise = Promise.resolve();
+    this.contentDisposePromise = new Promise<void>((resolveDely, rejectDelay) => {
+      this
+        .getWindow()
+        .setTimeout(
+          () => resolveDely(),
+          this.getOptions().contentDisposeDelay
+        );
+    });
     (<RootComponentFacade>this.rootFacade).signalDispose(this);
 
   }

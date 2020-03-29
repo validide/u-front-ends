@@ -3,9 +3,33 @@
 
   var mfeEventHadler = function (evt) {
     console.log(evt);
-    if (evt.type === 'error') {
-      console.error(evt.error);
-      //alert('Check console!');
+    switch (evt.type) {
+      case 'beforeCreate':
+        break;
+      case 'created':
+        evt.el.classList.add('loading');
+        break;
+      case 'beforeMount':
+        break;
+      case 'mounted':
+        evt.el.classList.remove('loading');
+        break;
+      case 'beforeUpdate':
+        evt.el.classList.add('loading');
+        break;
+      case 'updated':
+        evt.el.classList.remove('loading');
+        break;
+      case 'beforeDestroy':
+        evt.el.classList.add('loading');
+        break;
+      case 'destroyed':
+        break;
+      case 'error':
+        console.error(evt.error);
+        break;
+      default:
+        alert('Unknown event: ' + evt.type);
     }
   }
 
@@ -75,16 +99,20 @@
   var mainNavBar = new ufe.ScriptChildComponentOptions();
   mainNavBar.tag = 'nav';
   mainNavBar.handlers = Object.assign({}, globalHandlers, {
-    'created': function(e) {
+    'created': function (e) {
       e.el.parentElement.insertBefore(e.el, e.el.parentElement.firstChild);
 
       globalHandlers['created'](e);
+    },
+    'destroyed': function(e) {
+      navbarId = '';
+      globalHandlers['destroyed'](e);
     }
   });
-  mainNavBar.inject = function(el, bridge) {
+  mainNavBar.inject = function (el, bridge) {
     new app.jsComponents['MainNavBarComponent'](el, bridge);
   }
-  mainNavBar.skipResourceLoading = function() {
+  mainNavBar.skipResourceLoading = function () {
     return !!app.jsComponents['MainNavBarComponent'];
   }
   var mainNavBarScript = new ufe.ResourceConfiguration();
@@ -95,14 +123,14 @@
 
   var navbarId = '';
   var clickHandlers = {
-    'addNavBar': function(e) {
-      if(navbarId)
+    'addNavBar': function (e) {
+      if (navbarId)
         return;
 
       navbarId = mfe.addChild(mainNavBar);
     },
-    'removeNavBar': function(e) {
-      if(!navbarId)
+    'removeNavBar': function (e) {
+      if (!navbarId)
         return;
 
       mfe.removeChild(navbarId);
@@ -127,9 +155,9 @@
     var els = document.querySelectorAll('[data-demo-action]');
     for (var index = 0; index < els.length; index++) {
       var element = els[index];
-      element.addEventListener('click', function(e) {
+      element.addEventListener('click', function (e) {
         e.preventDefault();
-        clickHandlers[e.target.getAttribute('data-demo-action')](e);
+        clickHandlers[e.currentTarget.getAttribute('data-demo-action')](e);
       })
     }
 
@@ -141,11 +169,11 @@
 
     mfe
       .initialize()
-      .then(function(root) { return root.mount(); })
-      .then(function(root) {
+      .then(function (root) { return root.mount(); })
+      .then(function (root) {
         navbarId = root.addChild(mainNavBar);
 
-        document.getElementById('content').style.display = null;
+        document.getElementById('content').classList.remove('d-none');
       });
   }
 

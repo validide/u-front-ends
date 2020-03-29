@@ -1,5 +1,3 @@
-export * from './base/index';
+export * from './core/index';
 export * from './dom/index';
 export * from './infrastructure/index';
-export * from './root/index';
-export * from './children/index'

@@ -1,10 +1,11 @@
-import { Component, ComponentEventType } from '../base/index';
-import { RootComponentOptions } from './index';
-import { ChildComponentOptions } from '../children/childComponentOptions';
-import { ChildComponentFactory } from '../children/childComponentFactory';
+import { RootComponentOptions } from './rootComponentOptions';
 import { RootComponentFacade } from './rootComponentFacade';
-import { ChildComponent } from '../children/childComponent';
-import { getRandomString } from '../infrastructure/getRandomString';
+import { getRandomString } from '../infrastructure/index';
+import { Component } from './component';
+import { ChildComponent } from './childComponent';
+import { ChildComponentFactory } from './childComponentFactory';
+import { ChildComponentOptions } from './childComponentOptions';
+import { ComponentEventType } from './componentEvent';
 
 export class RootComponent extends Component {
   private children: { [id: string]: ChildComponent | null };

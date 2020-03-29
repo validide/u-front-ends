@@ -1,4 +1,4 @@
-import { ChildComponent } from "../children/childComponent";
+import { ChildComponent } from "./index";
 
 export class RootComponentFacade {
   public signalDispose: (child: ChildComponent) => void;
