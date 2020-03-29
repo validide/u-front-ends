@@ -22,7 +22,7 @@
 
 
   var configuration = new ufe.RootComponentOptions();
-  configuration.handlers = globalHandlers;
+  configuration.handlers = Object.assign({}, globalHandlers);
 
   var bootstrapCss = new ufe.ResourceConfiguration();
   bootstrapCss.url = 'https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css';
@@ -72,6 +72,45 @@
 
   var mfe = new ufe.RootComponent(window, configuration);
 
+  var mainNavBar = new ufe.ScriptChildComponentOptions();
+  mainNavBar.tag = 'nav';
+  mainNavBar.handlers = Object.assign({}, globalHandlers, {
+    'created': function(e) {
+      e.el.parentElement.insertBefore(e.el, e.el.parentElement.firstChild);
+
+      globalHandlers['created'](e);
+    }
+  });
+  mainNavBar.inject = function(el, bridge) {
+    new app.jsComponents['MainNavBarComponent'](el, bridge);
+  }
+  mainNavBar.skipResourceLoading = function() {
+    return !!app.jsComponents['MainNavBarComponent'];
+  }
+  var mainNavBarScript = new ufe.ResourceConfiguration();
+  mainNavBarScript.url = './js/main-nav-bar.js';
+  mainNavBarScript.isScript = true;
+  mainNavBar.resources.push(mainNavBarScript);
+
+
+  var navbarId = '';
+  var clickHandlers = {
+    'addNavBar': function(e) {
+      if(navbarId)
+        return;
+
+      navbarId = mfe.addChild(mainNavBar);
+    },
+    'removeNavBar': function(e) {
+      if(!navbarId)
+        return;
+
+      mfe.removeChild(navbarId);
+      navbarId = '';
+    },
+
+  }
+
   function ready(fn) {
     if (document.readyState != 'loading') {
       fn();
@@ -84,17 +123,36 @@
     window.location = ufe.getUrlFullPath(document, './index.html') + '#/';
   }
 
+  function initDemoHandlers() {
+    var els = document.querySelectorAll('[data-demo-action]');
+    for (var index = 0; index < els.length; index++) {
+      var element = els[index];
+      element.addEventListener('click', function(e) {
+        e.preventDefault();
+        clickHandlers[e.target.getAttribute('data-demo-action')](e);
+      })
+    }
+
+  }
+
   function init() {
     bang();
+    initDemoHandlers();
 
     mfe
       .initialize()
-      .then(function(root) { root.mount(); });
+      .then(function(root) { return root.mount(); })
+      .then(function(root) {
+        navbarId = root.addChild(mainNavBar);
+
+        document.getElementById('content').style.display = null;
+      });
   }
 
   window.app = {
     ready: ready,
-    init: init
+    init: init,
+    jsComponents: {},
   };
 })(window, window.validide_uFrontEnds, void 0);
 

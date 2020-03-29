@@ -423,9 +423,26 @@
             });
             return __awaiter$2(this, void 0, void 0, function* () {
                 const options = this.getOptions();
-                options.injectBridge(this.getChildContentBridge());
+                options.inject(this.rootElement, this.getChildContentBridge());
                 yield _super.mountCore.call(this);
             });
+        }
+    }
+
+    class ChildComponentOptions extends ComponentOptions {
+        constructor() {
+            super();
+            this.type = ChildComponentType.Script;
+            this.contentDisposeTimeout = 3000;
+        }
+    }
+
+    class ScriptChildComponentOptions extends ChildComponentOptions {
+        constructor() {
+            super();
+            this.inject = () => { throw new Error('Inject method not defined!'); };
+            this.skipResourceLoading = () => { return false; };
+            this.type = ChildComponentType.Script;
         }
     }
 
@@ -527,11 +544,13 @@
     exports.RootComponentFacade = RootComponentFacade;
     exports.RootComponentOptions = RootComponentOptions;
     exports.ScriptChildComponent = ScriptChildComponent;
+    exports.ScriptChildComponentOptions = ScriptChildComponentOptions;
     exports.generateUniqueId = generateUniqueId;
     exports.getHashCode = getHashCode;
     exports.getRandomString = getRandomString;
     exports.getUrlFullPath = getUrlFullPath;
     exports.getUrlOrigin = getUrlOrigin;
+    exports.loadResource = loadResource;
     exports.noop = noop;
 
     Object.defineProperty(exports, '__esModule', { value: true });

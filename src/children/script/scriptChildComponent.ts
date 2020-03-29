@@ -9,7 +9,7 @@ export class ScriptChildComponent extends ChildComponent {
 
   protected async mountCore(): Promise<void> {
     const options = <ScriptChildComponentOptions>this.getOptions();
-    options.injectBridge(this.getChildContentBridge());
+    options.inject(<HTMLElement>this.rootElement, this.getChildContentBridge());
     await super.mountCore();
   }
 }
