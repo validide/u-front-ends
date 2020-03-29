@@ -3,7 +3,7 @@ import { JSDOM } from 'jsdom';
 import { expect } from 'chai';
 import { Component, ComponentEvent, ComponentEventType } from '../../src';
 import { values_falsies, getDelayPromise } from '../utils';
-import { ComponentOptions, ComponentEventHandlers } from '../../src/base/componentOptions';
+import { ComponentOptions, ComponentEventHandlers } from '../../src/core/componentOptions';
 
 class StubComponent extends Component {
   public timesDisposedCalled: number;

@@ -1,4 +1,4 @@
-import { getRandomString } from '../../infrastructure/index';
+import { getRandomString } from '../../utilities/index';
 
 /**
  * Generate a random id that is not present in the document at this time

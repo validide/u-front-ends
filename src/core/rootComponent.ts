@@ -1,6 +1,6 @@
 import { RootComponentOptions } from './rootComponentOptions';
 import { RootComponentFacade } from './rootComponentFacade';
-import { getRandomString } from '../infrastructure/index';
+import { getRandomString } from '../utilities/index';
 import { Component } from './component';
 import { ChildComponent } from './childComponent';
 import { ChildComponentFactory } from './childComponentFactory';
