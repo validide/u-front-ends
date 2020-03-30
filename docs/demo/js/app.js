@@ -97,7 +97,6 @@
   var mfe = new ufe.RootComponent(window, configuration);
 
   var mainNavBar = new ufe.ScriptChildComponentOptions();
-  mainNavBar.tag = 'nav';
   mainNavBar.handlers = Object.assign({}, globalHandlers, {
     'created': function (e) {
       e.el.parentElement.insertBefore(e.el, e.el.parentElement.firstChild);
