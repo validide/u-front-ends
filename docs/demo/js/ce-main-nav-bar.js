@@ -55,11 +55,11 @@
 
   class ComponentBridge {
 
-    constructor(el, disposeAction) {
+    constructor(el, disposeCommandListener) {
       this.el = el;
       this.eventName = 'event.component_bridge.validide_micro_front_ends';
-      this.disposeAction = disposeAction;
-      this.el.addEventListener(this.eventName, this.disposeAction, false);
+      this.disposeCommandListener = disposeCommandListener;
+      this.el.addEventListener(this.eventName, this.disposeCommandListener, false);
     }
 
     generateEventDetail(type) {
@@ -68,24 +68,28 @@
       }
     }
 
-    signalMounted() {
+    dispatchMounted() {
       this.el.dispatchEvent(new CustomEvent(this.eventName, generateEventDetail('mounted')));
     }
-    signalBeforeUpdate () {
+    dispatchBeforeUpdate () {
       this.el.dispatchEvent(new CustomEvent(this.eventName, generateEventDetail('beforeUpdate')));
     }
 
-    signalUpdated() {
+    dispatchUpdated() {
       this.el.dispatchEvent(new CustomEvent(this.eventName, generateEventDetail('updated')));
     }
 
-    signalDispose() {
-      this.el.dispatchEvent(new CustomEvent(this.eventName, generateEventDetail('???DISPOSED')));
+    dispatchBeforeDispose() {
+      this.el.dispatchEvent(new CustomEvent(this.eventName, generateEventDetail('beforeDispose')));
+    }
+
+    dispatchDisposed() {
+      this.el.dispatchEvent(new CustomEvent(this.eventName, generateEventDetail('disposed')));
     }
 
     dispose() {
-      this.el.removeEventListener(this.eventName, this.disposeAction, false);
-      this.disposeAction = null;
+      this.el.removeEventListener(this.eventName, this.disposeCommandListener, false);
+      this.disposeCommandListener = null;
       this.eventName = null;
       this.el = null;
     }
@@ -95,16 +99,19 @@
     constructor() {
       super();
       this.el = this.firstElementChild;
-      this.componentBridge = new ComponentBridge(this.el, () => this.disposeAsync());
+      this.componentBridge = new ComponentBridge(this.el, (e) => {
+        // Check event data if it's actually a dipose command
+        this.dispose();
+      });
       this.submitHandler = (e) => {
         e.preventDefault();
         var action = e.currentTarget.getAttribute('data-demo-action');
         if (action === 'close') {
           this.dispose();
         } else {
-          this.componentBridge.signalBeforeUpdate();
+          this.componentBridge.dispatchBeforeUpdate();
           setTimeout(() => {
-            this.componentBridge.signalUpdated();
+            this.componentBridge.dispatchUpdated();
           }, 1000)
         }
       };
@@ -121,13 +128,15 @@
 
       // Simulate a delay to consider exts processing
       window.setTimeout(() => {
-        this.componentBridge.signalMounted();
+        this.componentBridge.dispatchMounted();
       }, 1000);
     }
 
     dispose() {
-      this.componentBridge.signalDispose();
-      this.disposeCore();
+      this.componentBridge.dispatchBeforeDispose();
+      setTimeout(() => {
+        this.disposeCore();
+      }, 1000)
     }
 
     disposeCore() {
@@ -138,19 +147,11 @@
 
       this.submitHandler = null;
       this.componentBridge.dispose();
+      this.componentBridge.dispatchDisposed();
       this.componentBridge = null;
       this.el = null;
       super.dispose();
       console.log('MainNavBarComponent -> finished');
-    }
-
-    disposeAsync() {
-      return new Promise((resolve, reject) => {
-        setTimeout(() => {
-          this.disposeCore();
-          resolve();
-        }, 1000)
-      });
     }
   }
 

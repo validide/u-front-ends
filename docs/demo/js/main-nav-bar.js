@@ -95,15 +95,6 @@
       super.dispose();
       console.log('MainNavBarComponent -> finished');
     }
-
-    disposeAsync() {
-      return new Promise((resolve, reject) => {
-        setTimeout(() => {
-          this.disposeCore();
-          resolve();
-        }, 1000)
-      });
-    }
   }
 
   app.jsComponents['MainNavBarComponent'] = MainNavBarComponent;
