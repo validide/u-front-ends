@@ -1,11 +1,11 @@
 import { ChildComponent } from "./index";
 
 export class RootComponentFacade {
-  public signalDispose: (child: ChildComponent) => void;
+  public signalDisposed: (child: ChildComponent) => void;
 
   constructor(
-    signalDispose: (child: ChildComponent) => void
+    signalDisposed: (child: ChildComponent) => void
   ) {
-    this.signalDispose = signalDispose;
+    this.signalDisposed = signalDisposed;
   }
 }

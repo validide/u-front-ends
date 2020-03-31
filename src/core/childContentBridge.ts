@@ -1,23 +1,29 @@
-export type ChildContentDisposeAction = () => Promise<void>;
+import { noop } from '../utilities/noop';
 
 export class ChildContentBridge {
-  public signalMounted: () => void;
-  public signalBeforeUpdate: () => void;
-  public signalUpdated: () => void;
-  public signalDispose: () => void;
-  public setDisposeAction: (Action: ChildContentDisposeAction) => void;
+  public dispatchMounted: () => void;
+  public dispatchBeforeUpdate: () => void;
+  public dispatchUpdated: () => void;
+  public dispatchBeforeDispose: () => void;
+  public dispatchDisposed: () => void;
+  public disposeCommandListener: () => void;
 
   constructor(
-    signalMounted: () => void,
-    signalBeforeUpdate: () => void,
-    signalUpdated: () => void,
-    signalDispose: () => void,
-    setDisposeAction: (Action: ChildContentDisposeAction) => void
+    dispatchMounted: () => void,
+    dispatchBeforeUpdate: () => void,
+    dispatchUpdated: () => void,
+    dispatchBeforeDispose: () => void,
+    dispatchDisposed: () => void
   ) {
-    this.signalMounted = signalMounted;
-    this.signalBeforeUpdate = signalBeforeUpdate;
-    this.signalUpdated = signalUpdated;
-    this.signalDispose = signalDispose;
-    this.setDisposeAction = setDisposeAction;
+    this.dispatchMounted = dispatchMounted;
+    this.dispatchBeforeUpdate = dispatchBeforeUpdate;
+    this.dispatchUpdated = dispatchUpdated;
+    this.dispatchBeforeDispose = dispatchBeforeDispose;
+    this.dispatchDisposed = dispatchDisposed;
+    this.disposeCommandListener = noop;
+  }
+
+  public setDisposeCommandListener(handler: () => void): void {
+    this.disposeCommandListener = handler;
   }
 }

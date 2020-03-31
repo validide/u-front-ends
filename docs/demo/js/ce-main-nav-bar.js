@@ -27,35 +27,84 @@
   </div>
 </nav>`;
 
-  class MainNavBar {
-    constructor(el) {
-      this.el = el;
+  class MainNavBar extends HTMLElement {
+    constructor() {
+      super();
+      this.initialized = false;
+    }
+
+    connectedCallback() {
       this.init();
     }
 
     init() {
-      this.el.innerHTML = navContent;
+      if (this.initialized)
+        return;
+
+      this.initialized = true;
+      this.innerHTML = navContent;
+    }
+
+
+
+    disconnectedCallback() {
+      this.innerHTML = '';
+    }
+
+  }
+
+  class ComponentBridge {
+
+    constructor(el, disposeAction) {
+      this.el = el;
+      this.eventName = 'event.component_bridge.validide_micro_front_ends';
+      this.disposeAction = disposeAction;
+      this.el.addEventListener(this.eventName, this.disposeAction, false);
+    }
+
+    generateEventDetail(type) {
+      return {
+        type: type
+      }
+    }
+
+    signalMounted() {
+      this.el.dispatchEvent(new CustomEvent(this.eventName, generateEventDetail('mounted')));
+    }
+    signalBeforeUpdate () {
+      this.el.dispatchEvent(new CustomEvent(this.eventName, generateEventDetail('beforeUpdate')));
+    }
+
+    signalUpdated() {
+      this.el.dispatchEvent(new CustomEvent(this.eventName, generateEventDetail('updated')));
+    }
+
+    signalDispose() {
+      this.el.dispatchEvent(new CustomEvent(this.eventName, generateEventDetail('???DISPOSED')));
     }
 
     dispose() {
-      this.el.innerHTML = '';
+      this.el.removeEventListener(this.eventName, this.disposeAction, false);
+      this.disposeAction = null;
+      this.eventName = null;
+      this.el = null;
     }
   }
 
   class MainNavBarComponent extends MainNavBar {
-    constructor(el, componentBridge) {
-      super(el);
-      this.componentBridge = componentBridge;
-      this.componentBridge.setDisposeCommandListener(() => this.dispose());
+    constructor() {
+      super();
+      this.el = this.firstElementChild;
+      this.componentBridge = new ComponentBridge(this.el, () => this.disposeAsync());
       this.submitHandler = (e) => {
         e.preventDefault();
         var action = e.currentTarget.getAttribute('data-demo-action');
         if (action === 'close') {
           this.dispose();
         } else {
-          this.componentBridge.dispatchBeforeUpdate();
+          this.componentBridge.signalBeforeUpdate();
           setTimeout(() => {
-            this.componentBridge.dispatchUpdated();
+            this.componentBridge.signalUpdated();
           }, 1000)
         }
       };
@@ -72,15 +121,13 @@
 
       // Simulate a delay to consider exts processing
       window.setTimeout(() => {
-        this.componentBridge.dispatchMounted();
+        this.componentBridge.signalMounted();
       }, 1000);
     }
 
     dispose() {
-      this.componentBridge.dispatchBeforeDispose();
-      setTimeout(() => {
-        this.disposeCore();
-      }, 1000)
+      this.componentBridge.signalDispose();
+      this.disposeCore();
     }
 
     disposeCore() {
@@ -90,8 +137,9 @@
       }
 
       this.submitHandler = null;
-      this.componentBridge.dispatchDisposed();
+      this.componentBridge.dispose();
       this.componentBridge = null;
+      this.el = null;
       super.dispose();
       console.log('MainNavBarComponent -> finished');
     }

@@ -4,13 +4,19 @@
     (global = global || self, factory(global.validide_uFrontEnds = {}));
 }(this, (function (exports) { 'use strict';
 
+    function noop() { }
+
     class ChildContentBridge {
-        constructor(signalMounted, signalBeforeUpdate, signalUpdated, signalDispose, setDisposeAction) {
-            this.signalMounted = signalMounted;
-            this.signalBeforeUpdate = signalBeforeUpdate;
-            this.signalUpdated = signalUpdated;
-            this.signalDispose = signalDispose;
-            this.setDisposeAction = setDisposeAction;
+        constructor(dispatchMounted, dispatchBeforeUpdate, dispatchUpdated, dispatchBeforeDispose, dispatchDisposed) {
+            this.dispatchMounted = dispatchMounted;
+            this.dispatchBeforeUpdate = dispatchBeforeUpdate;
+            this.dispatchUpdated = dispatchUpdated;
+            this.dispatchBeforeDispose = dispatchBeforeDispose;
+            this.dispatchDisposed = dispatchDisposed;
+            this.disposeCommandListener = noop;
+        }
+        setDisposeCommandListener(handler) {
+            this.disposeCommandListener = handler;
         }
     }
 
@@ -39,8 +45,6 @@
      * @returns A random generated string
      */
     function getRandomString() { return Math.random().toString(36).substring(2); }
-
-    function noop() { }
 
     /**
      * Generate a random id that is not present in the document at this time
@@ -320,66 +324,70 @@
         constructor(window, options, rootFacade) {
             super(window, options);
             this.rootFacade = rootFacade;
-            this.childContentBridge = new ChildContentBridge(() => this.callHandler(exports.ComponentEventType.Mounted), () => this.callHandler(exports.ComponentEventType.BeforeUpdate), () => this.callHandler(exports.ComponentEventType.Updated), () => this.signalDispose(), (cb) => this.setContentDisposeCallback(cb));
-            this.childContentDisposeAction = null;
+            this.childContentBridge = null;
             this.contentDisposePromise = null;
+            this.contentDisposePromiseResolver = null;
         }
         getChildContentBridge() {
+            if (!this.childContentBridge) {
+                this.childContentBridge = new ChildContentBridge(() => this.callHandler(exports.ComponentEventType.Mounted), () => this.callHandler(exports.ComponentEventType.BeforeUpdate), () => this.callHandler(exports.ComponentEventType.Updated), () => this.contentBeginDisposed(), () => this.contentDisposed());
+            }
             return this.childContentBridge;
         }
         getOptions() {
             return super.getOptions();
         }
-        beginContentDispose() {
+        contentBeginDisposed() {
             if (this.contentDisposePromise !== null)
-                return; // Dispose was already requested.
-            if (this.childContentDisposeAction) {
-                this.contentDisposePromise = Promise
-                    .race([
-                    this.childContentDisposeAction(),
-                    new Promise((resolveTimeout, rejectTimeout) => {
-                        this
-                            .getWindow()
-                            .setTimeout(() => resolveTimeout(), this.getOptions().contentDisposeTimeout);
-                    })
-                ])
-                    .catch((err) => {
-                    this.callErrorHandler(err);
-                });
+                return; // Dispose has already started.
+            this.setContentDisposePromise();
+            // Inform parent the content is beeing disposed.
+            this.rootFacade.signalDisposed(this);
+        }
+        startDisposingContent() {
+            if (this.contentDisposePromise !== null)
+                return; // Dispose has already started.
+            this.setContentDisposePromise();
+            // This should trigger the child component dispose.
+            this.getChildContentBridge().disposeCommandListener();
+        }
+        setContentDisposePromise() {
+            if (this.contentDisposePromise !== null)
+                return;
+            this.contentDisposePromise = Promise
+                .race([
+                new Promise((resolver, rejecter) => {
+                    this.contentDisposePromiseResolver = resolver;
+                }),
+                new Promise((resolveTimeout, rejectTimeout) => {
+                    this
+                        .getWindow()
+                        .setTimeout(() => rejectTimeout(), this.getOptions().contentDisposeTimeout);
+                })
+            ])
+                .catch((err) => {
+                this.callErrorHandler(err);
+            });
+        }
+        contentDisposed() {
+            if (this.contentDisposePromiseResolver === null) {
+                // For some reason we got the disposed call without getting the 'beginDispose' call.
+                this.contentDisposePromise = Promise.resolve();
+                this.rootFacade.signalDisposed(this);
             }
             else {
-                this.contentDisposePromise = Promise.resolve();
+                this.contentDisposePromiseResolver();
             }
-        }
-        setContentDisposeCallback(callback) {
-            if (this.childContentDisposeAction)
-                return;
-            this.childContentDisposeAction = callback;
-        }
-        signalDispose() {
-            if (this.contentDisposePromise !== null)
-                return; // Dispose was already initiated by "this.beginContentDispose".
-            // Set the promise so we do not trigger it again;
-            // this.contentDisposePromise = new Promise<void>((resolveDely, rejectDelay) => {
-            //   this
-            //     .getWindow()
-            //     .setTimeout(
-            //       () => resolveDely(),
-            //       this.getOptions().contentDisposeDelay
-            //     );
-            // });
-            this.contentDisposePromise = Promise.resolve();
-            this.rootFacade.signalDispose(this);
         }
         disposeCore() {
             const _super = Object.create(null, {
                 disposeCore: { get: () => super.disposeCore }
             });
             return __awaiter$1(this, void 0, void 0, function* () {
-                this.beginContentDispose();
+                this.startDisposingContent();
                 yield this.contentDisposePromise;
                 this.childContentBridge = null;
-                this.childContentDisposeAction = null;
+                this.contentDisposePromiseResolver = null;
                 this.contentDisposePromise = null;
                 yield _super.disposeCore.call(this);
             });
@@ -433,7 +441,6 @@
         constructor() {
             super();
             this.type = exports.ChildComponentType.Script;
-            this.contentDisposeDelay = 50; // Dispose is called from the content before actually beeing finished so allow a delay.
             this.contentDisposeTimeout = 3000;
         }
     }
@@ -470,8 +477,8 @@
     }
 
     class RootComponentFacade {
-        constructor(signalDispose) {
-            this.signalDispose = signalDispose;
+        constructor(signalDisposed) {
+            this.signalDisposed = signalDisposed;
         }
     }
 
