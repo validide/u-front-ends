@@ -1,34 +1,36 @@
 import { ChildComponentOptions } from './childComponentOptions';
-import { ChildContentBridge } from './childContentBridge';
-import { Component } from './component';
-import { ComponentEventType } from './componentEvent';
-import { RootComponentFacade } from './rootComponentFacade';
+import { WrapperAdapter, WrapperAdapterMethods } from '../wrapperAdapter';
+import { Component } from '../component';
+import { RootComponentFacade } from '../rootComponentFacade';
+import { ComponentEventType } from '../componentEvent';
 
 export abstract class ChildComponent extends Component {
   private rootFacade: RootComponentFacade | null;
-  private childContentBridge: ChildContentBridge | null;
+  private wrapperAdapter: WrapperAdapter | null;
   private contentDisposePromise: Promise<void> | null;
   private contentDisposePromiseResolver: (() => void) | null;
 
   constructor(window: Window, options: ChildComponentOptions, rootFacade: RootComponentFacade) {
     super(window, options);
     this.rootFacade = rootFacade;
-    this.childContentBridge = null;
+    this.wrapperAdapter = null;
     this.contentDisposePromise = null;
     this.contentDisposePromiseResolver = null;
   }
 
-  protected getChildContentBridge(): ChildContentBridge {
-    if (!this.childContentBridge) {
-      this.childContentBridge = new ChildContentBridge(
-        () => this.callHandler(ComponentEventType.Mounted),
-        () => this.callHandler(ComponentEventType.BeforeUpdate),
-        () => this.callHandler(ComponentEventType.Updated),
-        () => this.contentBeginDisposed(),
-        () => this.contentDisposed()
-      );
+  protected abstract getWrapperAdapterCore(methods: WrapperAdapterMethods): WrapperAdapter;
+
+  protected getWrapperAdapter(): WrapperAdapter {
+    if (!this.wrapperAdapter) {
+      const methods = new WrapperAdapterMethods();
+      methods.callMounterHandler = () => this.callHandler(ComponentEventType.Mounted);
+      methods.callBeforeUpdateHandler = () => this.callHandler(ComponentEventType.BeforeUpdate);
+      methods.callUpdatedHandler = () => this.callHandler(ComponentEventType.Updated);
+      methods.contentBeginDisposed = () => this.contentBeginDisposed();
+      methods.contentDisposed = () => this.contentDisposed();
+      this.wrapperAdapter = this.getWrapperAdapterCore(methods);
     }
-    return this.childContentBridge;
+    return this.wrapperAdapter;
   }
 
   protected getOptions(): ChildComponentOptions {
@@ -51,7 +53,7 @@ export abstract class ChildComponent extends Component {
     this.setContentDisposePromise();
 
     // This should trigger the child component dispose.
-    this.getChildContentBridge().disposeCommandListener();
+    this.getWrapperAdapter().requestContentDispose();
   }
 
   private setContentDisposePromise(): void {
@@ -91,7 +93,10 @@ export abstract class ChildComponent extends Component {
     this.startDisposingContent();
     await (<Promise<void>>this.contentDisposePromise);
 
-    this.childContentBridge = null;
+    if (this.wrapperAdapter) {
+      this.wrapperAdapter.dispose();
+      this.wrapperAdapter = null;
+    }
     this.contentDisposePromiseResolver = null;
     this.contentDisposePromise = null;
     await super.disposeCore();

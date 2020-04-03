@@ -2,10 +2,8 @@ import { RootComponentOptions } from './rootComponentOptions';
 import { RootComponentFacade } from './rootComponentFacade';
 import { getRandomString } from '../utilities/index';
 import { Component } from './component';
-import { ChildComponent } from './childComponent';
-import { ChildComponentFactory } from './childComponentFactory';
-import { ChildComponentOptions } from './childComponentOptions';
 import { ComponentEventType } from './componentEvent';
+import { ChildComponent, ChildComponentFactory, ChildComponentOptions } from './children/index';
 
 export class RootComponent extends Component {
   private children: { [id: string]: ChildComponent | null };

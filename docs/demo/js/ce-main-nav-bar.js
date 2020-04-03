@@ -53,54 +53,23 @@
 
   }
 
-  class ComponentBridge {
 
-    constructor(el, disposeCommandListener) {
-      this.el = el;
-      this.eventName = 'event.component_bridge.validide_micro_front_ends';
-      this.disposeCommandListener = disposeCommandListener;
-      this.el.addEventListener(this.eventName, this.disposeCommandListener, false);
-    }
-
-    generateEventDetail(type) {
-      return {
-        type: type
-      }
-    }
-
-    dispatchMounted() {
-      this.el.dispatchEvent(new CustomEvent(this.eventName, generateEventDetail('mounted')));
-    }
-    dispatchBeforeUpdate () {
-      this.el.dispatchEvent(new CustomEvent(this.eventName, generateEventDetail('beforeUpdate')));
-    }
-
-    dispatchUpdated() {
-      this.el.dispatchEvent(new CustomEvent(this.eventName, generateEventDetail('updated')));
-    }
-
-    dispatchBeforeDispose() {
-      this.el.dispatchEvent(new CustomEvent(this.eventName, generateEventDetail('beforeDispose')));
-    }
-
-    dispatchDisposed() {
-      this.el.dispatchEvent(new CustomEvent(this.eventName, generateEventDetail('disposed')));
-    }
-
-    dispose() {
-      this.el.removeEventListener(this.eventName, this.disposeCommandListener, false);
-      this.disposeCommandListener = null;
-      this.eventName = null;
-      this.el = null;
-    }
-  }
 
   class MainNavBarComponent extends MainNavBar {
     constructor() {
       super();
+      this.el = null;
+      this.componentBridge = null;
+      this.submitHandler = null;
+    }
+
+    init() {
+      super.init();
+
       this.el = this.firstElementChild;
-      this.componentBridge = new ComponentBridge(this.el, (e) => {
-        // Check event data if it's actually a dipose command
+      this.componentBridge = new CustomElementContentBridge(this.el, (e) => {
+        // Check event data if it's actually a dipose command.
+        // Move this to the CustomElementContentBridge
         this.dispose();
       });
       this.submitHandler = (e) => {
