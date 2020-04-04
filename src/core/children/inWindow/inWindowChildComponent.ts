@@ -1,11 +1,11 @@
 import { ChildComponent } from '../childComponent';
 import { RootComponentFacade } from '../../rootComponentFacade';
-import { ChildComponentOptions } from '../childComponentOptions';
 import { ContainerCommunicationHandlerMethods, ContainerCommunicationHandler } from '../communications/index';
 import { InWindowContainerCommunicationHandler } from './inWindowContainerCommunicationHandler';
+import { InWindowChildComponentOptions } from './inWindowChildComponentOptions';
 
 export class InWindowChildComponent extends ChildComponent {
-  constructor(window: Window, options: ChildComponentOptions, rootFacade: RootComponentFacade) {
+  constructor(window: Window, options: InWindowChildComponentOptions, rootFacade: RootComponentFacade) {
     super(window, options, rootFacade);
   }
 
@@ -13,8 +13,16 @@ export class InWindowChildComponent extends ChildComponent {
     return new InWindowContainerCommunicationHandler(<HTMLElement>this.rootElement, methods);
   }
 
+  protected getOptions(): InWindowChildComponentOptions {
+    return <InWindowChildComponentOptions>super.getOptions();
+  }
+
   protected async mountCore(): Promise<void> {
-    this.getOptions().inject(<HTMLElement>this.rootElement);
+    const injectionFunction = this.getOptions().inject;
+    if (!injectionFunction) {
+      throw new Error('Inject method not defined!');
+    }
+    injectionFunction(<HTMLElement>this.rootElement);
     await super.mountCore();
   }
 }

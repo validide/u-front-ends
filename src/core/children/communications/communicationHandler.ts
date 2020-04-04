@@ -4,17 +4,17 @@ import { CommunicationEvent } from './communicationEvent';
 
 export abstract class CommunicationHandler {
   private endpoint: ICommunicationsEndpoint | null;
-  private inboundType: string;
+  private messageType: string;
   private manager: ICommunicationsManager | null;
   private handlerAction: ((e: Event) => void) | null;
   private disposed: boolean;
 
   constructor(
-    inboundType: string,
+    messageType: string,
     endpoint: ICommunicationsEndpoint,
     manager: ICommunicationsManager
   ) {
-    this.inboundType = inboundType;
+    this.messageType = messageType;
     this.endpoint = endpoint;
     this.manager = manager;
     this.handlerAction = this.handleEvent.bind(this);
@@ -40,14 +40,14 @@ export abstract class CommunicationHandler {
     if(!this.endpoint || !this.handlerAction)
       return;
 
-    this.endpoint.addEventListener(this.inboundType, this.handlerAction);
+    this.endpoint.addEventListener(this.messageType, this.handlerAction);
   }
 
   private detachCommandHandler(): void{
     if(!this.endpoint || !this.handlerAction)
       return;
 
-    this.endpoint.removeEventListener(this.inboundType, this.handlerAction);
+    this.endpoint.removeEventListener(this.messageType, this.handlerAction);
   }
 
   protected dispatchEvent<T>(information: T): void {

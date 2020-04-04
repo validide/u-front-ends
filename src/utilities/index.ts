@@ -1,4 +1,4 @@
 export * from './getHashCode';
-export * from './getRandomString';
+export * from './random';
 export * from './noop';
 

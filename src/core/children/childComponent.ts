@@ -86,11 +86,11 @@ export abstract class ChildComponent extends Component {
     }
   }
 
-  protected initializeCore(): Promise<void> {
+  protected mountCore(): Promise<void> {
     if (!this.communicationHandler) {
       this.communicationHandler = this.getCommunicationHandler();
     }
-    return super.initializeCore();
+    return super.mountCore();
   }
 
   protected async disposeCore(): Promise<void> {

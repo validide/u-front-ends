@@ -1,6 +1,5 @@
 import { RootComponentOptions } from './rootComponentOptions';
 import { RootComponentFacade } from './rootComponentFacade';
-import { getRandomString } from '../utilities/index';
 import { Component } from './component';
 import { ComponentEventType } from './componentEvent';
 import { ChildComponent, ChildComponentOptions } from './children/index';
@@ -55,7 +54,7 @@ export class RootComponent extends Component {
     return super.mountCore();
   }
 
-  public addChild(options: ChildComponentOptions): string {
+  public async addChild(options: ChildComponentOptions): Promise<string> {
     if (!this.isMounted)
       throw new Error('Wait for the component to mount before starting to add children.');
 
@@ -65,17 +64,9 @@ export class RootComponent extends Component {
       new RootComponentFacade((child) => this.scheduleDisposeChild(child))
     );
 
-    let id: string;
-    do {
-      id = 'c_' + getRandomString();
-    } while (Object.keys(this.children).indexOf(id) !== -1);
-
+    const id = (await child.initialize()).id;
     this.children[id] = child;
-    this.getWindow().setTimeout(() => {
-      child
-        .initialize()
-        .then((t) => t.mount());
-    }, 0);
+    this.getWindow().setTimeout(() => { child.mount(); }, 0);
     return id;
   }
 

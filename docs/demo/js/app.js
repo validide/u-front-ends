@@ -96,14 +96,14 @@
 
   var mfe = new ufe.RootComponent(window, configuration);
 
-  var mainNavBar = new ufe.ChildComponentOptions();
+  var mainNavBar = new ufe.InWindowChildComponentOptions();
   mainNavBar.handlers = Object.assign({}, globalHandlers, {
     'created': function (e) {
       e.el.parentElement.insertBefore(e.el, e.el.parentElement.firstChild);
 
       globalHandlers['created'](e);
     },
-    'destroyed': function(e) {
+    'destroyed': function (e) {
       navbarId = '';
       globalHandlers['destroyed'](e);
     }
@@ -120,14 +120,14 @@
   mainNavBar.resources.push(mainNavBarScript);
 
 
-  var mainNavBarCustomEl = new ufe.ChildComponentOptions();
+  var mainNavBarCustomEl = new ufe.InWindowChildComponentOptions();
   mainNavBarCustomEl.handlers = Object.assign({}, globalHandlers, {
     'created': function (e) {
       e.el.parentElement.insertBefore(e.el, e.el.parentElement.firstChild);
 
       globalHandlers['created'](e);
     },
-    'destroyed': function(e) {
+    'destroyed': function (e) {
       navbarCeId = '';
       globalHandlers['destroyed'](e);
     }
@@ -150,11 +150,11 @@
   var navbarId = '';
   var navbarCeId = '';
   var clickHandlers = {
-    'addNavBar': function (e) {
+    'addNavBar': async function (e) {
       if (navbarId)
         return;
 
-      navbarId = mfe.addChild(mainNavBar);
+      navbarId = await mfe.addChild(mainNavBar);
     },
     'removeNavBar': function (e) {
       if (!navbarId)
@@ -163,11 +163,11 @@
       mfe.removeChild(navbarId);
       navbarId = '';
     },
-    'addNavBarCe': function (e) {
+    'addNavBarCe': async function (e) {
       if (navbarCeId)
         return;
 
-      navbarCeId = mfe.addChild(mainNavBarCustomEl);
+      navbarCeId = await mfe.addChild(mainNavBarCustomEl);
     },
     'removeNavBarCe': function (e) {
       if (!navbarCeId)
@@ -206,13 +206,22 @@
     bang();
     initDemoHandlers();
 
-    mfe
+    const rootMountProm = mfe
       .initialize()
-      .then(function (root) { return root.mount(); })
       .then(function (root) {
-        navbarId = root.addChild(mainNavBar);
-        navbarCeId = root.addChild(mainNavBarCustomEl);
+        return root.mount();
+      });
 
+    Promise
+      .all([
+        rootMountProm.then(async function (root) {
+          navbarId = await root.addChild(mainNavBar);
+        }),
+        rootMountProm.then(async function (root) {
+          navbarCeId = await root.addChild(mainNavBarCustomEl);
+        })
+      ])
+      .then(function () {
         document.getElementById('content').classList.remove('d-none');
       });
   }

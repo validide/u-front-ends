@@ -25,6 +25,16 @@
     }
 
     /**
+     * Generate a v4 UUID/GUID
+     * @returns A random generated string
+     */
+    function getUuidV4() {
+        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+            var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+            return v.toString(16);
+        });
+    }
+    /**
      * Generate a random string
      * @returns A random generated string
      */
@@ -309,14 +319,17 @@
     class CommunicationEvent {
         constructor(kind) {
             this.kind = kind;
+            this.uuid = getUuidV4();
+            this.timestamp = new Date().getTime();
+            this.contentId = '';
         }
     }
     CommunicationEvent.CONTENT_EVENT_TYPE = 'content_event.communication.children.validide_micro_front_ends';
     CommunicationEvent.CONTAINER_EVENT_TYPE = 'container_event.communication.children.validide_micro_front_ends';
 
     class CommunicationHandler {
-        constructor(inboundType, endpoint, manager) {
-            this.inboundType = inboundType;
+        constructor(messageType, endpoint, manager) {
+            this.messageType = messageType;
             this.endpoint = endpoint;
             this.manager = manager;
             this.handlerAction = this.handleEvent.bind(this);
@@ -334,12 +347,12 @@
         attachCommandHandler() {
             if (!this.endpoint || !this.handlerAction)
                 return;
-            this.endpoint.addEventListener(this.inboundType, this.handlerAction);
+            this.endpoint.addEventListener(this.messageType, this.handlerAction);
         }
         detachCommandHandler() {
             if (!this.endpoint || !this.handlerAction)
                 return;
-            this.endpoint.removeEventListener(this.inboundType, this.handlerAction);
+            this.endpoint.removeEventListener(this.messageType, this.handlerAction);
         }
         dispatchEvent(information) {
             if (!this.manager)
@@ -372,8 +385,8 @@
         }
     }
     class ContainerCommunicationHandler extends CommunicationHandler {
-        constructor(type, endpoint, manager, wrapperMethods) {
-            super(type, endpoint, manager);
+        constructor(messageType, endpoint, manager, wrapperMethods) {
+            super(messageType, endpoint, manager);
             this.wrapperMethods = wrapperMethods;
         }
         handleEventCore(e) {
@@ -408,8 +421,8 @@
     }
 
     class ContentCommunicationHandler extends CommunicationHandler {
-        constructor(type, endpoint, manager, disposeCommandCallback) {
-            super(type, endpoint, manager);
+        constructor(messageType, endpoint, manager, disposeCommandCallback) {
+            super(messageType, endpoint, manager);
             this.disposeCommandCallback = disposeCommandCallback;
         }
         handleEventCore(e) {
@@ -515,11 +528,11 @@
                 this.contentDisposePromiseResolver();
             }
         }
-        initializeCore() {
+        mountCore() {
             if (!this.communicationHandler) {
                 this.communicationHandler = this.getCommunicationHandler();
             }
-            return super.initializeCore();
+            return super.mountCore();
         }
         disposeCore() {
             const _super = Object.create(null, {
@@ -587,12 +600,19 @@
         getCommunicationHandlerCore(methods) {
             return new InWindowContainerCommunicationHandler(this.rootElement, methods);
         }
+        getOptions() {
+            return super.getOptions();
+        }
         mountCore() {
             const _super = Object.create(null, {
                 mountCore: { get: () => super.mountCore }
             });
             return __awaiter$2(this, void 0, void 0, function* () {
-                this.getOptions().inject(this.rootElement);
+                const injectionFunction = this.getOptions().inject;
+                if (!injectionFunction) {
+                    throw new Error('Inject method not defined!');
+                }
+                injectionFunction(this.rootElement);
                 yield _super.mountCore.call(this);
             });
         }
@@ -626,11 +646,199 @@
             super();
             this.type = exports.ChildComponentType.InWindow;
             this.contentDisposeTimeout = 3000;
-            this.inject = () => { throw new Error('Inject method not defined!'); };
         }
     }
 
-    class CrossWindowChildComponent {
+    class CrossWindowCommunicationManager {
+        constructor(win, origin, inboundEventType, outboundEventType) {
+            this.win = win;
+            this.origin = origin;
+            this.inboundEventType = inboundEventType;
+            this.outboundEventType = outboundEventType;
+        }
+        readEvent(e) {
+            if (!e)
+                return null;
+            const messageEvent = e;
+            if (!messageEvent || messageEvent.origin !== this.origin)
+                return null;
+            const data = messageEvent.data;
+            if (!data || data.type !== this.inboundEventType)
+                return null;
+            return data.detail;
+        }
+        dispatchEvent(detail) {
+            if (!this.win)
+                return;
+            const event = {
+                type: this.outboundEventType,
+                detail: detail
+            };
+            this.win.postMessage(event, this.origin);
+        }
+        dispose() {
+            this.win = null;
+        }
+    }
+
+    class CrossWindowContainerCommunicationHandler extends ContainerCommunicationHandler {
+        constructor(endpoint, iframeId, origin, wrapperMethods) {
+            super('message', endpoint, new CrossWindowCommunicationManager(endpoint, origin, CommunicationEvent.CONTENT_EVENT_TYPE, CommunicationEvent.CONTAINER_EVENT_TYPE), wrapperMethods);
+            this.iframeId = iframeId;
+        }
+        handleEventCore(e) {
+            if (!this.iframeId)
+                return;
+            if (!e.contentId && e.kind === exports.CommunicationEventKind.Mounted) {
+                this.attemptHandShake(e);
+                return;
+            }
+            if (this.iframeId !== e.contentId)
+                return;
+            super.handleEventCore(e);
+        }
+        attemptHandShake(e) {
+            const hash = getHashCode(this.iframeId).toString(10);
+            const response = new CommunicationEvent(exports.CommunicationEventKind.Mounted);
+            // We got a message back so if the data matches the hash we sent send the id
+            if (e.data && e.data === hash) {
+                response.contentId = this.iframeId;
+            }
+            else {
+                response.data = hash;
+            }
+            this.dispatchEvent(response);
+        }
+    }
+
+    var __awaiter$3 = (window && window.__awaiter) || function (thisArg, _arguments, P, generator) {
+        function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+        return new (P || (P = Promise))(function (resolve, reject) {
+            function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+            function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+            function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+            step((generator = generator.apply(thisArg, _arguments || [])).next());
+        });
+    };
+    class CrossWindowChildComponent extends ChildComponent {
+        constructor(window, options, rootFacade) {
+            super(window, options, rootFacade);
+            this.iframeId = '';
+        }
+        defaultInjection() {
+            const iframe = this.getDocument().createElement('iframe');
+            const opt = this.getOptions();
+            if (opt.iframeAttributes) {
+                const keys = Object.keys(opt.iframeAttributes);
+                for (let index = 0; index < keys.length; index++) {
+                    const key = keys[index];
+                    iframe.setAttribute(key, opt.iframeAttributes[key]);
+                }
+            }
+            iframe.setAttribute('src', opt.url);
+            const iframeId = generateUniqueId(this.getDocument(), 'ufe-cross-');
+            this.rootElement.appendChild(iframe);
+            return iframeId;
+        }
+        getCommunicationHandlerCore(methods) {
+            const document = this.getDocument();
+            return new CrossWindowContainerCommunicationHandler((document).defaultView, this.iframeId, getUrlOrigin(document, this.getOptions().url), methods);
+        }
+        mountCore() {
+            const _super = Object.create(null, {
+                mountCore: { get: () => super.mountCore }
+            });
+            return __awaiter$3(this, void 0, void 0, function* () {
+                const injectionFunction = this.getOptions().inject;
+                if (injectionFunction) {
+                    this.iframeId = injectionFunction(this.rootElement);
+                }
+                else {
+                    this.iframeId = this.defaultInjection();
+                }
+                if (!this.iframeId)
+                    throw new Error(`Iframe Id("${this.iframeId}") is not valid.`);
+                yield _super.mountCore.call(this);
+            });
+        }
+        getOptions() {
+            return super.getOptions();
+        }
+    }
+
+    class CrossWindowChildComponentOptions extends ChildComponentOptions {
+        constructor() {
+            super(...arguments);
+            this.url = 'about:blank';
+        }
+    }
+
+    class CrossWindowContentCommunicationHandler extends ContentCommunicationHandler {
+        constructor(endpoint, origin, disposeCommandCallback) {
+            super(CommunicationEvent.CONTAINER_EVENT_TYPE, endpoint, new CrossWindowCommunicationManager(endpoint, origin, CommunicationEvent.CONTAINER_EVENT_TYPE, CommunicationEvent.CONTENT_EVENT_TYPE), disposeCommandCallback);
+            this.iframeId = '';
+            this.messageQueue = [];
+        }
+        disposeCore() {
+            this.messageQueue = [];
+            super.disposeCore();
+        }
+        handleEventCore(e) {
+            if (!this.iframeId) {
+                this.attemptHandShake(e);
+                return;
+            }
+            super.handleEventCore(e);
+        }
+        dispatchEvent(information) {
+            const message = information;
+            if (message) {
+                if (this.iframeId) {
+                    message.contentId = this.iframeId;
+                }
+                else {
+                    if (message.kind !== exports.CommunicationEventKind.Mounted) {
+                        // In case we do not have an iframeId push all events to queue,
+                        // only Mounted are allowed to establish handshake.
+                        this.messageQueue.push(message);
+                        return;
+                    }
+                }
+            }
+            super.dispatchEvent(information);
+        }
+        attemptHandShake(e) {
+            if (e.contentId) {
+                // Phase 2 of the handshake - we got the id.
+                this.iframeId = e.contentId;
+                // Send it again to notify parent.
+                const response = new CommunicationEvent(exports.CommunicationEventKind.Mounted);
+                response.contentId = this.iframeId;
+                this.dispatchEvent(response);
+                // Send the previously queued messages.
+                this.flushMessages();
+            }
+            else {
+                // Phase 1 of the handshake - we got the hash so send it back.
+                const response = new CommunicationEvent(exports.CommunicationEventKind.Mounted);
+                response.contentId = this.iframeId;
+                response.data = e.data;
+                this.dispatchEvent(response);
+            }
+        }
+        flushMessages() {
+            for (let index = 0; index < this.messageQueue.length; index++) {
+                const msg = this.messageQueue[index];
+                msg.contentId = this.iframeId;
+                this.dispatchEvent(msg);
+            }
+        }
+    }
+
+    class InWindowChildComponentOptions extends ChildComponentOptions {
+        constructor() {
+            super();
+        }
     }
 
     class InWindowContentCommunicationHandler extends ContentCommunicationHandler {
@@ -653,6 +861,15 @@
         }
     }
 
+    var __awaiter$4 = (window && window.__awaiter) || function (thisArg, _arguments, P, generator) {
+        function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+        return new (P || (P = Promise))(function (resolve, reject) {
+            function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+            function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+            function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+            step((generator = generator.apply(thisArg, _arguments || [])).next());
+        });
+    };
     class RootComponent extends Component {
         constructor(window, options) {
             super(window, options);
@@ -694,20 +911,15 @@
             return super.mountCore();
         }
         addChild(options) {
-            if (!this.isMounted)
-                throw new Error('Wait for the component to mount before starting to add children.');
-            const child = this.options.childFactory.createComponent(this.getWindow(), options, new RootComponentFacade((child) => this.scheduleDisposeChild(child)));
-            let id;
-            do {
-                id = 'c_' + getRandomString();
-            } while (Object.keys(this.children).indexOf(id) !== -1);
-            this.children[id] = child;
-            this.getWindow().setTimeout(() => {
-                child
-                    .initialize()
-                    .then((t) => t.mount());
-            }, 0);
-            return id;
+            return __awaiter$4(this, void 0, void 0, function* () {
+                if (!this.isMounted)
+                    throw new Error('Wait for the component to mount before starting to add children.');
+                const child = this.options.childFactory.createComponent(this.getWindow(), options, new RootComponentFacade((child) => this.scheduleDisposeChild(child)));
+                const id = (yield child.initialize()).id;
+                this.children[id] = child;
+                this.getWindow().setTimeout(() => { child.mount(); }, 0);
+                return id;
+            });
         }
         removeChild(childId) {
             this.getWindow().setTimeout(() => {
@@ -737,7 +949,12 @@
     exports.ContainerCommunicationHandlerMethods = ContainerCommunicationHandlerMethods;
     exports.ContentCommunicationHandler = ContentCommunicationHandler;
     exports.CrossWindowChildComponent = CrossWindowChildComponent;
+    exports.CrossWindowChildComponentOptions = CrossWindowChildComponentOptions;
+    exports.CrossWindowCommunicationManager = CrossWindowCommunicationManager;
+    exports.CrossWindowContainerCommunicationHandler = CrossWindowContainerCommunicationHandler;
+    exports.CrossWindowContentCommunicationHandler = CrossWindowContentCommunicationHandler;
     exports.InWindowChildComponent = InWindowChildComponent;
+    exports.InWindowChildComponentOptions = InWindowChildComponentOptions;
     exports.InWindowCommunicationManager = InWindowCommunicationManager;
     exports.InWindowContainerCommunicationHandler = InWindowContainerCommunicationHandler;
     exports.InWindowContentCommunicationHandler = InWindowContentCommunicationHandler;
@@ -750,6 +967,7 @@
     exports.getRandomString = getRandomString;
     exports.getUrlFullPath = getUrlFullPath;
     exports.getUrlOrigin = getUrlOrigin;
+    exports.getUuidV4 = getUuidV4;
     exports.loadResource = loadResource;
     exports.noop = noop;
 
