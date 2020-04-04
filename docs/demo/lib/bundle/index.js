@@ -76,7 +76,9 @@
         return a.protocol + "//" + a.hostname + (a.port && ":" + a.port);
     }
 
-    function loadResource(document, url, isScript = true, attributes) {
+    function loadResource(document, url, isScript = true, skipLoading, attributes) {
+        if (skipLoading && skipLoading())
+            return Promise.resolve();
         return new Promise((resolve, reject) => {
             let resource;
             if (isScript) {
@@ -180,9 +182,9 @@
                     const document = this.getDocument();
                     for (let index = 0; index < options.resources.length; index++) {
                         const resource = options.resources[index];
-                        // DO NOT LOAD ALL T ONCE AS YOU MIHGT HAVE DEPENDENCIES
-                        // AND LA RESOURCE MIGHT LOAD BEFORE IT'S DEPENDENCY
-                        yield loadResource(document, resource.url, resource.isScript, resource.attributes);
+                        // DO NOT LOAD ALL AT ONCE AS YOU MIHGT HAVE DEPENDENCIES
+                        // AND A RESOURCE MIGHT LOAD BEFORE IT'S DEPENDENCY
+                        yield loadResource(document, resource.url, resource.isScript, resource.skip, resource.attributes);
                     }
                 }
             });
@@ -417,6 +419,7 @@
                     if (this.disposeCommandCallback) {
                         this.disposeCommandCallback();
                     }
+                    break;
                 default:
                     throw new Error(`The "${e.kind}" event is not configured.`);
             }
@@ -459,16 +462,13 @@
             this.contentDisposePromiseResolver = null;
         }
         getCommunicationHandler() {
-            if (!this.communicationHandler) {
-                const methods = new ContainerCommunicationHandlerMethods();
-                methods.callMounterHandler = () => this.callHandler(exports.ComponentEventType.Mounted);
-                methods.callBeforeUpdateHandler = () => this.callHandler(exports.ComponentEventType.BeforeUpdate);
-                methods.callUpdatedHandler = () => this.callHandler(exports.ComponentEventType.Updated);
-                methods.contentBeginDisposed = () => this.contentBeginDisposed();
-                methods.contentDisposed = () => this.contentDisposed();
-                this.communicationHandler = this.getCommunicationHandlerCore(methods);
-            }
-            return this.communicationHandler;
+            const methods = new ContainerCommunicationHandlerMethods();
+            methods.callMounterHandler = () => this.callHandler(exports.ComponentEventType.Mounted);
+            methods.callBeforeUpdateHandler = () => this.callHandler(exports.ComponentEventType.BeforeUpdate);
+            methods.callUpdatedHandler = () => this.callHandler(exports.ComponentEventType.Updated);
+            methods.contentBeginDisposed = () => this.contentBeginDisposed();
+            methods.contentDisposed = () => this.contentDisposed();
+            return this.getCommunicationHandlerCore(methods);
         }
         getOptions() {
             return super.getOptions();
@@ -485,7 +485,7 @@
                 return; // Dispose has already started.
             this.setContentDisposePromise();
             // This should trigger the child component dispose.
-            this.getCommunicationHandler().requestContentDispose();
+            this.communicationHandler.requestContentDispose();
         }
         setContentDisposePromise() {
             if (this.contentDisposePromise !== null)
@@ -498,7 +498,7 @@
                 new Promise((resolveTimeout, rejectTimeout) => {
                     this
                         .getWindow()
-                        .setTimeout(() => rejectTimeout(), this.getOptions().contentDisposeTimeout);
+                        .setTimeout(() => rejectTimeout(`Child dispose timeout.`), this.getOptions().contentDisposeTimeout);
                 })
             ])
                 .catch((err) => {
@@ -514,6 +514,12 @@
             else {
                 this.contentDisposePromiseResolver();
             }
+        }
+        initializeCore() {
+            if (!this.communicationHandler) {
+                this.communicationHandler = this.getCommunicationHandler();
+            }
+            return super.initializeCore();
         }
         disposeCore() {
             const _super = Object.create(null, {
@@ -621,7 +627,6 @@
             this.type = exports.ChildComponentType.InWindow;
             this.contentDisposeTimeout = 3000;
             this.inject = () => { throw new Error('Inject method not defined!'); };
-            this.skipResourceLoading = () => { return false; };
         }
     }
 
@@ -638,6 +643,7 @@
         constructor() {
             this.url = '';
             this.isScript = true;
+            this.skip = () => { return false; };
         }
     }
 

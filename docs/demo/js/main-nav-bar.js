@@ -45,7 +45,7 @@
   class MainNavBarComponent extends MainNavBar {
     constructor(el) {
       super(el);
-      this.contentAdapter = new ufe.InWindowContentCommunicationHandler(el, () => this.dispose());
+      this.communicationHandler = new ufe.InWindowContentCommunicationHandler(el, () => this.dispose());
 
       this.submitHandler = (e) => {
         e.preventDefault();
@@ -53,9 +53,9 @@
         if (action === 'close') {
           this.dispose();
         } else {
-          this.contentAdapter.dispatchBeforeUpdate();
+          this.communicationHandler.dispatchBeforeUpdate();
           setTimeout(() => {
-            this.contentAdapter.dispatchUpdated();
+            this.communicationHandler.dispatchUpdated();
           }, 1000)
         }
       };
@@ -72,12 +72,12 @@
 
       // Simulate a delay to consider exts processing
       window.setTimeout(() => {
-        this.contentAdapter.dispatchMounted();
+        this.communicationHandler.dispatchMounted();
       }, 1000);
     }
 
     dispose() {
-      this.contentAdapter.dispatchBeforeDispose();
+      this.communicationHandler.dispatchBeforeDispose();
       setTimeout(() => {
         this.disposeCore();
       }, 1000)
@@ -90,9 +90,9 @@
       }
 
       this.submitHandler = null;
-      this.contentAdapter.dispatchDisposed();
-      this.contentAdapter.dispose();
-      this.contentAdapter = null;
+      this.communicationHandler.dispatchDisposed();
+      this.communicationHandler.dispose();
+      this.communicationHandler = null;
       super.dispose();
       console.log('MainNavBarComponent -> finished');
     }

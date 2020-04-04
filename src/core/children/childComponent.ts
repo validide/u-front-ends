@@ -21,16 +21,13 @@ export abstract class ChildComponent extends Component {
   protected abstract getCommunicationHandlerCore(methods: ContainerCommunicationHandlerMethods): ContainerCommunicationHandler;
 
   protected getCommunicationHandler(): ContainerCommunicationHandler {
-    if (!this.communicationHandler) {
-      const methods = new ContainerCommunicationHandlerMethods();
-      methods.callMounterHandler = () => this.callHandler(ComponentEventType.Mounted);
-      methods.callBeforeUpdateHandler = () => this.callHandler(ComponentEventType.BeforeUpdate);
-      methods.callUpdatedHandler = () => this.callHandler(ComponentEventType.Updated);
-      methods.contentBeginDisposed = () => this.contentBeginDisposed();
-      methods.contentDisposed = () => this.contentDisposed();
-      this.communicationHandler = this.getCommunicationHandlerCore(methods);
-    }
-    return this.communicationHandler;
+    const methods = new ContainerCommunicationHandlerMethods();
+    methods.callMounterHandler = () => this.callHandler(ComponentEventType.Mounted);
+    methods.callBeforeUpdateHandler = () => this.callHandler(ComponentEventType.BeforeUpdate);
+    methods.callUpdatedHandler = () => this.callHandler(ComponentEventType.Updated);
+    methods.contentBeginDisposed = () => this.contentBeginDisposed();
+    methods.contentDisposed = () => this.contentDisposed();
+    return this.getCommunicationHandlerCore(methods);
   }
 
   protected getOptions(): ChildComponentOptions {
@@ -53,7 +50,7 @@ export abstract class ChildComponent extends Component {
     this.setContentDisposePromise();
 
     // This should trigger the child component dispose.
-    this.getCommunicationHandler().requestContentDispose();
+    (<ContainerCommunicationHandler>this.communicationHandler).requestContentDispose();
   }
 
   private setContentDisposePromise(): void {
@@ -69,7 +66,7 @@ export abstract class ChildComponent extends Component {
           this
             .getWindow()
             .setTimeout(
-              () => rejectTimeout(),
+              () => rejectTimeout(`Child dispose timeout.`),
               this.getOptions().contentDisposeTimeout
             );
         })
@@ -87,6 +84,13 @@ export abstract class ChildComponent extends Component {
     } else {
       this.contentDisposePromiseResolver();
     }
+  }
+
+  protected initializeCore(): Promise<void> {
+    if (!this.communicationHandler) {
+      this.communicationHandler = this.getCommunicationHandler();
+    }
+    return super.initializeCore();
   }
 
   protected async disposeCore(): Promise<void> {

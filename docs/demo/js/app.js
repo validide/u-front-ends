@@ -111,16 +111,44 @@
   mainNavBar.inject = function (el) {
     new app.inWindow['MainNavBarComponent'](el);
   }
-  mainNavBar.skipResourceLoading = function () {
-    return !!app.inWindow['MainNavBarComponent'];
-  }
   var mainNavBarScript = new ufe.ResourceConfiguration();
   mainNavBarScript.url = './js/main-nav-bar.js';
   mainNavBarScript.isScript = true;
+  mainNavBarScript.skip = function () {
+    return !!app.inWindow['MainNavBarComponent'];
+  };
   mainNavBar.resources.push(mainNavBarScript);
 
 
+  var mainNavBarCustomEl = new ufe.ChildComponentOptions();
+  mainNavBarCustomEl.handlers = Object.assign({}, globalHandlers, {
+    'created': function (e) {
+      e.el.parentElement.insertBefore(e.el, e.el.parentElement.firstChild);
+
+      globalHandlers['created'](e);
+    },
+    'destroyed': function(e) {
+      navbarCeId = '';
+      globalHandlers['destroyed'](e);
+    }
+  });
+  mainNavBarCustomEl.inject = function (el) {
+    var ce = app.inWindow['MainNavBarComponentCE'];
+    if (!window.customElements.get('main-nav-bar')) {
+      window.customElements.define('main-nav-bar', ce);
+    }
+  }
+  mainNavBarCustomEl.tag = 'main-nav-bar';
+  var mainNavBarCustomElScript = new ufe.ResourceConfiguration();
+  mainNavBarCustomElScript.url = './js/ce-main-nav-bar.js';
+  mainNavBarCustomElScript.isScript = true;
+  mainNavBarCustomElScript.skip = function () {
+    return !!window.customElements.get('main-nav-bar');
+  }
+  mainNavBarCustomEl.resources.push(mainNavBarCustomElScript);
+
   var navbarId = '';
+  var navbarCeId = '';
   var clickHandlers = {
     'addNavBar': function (e) {
       if (navbarId)
@@ -135,7 +163,19 @@
       mfe.removeChild(navbarId);
       navbarId = '';
     },
+    'addNavBarCe': function (e) {
+      if (navbarCeId)
+        return;
 
+      navbarCeId = mfe.addChild(mainNavBarCustomEl);
+    },
+    'removeNavBarCe': function (e) {
+      if (!navbarCeId)
+        return;
+
+      mfe.removeChild(navbarCeId);
+      navbarCeId = '';
+    },
   }
 
   function ready(fn) {
@@ -171,6 +211,7 @@
       .then(function (root) { return root.mount(); })
       .then(function (root) {
         navbarId = root.addChild(mainNavBar);
+        navbarCeId = root.addChild(mainNavBarCustomEl);
 
         document.getElementById('content').classList.remove('d-none');
       });

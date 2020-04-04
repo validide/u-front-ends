@@ -17,12 +17,13 @@ export abstract class ContentCommunicationHandler extends CommunicationHandler {
   }
 
   protected handleEventCore(e: CommunicationEvent): void {
-    switch(e.kind){
+    switch (e.kind) {
       case CommunicationEventKind.BeforeDispose:
       case CommunicationEventKind.Disposed:
         if (this.disposeCommandCallback) {
           this.disposeCommandCallback();
         }
+        break;
       default:
         throw new Error(`The "${e.kind}" event is not configured.`);
     }
@@ -32,7 +33,7 @@ export abstract class ContentCommunicationHandler extends CommunicationHandler {
     this.dispatchEvent(new CommunicationEvent(CommunicationEventKind.Mounted));
   }
 
-  public dispatchBeforeUpdate (): void {
+  public dispatchBeforeUpdate(): void {
     this.dispatchEvent(new CommunicationEvent(CommunicationEventKind.BeforeUpdate));
   }
 

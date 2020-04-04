@@ -69,9 +69,9 @@ export abstract class Component {
       const document = this.getDocument();
       for (let index = 0; index < options.resources.length; index++) {
         const resource = options.resources[index];
-        // DO NOT LOAD ALL T ONCE AS YOU MIHGT HAVE DEPENDENCIES
-        // AND LA RESOURCE MIGHT LOAD BEFORE IT'S DEPENDENCY
-        await loadResource(document, resource.url, resource.isScript, resource.attributes);
+        // DO NOT LOAD ALL AT ONCE AS YOU MIHGT HAVE DEPENDENCIES
+        // AND A RESOURCE MIGHT LOAD BEFORE IT'S DEPENDENCY
+        await loadResource(document, resource.url, resource.isScript, resource.skip, resource.attributes);
       }
     }
   }

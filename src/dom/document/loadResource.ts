@@ -2,8 +2,12 @@ export function loadResource(
   document: Document,
   url: string,
   isScript: boolean = true,
+  skipLoading?: () => boolean,
   attributes?: { [key: string]: string; }
 ): Promise<void> {
+  if (skipLoading && skipLoading())
+    return Promise.resolve();
+
   return new Promise<void>((resolve, reject) => {
     let resource: HTMLScriptElement | HTMLLinkElement;
 

@@ -1,7 +1,7 @@
 (function (window, app, ufe, undefined) {
   'use strict';
 
-  var navContent = `<nav class="navbar navbar-expand-lg navbar-light bg-light">
+  var navContent = `<nav class="navbar navbar-expand-lg navbar-light navbar-dark bg-dark">
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarTogglerDemo01" aria-controls="navbarTogglerDemo01" aria-expanded="false" aria-label="Toggle navigation">
     <span class="navbar-toggler-icon"></span>
   </button>
@@ -34,7 +34,9 @@
     }
 
     connectedCallback() {
-      this.init();
+      if (this.isConnected) {
+        this.init();
+      }
     }
 
     init() {
@@ -42,15 +44,32 @@
         return;
 
       this.initialized = true;
+      this.initCore();
+    }
+
+    initCore() {
+      this.classList.add('d-block');
       this.innerHTML = navContent;
     }
 
 
 
     disconnectedCallback() {
-      this.innerHTML = '';
+      this.dispose()
     }
 
+    dispose() {
+      if (!this.initialized)
+        return;
+
+      this.initialized = false;
+      this.disposeCore();
+    }
+
+    disposeCore() {
+      this.innerHTML = '';
+      this.classList.remove('d-block');
+    }
   }
 
 
@@ -59,28 +78,28 @@
     constructor() {
       super();
       this.el = null;
-      this.componentBridge = null;
+      this.communicationHandler = null;
       this.submitHandler = null;
     }
 
-    init() {
-      super.init();
+
+
+
+
+    initCore() {
+      super.initCore();
 
       this.el = this.firstElementChild;
-      this.componentBridge = new CustomElementContentBridge(this.el, (e) => {
-        // Check event data if it's actually a dipose command.
-        // Move this to the CustomElementContentBridge
-        this.dispose();
-      });
+      this.communicationHandler = new ufe.InWindowContentCommunicationHandler(this, () => this.dispose());
       this.submitHandler = (e) => {
         e.preventDefault();
         var action = e.currentTarget.getAttribute('data-demo-action');
         if (action === 'close') {
           this.dispose();
         } else {
-          this.componentBridge.dispatchBeforeUpdate();
+          this.communicationHandler.dispatchBeforeUpdate();
           setTimeout(() => {
-            this.componentBridge.dispatchUpdated();
+            this.communicationHandler.dispatchUpdated();
           }, 1000)
         }
       };
@@ -97,32 +116,54 @@
 
       // Simulate a delay to consider exts processing
       window.setTimeout(() => {
-        this.componentBridge.dispatchMounted();
+        this.communicationHandler.dispatchMounted();
       }, 1000);
     }
 
-    dispose() {
-      this.componentBridge.dispatchBeforeDispose();
+    disposeCore() {
+      this.communicationHandler.dispatchBeforeDispose();
       setTimeout(() => {
-        this.disposeCore();
+        this.disposeCustomElement();
       }, 1000)
     }
 
-    disposeCore() {
+    disposeCustomElement() {
       var els = this.el.querySelectorAll('[data-demo-action]');
       for (var index = 0; index < els.length; index++) {
         els[index].removeEventListener('click', this.submitHandler);
       }
 
       this.submitHandler = null;
-      this.componentBridge.dispose();
-      this.componentBridge.dispatchDisposed();
-      this.componentBridge = null;
+      this.communicationHandler.dispatchDisposed();
+      this.communicationHandler.dispose();
+      this.communicationHandler = null;
       this.el = null;
-      super.dispose();
-      console.log('MainNavBarComponent -> finished');
+      super.disposeCore();
+      console.log('MainNavBarComponent CE -> finished');
+    }
+
+    connectedCallback() {
+      // We are moving the element after creating it so we need to:
+      // - delay the conect actions a bit
+      // - execute the actions only if we are connected
+
+      window.setTimeout(()=> {
+        super.connectedCallback();
+      }, 5);
+    }
+
+    disconnectedCallback() {
+
+      // We are moving the element after creating it so we need to:
+      // - delay the disconect actions a bit
+      // - execute the actions only if we were not re-connected
+      window.setTimeout(() => {
+        if (!this.isConnected) {
+          super.disconnectedCallback()
+        }
+      }, 5)
     }
   }
 
-  app.jsComponents['MainNavBarComponent'] = MainNavBarComponent;
+  app.inWindow['MainNavBarComponentCE'] = MainNavBarComponent;
 })(window, window.app, window.validide_uFrontEnds, void 0);

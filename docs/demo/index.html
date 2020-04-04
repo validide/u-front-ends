@@ -13,7 +13,7 @@
 
 <body>
   <div class="container d-none mt-2" id="content">
-    <div class="alert alert-warning alert-dismissible fade show m-1" role="alert">
+    <div class="alert alert-danger alert-dismissible fade show m-1" role="alert" id="old-browser">
       The demo requires ES6 features to work (ES classes, lambda functions, template strings) for simplicity reason.
       <button type="button" class="close" data-dismiss="alert" aria-label="Close">
         <span aria-hidden="true">&times;</span>
@@ -24,8 +24,38 @@
         <a class="btn btn-outline-primary" href="#" role="button" data-demo-action="removeNavBar">Remove navigation bar</a>
         <a class="btn btn-outline-primary" href="#" role="button" data-demo-action="addNavBar">Add bar</a>
       </div>
+      <div class="col-12 text-center">
+        <a class="btn btn-outline-primary" href="#" role="button" data-demo-action="removeNavBarCe">Remove navigation bar CE</a>
+        <a class="btn btn-outline-primary" href="#" role="button" data-demo-action="addNavBarCe">Add bar CE</a>
+      </div>
     </div>
   </div>
+  <script>
+    (function() {
+      var modernBrowser = true;
+      var handleBrowser = function() {
+        if (modernBrowser){
+          var alertEl = window.document.getElementById('old-browser');
+          if (alertEl) {
+            alertEl.parentElement.removeChild(alertEl);
+          }
+        }
+      }
+      try {
+        let a = true;
+        eval('"use strict"; class foo {}');
+        const func = () => {
+          console.log(`Q: Modern browser?\nA:${modernBrowser ? '😀' : 'NO'}`);
+          handleBrowser();
+        };
+        func();
+      } catch (e) {
+        modernBrowser = false;
+        console.log(e);
+        handleBrowser();
+      }
+    })();
+  </script>
   <script src="./lib/bundle/index.js"></script>
   <script src="./js/app.js"></script>
 </body>

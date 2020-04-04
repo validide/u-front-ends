@@ -58,7 +58,7 @@ export function test_loadResource() {
     it('should reject if load fails', async () => {
       const url = 'http://test.com/404.js';
       try {
-        const prom = loadResource(_win.document, url, true, undefined);
+        const prom = loadResource(_win.document, url, true, undefined, undefined);
         expect(_win.document.querySelectorAll(`script[src="${url}"]`).length).to.eq(1);
         await prom;
       }
@@ -77,12 +77,20 @@ export function test_loadResource() {
 
     it('should load css', async () => {
       const url = 'http://test.com/test.css';
-      const prom = loadResource(_win.document, url, false, {
+      const prom = loadResource(_win.document, url, false, undefined, {
         'rel': 'stylesheet'
       });
       expect(_win.document.querySelectorAll(`link[href="${url}"]`).length).to.eq(1);
       await prom;
       expect(_win.document.defaultView?.getComputedStyle(_win.document.body).color || 'null').to.eq('red');
+    })
+
+    it('should skip loading', async () => {
+      const url = 'http://test.com/test.js';
+      const prom = loadResource(_win.document, url, true, () => true, undefined);
+      expect(_win.document.querySelectorAll(`script[src="${url}"]`).length).to.eq(0);
+      await prom;
+      expect(_win.document.getElementById(`testId`)).to.be.null;
     })
 
   })
