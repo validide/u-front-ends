@@ -2,7 +2,7 @@ import { RootComponentFacade } from '../rootComponentFacade';
 import { ChildComponent } from './childComponent';
 import { ChildComponentOptions } from './childComponentOptions';
 import { ChildComponentType } from './childComponentType';
-import { InWindowChildComponent } from './inWindow';
+import { InWindowChildComponent } from './inWindow/inWindowChildComponent';
 
 export class ChildComponentFactory {
   public createComponent(window: Window, options: ChildComponentOptions, rootFacade: RootComponentFacade): ChildComponent {

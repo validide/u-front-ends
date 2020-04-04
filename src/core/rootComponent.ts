@@ -3,7 +3,7 @@ import { RootComponentFacade } from './rootComponentFacade';
 import { getRandomString } from '../utilities/index';
 import { Component } from './component';
 import { ComponentEventType } from './componentEvent';
-import { ChildComponent, ChildComponentFactory, ChildComponentOptions } from './children/index';
+import { ChildComponent, ChildComponentOptions } from './children/index';
 
 export class RootComponent extends Component {
   private children: { [id: string]: ChildComponent | null };
@@ -59,8 +59,7 @@ export class RootComponent extends Component {
     if (!this.isMounted)
       throw new Error('Wait for the component to mount before starting to add children.');
 
-    const factory = new ChildComponentFactory();
-    const child = factory.createComponent(
+    const child = (<RootComponentOptions>this.options).childFactory.createComponent(
       this.getWindow(),
       options,
       new RootComponentFacade((child) => this.scheduleDisposeChild(child))

@@ -43,19 +43,19 @@
   }
 
   class MainNavBarComponent extends MainNavBar {
-    constructor(el, componentBridge) {
+    constructor(el) {
       super(el);
-      this.componentBridge = componentBridge;
-      this.componentBridge.setDisposeCommandListener(() => this.dispose());
+      this.contentAdapter = new ufe.InWindowContentCommunicationHandler(el, () => this.dispose());
+
       this.submitHandler = (e) => {
         e.preventDefault();
         var action = e.currentTarget.getAttribute('data-demo-action');
         if (action === 'close') {
           this.dispose();
         } else {
-          this.componentBridge.dispatchBeforeUpdate();
+          this.contentAdapter.dispatchBeforeUpdate();
           setTimeout(() => {
-            this.componentBridge.dispatchUpdated();
+            this.contentAdapter.dispatchUpdated();
           }, 1000)
         }
       };
@@ -72,12 +72,12 @@
 
       // Simulate a delay to consider exts processing
       window.setTimeout(() => {
-        this.componentBridge.dispatchMounted();
+        this.contentAdapter.dispatchMounted();
       }, 1000);
     }
 
     dispose() {
-      this.componentBridge.dispatchBeforeDispose();
+      this.contentAdapter.dispatchBeforeDispose();
       setTimeout(() => {
         this.disposeCore();
       }, 1000)
@@ -90,12 +90,13 @@
       }
 
       this.submitHandler = null;
-      this.componentBridge.dispatchDisposed();
-      this.componentBridge = null;
+      this.contentAdapter.dispatchDisposed();
+      this.contentAdapter.dispose();
+      this.contentAdapter = null;
       super.dispose();
       console.log('MainNavBarComponent -> finished');
     }
   }
 
-  app.jsComponents['MainNavBarComponent'] = MainNavBarComponent;
+  app.inWindow['MainNavBarComponent'] = MainNavBarComponent;
 })(window, window.app, window.validide_uFrontEnds, void 0);

@@ -1,16 +1,16 @@
 import { ChildComponent } from '../childComponent';
 import { RootComponentFacade } from '../../rootComponentFacade';
 import { ChildComponentOptions } from '../childComponentOptions';
-import { WrapperAdapter, WrapperAdapterMethods } from '../../wrapperAdapter';
-import { InWindowWrapperAdapter } from './inWindowWrapperAdapter';
+import { ContainerCommunicationHandlerMethods, ContainerCommunicationHandler } from '../communications/index';
+import { InWindowContainerCommunicationHandler } from './inWindowContainerCommunicationHandler';
 
 export class InWindowChildComponent extends ChildComponent {
   constructor(window: Window, options: ChildComponentOptions, rootFacade: RootComponentFacade) {
     super(window, options, rootFacade);
   }
 
-  protected getWrapperAdapterCore(methods: WrapperAdapterMethods): WrapperAdapter {
-    return new InWindowWrapperAdapter(<HTMLElement>this.rootElement, methods);
+  protected getCommunicationHandlerCore(methods: ContainerCommunicationHandlerMethods): ContainerCommunicationHandler {
+    return new InWindowContainerCommunicationHandler(<HTMLElement>this.rootElement, methods);
   }
 
   protected async mountCore(): Promise<void> {

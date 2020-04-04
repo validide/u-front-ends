@@ -4,22 +4,6 @@
     (global = global || self, factory(global.validide_uFrontEnds = {}));
 }(this, (function (exports) { 'use strict';
 
-    function noop() { }
-
-    class ChildContentBridge {
-        constructor(dispatchMounted, dispatchBeforeUpdate, dispatchUpdated, dispatchBeforeDispose, dispatchDisposed) {
-            this.dispatchMounted = dispatchMounted;
-            this.dispatchBeforeUpdate = dispatchBeforeUpdate;
-            this.dispatchUpdated = dispatchUpdated;
-            this.dispatchBeforeDispose = dispatchBeforeDispose;
-            this.dispatchDisposed = dispatchDisposed;
-            this.disposeCommandListener = noop;
-        }
-        setDisposeCommandListener(handler) {
-            this.disposeCommandListener = handler;
-        }
-    }
-
     /**
      * Get a hash code for the given string
      * @returns The has code
@@ -45,6 +29,8 @@
      * @returns A random generated string
      */
     function getRandomString() { return Math.random().toString(36).substring(2); }
+
+    function noop() { }
 
     /**
      * Generate a random id that is not present in the document at this time
@@ -311,6 +297,150 @@
         }
     }
 
+    (function (CommunicationEventKind) {
+        CommunicationEventKind["Mounted"] = "mounted";
+        CommunicationEventKind["BeforeUpdate"] = "beforeUpdate";
+        CommunicationEventKind["Updated"] = "updated";
+        CommunicationEventKind["BeforeDispose"] = "beforeDispose";
+        CommunicationEventKind["Disposed"] = "disposed";
+    })(exports.CommunicationEventKind || (exports.CommunicationEventKind = {}));
+    class CommunicationEvent {
+        constructor(kind) {
+            this.kind = kind;
+        }
+    }
+    CommunicationEvent.CONTENT_EVENT_TYPE = 'content_event.communication.children.validide_micro_front_ends';
+    CommunicationEvent.CONTAINER_EVENT_TYPE = 'container_event.communication.children.validide_micro_front_ends';
+
+    class CommunicationHandler {
+        constructor(inboundType, endpoint, manager) {
+            this.inboundType = inboundType;
+            this.endpoint = endpoint;
+            this.manager = manager;
+            this.handlerAction = this.handleEvent.bind(this);
+            this.disposed = false;
+            this.attachCommandHandler();
+        }
+        handleEvent(e) {
+            if (!this.manager)
+                return;
+            const evt = this.manager.readEvent(e);
+            if (!evt)
+                return;
+            this.handleEventCore(evt);
+        }
+        attachCommandHandler() {
+            if (!this.endpoint || !this.handlerAction)
+                return;
+            this.endpoint.addEventListener(this.inboundType, this.handlerAction);
+        }
+        detachCommandHandler() {
+            if (!this.endpoint || !this.handlerAction)
+                return;
+            this.endpoint.removeEventListener(this.inboundType, this.handlerAction);
+        }
+        dispatchEvent(information) {
+            if (!this.manager)
+                return;
+            this.manager.dispatchEvent(information);
+        }
+        dispose() {
+            if (this.disposed)
+                return;
+            this.disposed = true;
+            if (this.handlerAction) {
+                this.detachCommandHandler();
+            }
+            this.handlerAction = null;
+            if (this.manager) {
+                this.manager.dispose();
+            }
+            this.manager = null;
+            this.disposeCore();
+        }
+    }
+
+    class ContainerCommunicationHandlerMethods {
+        constructor() {
+            this.callMounterHandler = noop;
+            this.callBeforeUpdateHandler = noop;
+            this.callUpdatedHandler = noop;
+            this.contentBeginDisposed = noop;
+            this.contentDisposed = noop;
+        }
+    }
+    class ContainerCommunicationHandler extends CommunicationHandler {
+        constructor(type, endpoint, manager, wrapperMethods) {
+            super(type, endpoint, manager);
+            this.wrapperMethods = wrapperMethods;
+        }
+        handleEventCore(e) {
+            if (!this.wrapperMethods)
+                return;
+            switch (e.kind) {
+                case exports.CommunicationEventKind.Mounted:
+                    this.wrapperMethods.callMounterHandler();
+                    break;
+                case exports.CommunicationEventKind.BeforeUpdate:
+                    this.wrapperMethods.callBeforeUpdateHandler();
+                    break;
+                case exports.CommunicationEventKind.Updated:
+                    this.wrapperMethods.callUpdatedHandler();
+                    break;
+                case exports.CommunicationEventKind.BeforeDispose:
+                    this.wrapperMethods.contentBeginDisposed();
+                    break;
+                case exports.CommunicationEventKind.Disposed:
+                    this.wrapperMethods.contentDisposed();
+                    break;
+                default:
+                    throw new Error(`The "${e.kind}" event is not configured.`);
+            }
+        }
+        disposeCore() {
+            this.wrapperMethods = null;
+        }
+        requestContentDispose() {
+            this.dispatchEvent(new CommunicationEvent(exports.CommunicationEventKind.BeforeDispose));
+        }
+    }
+
+    class ContentCommunicationHandler extends CommunicationHandler {
+        constructor(type, endpoint, manager, disposeCommandCallback) {
+            super(type, endpoint, manager);
+            this.disposeCommandCallback = disposeCommandCallback;
+        }
+        handleEventCore(e) {
+            switch (e.kind) {
+                case exports.CommunicationEventKind.BeforeDispose:
+                case exports.CommunicationEventKind.Disposed:
+                    if (this.disposeCommandCallback) {
+                        this.disposeCommandCallback();
+                    }
+                default:
+                    throw new Error(`The "${e.kind}" event is not configured.`);
+            }
+        }
+        dispatchMounted() {
+            this.dispatchEvent(new CommunicationEvent(exports.CommunicationEventKind.Mounted));
+        }
+        dispatchBeforeUpdate() {
+            this.dispatchEvent(new CommunicationEvent(exports.CommunicationEventKind.BeforeUpdate));
+        }
+        dispatchUpdated() {
+            this.dispatchEvent(new CommunicationEvent(exports.CommunicationEventKind.Updated));
+        }
+        dispatchBeforeDispose() {
+            this.dispatchEvent(new CommunicationEvent(exports.CommunicationEventKind.BeforeDispose));
+        }
+        dispatchDisposed() {
+            this.dispatchEvent(new CommunicationEvent(exports.CommunicationEventKind.Disposed));
+        }
+        disposeCore() {
+            this.disposeCommandCallback = null;
+        }
+    }
+
     var __awaiter$1 = (window && window.__awaiter) || function (thisArg, _arguments, P, generator) {
         function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
         return new (P || (P = Promise))(function (resolve, reject) {
@@ -324,15 +454,21 @@
         constructor(window, options, rootFacade) {
             super(window, options);
             this.rootFacade = rootFacade;
-            this.childContentBridge = null;
+            this.communicationHandler = null;
             this.contentDisposePromise = null;
             this.contentDisposePromiseResolver = null;
         }
-        getChildContentBridge() {
-            if (!this.childContentBridge) {
-                this.childContentBridge = new ChildContentBridge(() => this.callHandler(exports.ComponentEventType.Mounted), () => this.callHandler(exports.ComponentEventType.BeforeUpdate), () => this.callHandler(exports.ComponentEventType.Updated), () => this.contentBeginDisposed(), () => this.contentDisposed());
+        getCommunicationHandler() {
+            if (!this.communicationHandler) {
+                const methods = new ContainerCommunicationHandlerMethods();
+                methods.callMounterHandler = () => this.callHandler(exports.ComponentEventType.Mounted);
+                methods.callBeforeUpdateHandler = () => this.callHandler(exports.ComponentEventType.BeforeUpdate);
+                methods.callUpdatedHandler = () => this.callHandler(exports.ComponentEventType.Updated);
+                methods.contentBeginDisposed = () => this.contentBeginDisposed();
+                methods.contentDisposed = () => this.contentDisposed();
+                this.communicationHandler = this.getCommunicationHandlerCore(methods);
             }
-            return this.childContentBridge;
+            return this.communicationHandler;
         }
         getOptions() {
             return super.getOptions();
@@ -349,7 +485,7 @@
                 return; // Dispose has already started.
             this.setContentDisposePromise();
             // This should trigger the child component dispose.
-            this.getChildContentBridge().disposeCommandListener();
+            this.getCommunicationHandler().requestContentDispose();
         }
         setContentDisposePromise() {
             if (this.contentDisposePromise !== null)
@@ -386,7 +522,10 @@
             return __awaiter$1(this, void 0, void 0, function* () {
                 this.startDisposingContent();
                 yield this.contentDisposePromise;
-                this.childContentBridge = null;
+                if (this.communicationHandler) {
+                    this.communicationHandler.dispose();
+                    this.communicationHandler = null;
+                }
                 this.contentDisposePromiseResolver = null;
                 this.contentDisposePromise = null;
                 yield _super.disposeCore.call(this);
@@ -395,10 +534,36 @@
     }
 
     (function (ChildComponentType) {
-        ChildComponentType["Script"] = "script";
-        ChildComponentType["Iframe"] = "iframe";
-        ChildComponentType["CustomElement"] = "customElement";
+        ChildComponentType["InWindow"] = "inWindow";
+        ChildComponentType["CrossWindow"] = "crossWindow";
     })(exports.ChildComponentType || (exports.ChildComponentType = {}));
+
+    class InWindowCommunicationManager {
+        constructor(el, inboundEventType, outboundEventType) {
+            this.el = el;
+            this.inboundEventType = inboundEventType;
+            this.outboundEventType = outboundEventType;
+        }
+        readEvent(e) {
+            if (!e || e.type !== this.inboundEventType)
+                return null;
+            return e.detail;
+        }
+        dispatchEvent(detail) {
+            if (!this.el)
+                return;
+            this.el.dispatchEvent(new CustomEvent(this.outboundEventType, { detail: detail }));
+        }
+        dispose() {
+            this.el = null;
+        }
+    }
+
+    class InWindowContainerCommunicationHandler extends ContainerCommunicationHandler {
+        constructor(el, wrapperMethods) {
+            super(CommunicationEvent.CONTENT_EVENT_TYPE, el, new InWindowCommunicationManager(el, CommunicationEvent.CONTENT_EVENT_TYPE, CommunicationEvent.CONTAINER_EVENT_TYPE), wrapperMethods);
+        }
+    }
 
     var __awaiter$2 = (window && window.__awaiter) || function (thisArg, _arguments, P, generator) {
         function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -409,19 +574,32 @@
             step((generator = generator.apply(thisArg, _arguments || [])).next());
         });
     };
-    class ScriptChildComponent extends ChildComponent {
+    class InWindowChildComponent extends ChildComponent {
         constructor(window, options, rootFacade) {
             super(window, options, rootFacade);
+        }
+        getCommunicationHandlerCore(methods) {
+            return new InWindowContainerCommunicationHandler(this.rootElement, methods);
         }
         mountCore() {
             const _super = Object.create(null, {
                 mountCore: { get: () => super.mountCore }
             });
             return __awaiter$2(this, void 0, void 0, function* () {
-                const options = this.getOptions();
-                options.inject(this.rootElement, this.getChildContentBridge());
+                this.getOptions().inject(this.rootElement);
                 yield _super.mountCore.call(this);
             });
+        }
+    }
+
+    class ChildComponentFactory {
+        createComponent(window, options, rootFacade) {
+            switch (options.type) {
+                case exports.ChildComponentType.InWindow:
+                    return new InWindowChildComponent(window, options, rootFacade);
+                default:
+                    throw new Error(`The "${options.type}" is not configured.`);
+            }
         }
     }
 
@@ -440,34 +618,21 @@
     class ChildComponentOptions extends ComponentOptions {
         constructor() {
             super();
-            this.type = exports.ChildComponentType.Script;
+            this.type = exports.ChildComponentType.InWindow;
             this.contentDisposeTimeout = 3000;
-        }
-    }
-
-    class ScriptChildComponentOptions extends ChildComponentOptions {
-        constructor() {
-            super();
             this.inject = () => { throw new Error('Inject method not defined!'); };
             this.skipResourceLoading = () => { return false; };
-            this.type = exports.ChildComponentType.Script;
         }
     }
 
-    class ChildComponentFactory {
-        createComponent(window, options, rootFacade) {
-            switch (options.type) {
-                case exports.ChildComponentType.Script:
-                    return new ScriptChildComponent(window, options, rootFacade);
-                default:
-                    throw new Error(`The "${options.type}" is not configured.`);
-            }
-        }
+    class CrossWindowChildComponent {
     }
 
-    const CE = 'CE';
-
-    const I = 'I';
+    class InWindowContentCommunicationHandler extends ContentCommunicationHandler {
+        constructor(el, disposeCommandCallback) {
+            super(CommunicationEvent.CONTAINER_EVENT_TYPE, el, new InWindowCommunicationManager(el, CommunicationEvent.CONTAINER_EVENT_TYPE, CommunicationEvent.CONTENT_EVENT_TYPE), disposeCommandCallback);
+        }
+    }
 
     class ResourceConfiguration {
         constructor() {
@@ -525,8 +690,7 @@
         addChild(options) {
             if (!this.isMounted)
                 throw new Error('Wait for the component to mount before starting to add children.');
-            const factory = new ChildComponentFactory();
-            const child = factory.createComponent(this.getWindow(), options, new RootComponentFacade((child) => this.scheduleDisposeChild(child)));
+            const child = this.options.childFactory.createComponent(this.getWindow(), options, new RootComponentFacade((child) => this.scheduleDisposeChild(child)));
             let id;
             do {
                 id = 'c_' + getRandomString();
@@ -550,25 +714,31 @@
         constructor() {
             super();
             this.tag = 'script';
+            this.childFactory = new ChildComponentFactory();
         }
     }
 
-    exports.CE = CE;
     exports.ChildComponent = ChildComponent;
     exports.ChildComponentFactory = ChildComponentFactory;
     exports.ChildComponentOptions = ChildComponentOptions;
-    exports.ChildContentBridge = ChildContentBridge;
+    exports.CommunicationEvent = CommunicationEvent;
+    exports.CommunicationHandler = CommunicationHandler;
     exports.Component = Component;
     exports.ComponentEvent = ComponentEvent;
     exports.ComponentEventHandlers = ComponentEventHandlers;
     exports.ComponentOptions = ComponentOptions;
-    exports.I = I;
+    exports.ContainerCommunicationHandler = ContainerCommunicationHandler;
+    exports.ContainerCommunicationHandlerMethods = ContainerCommunicationHandlerMethods;
+    exports.ContentCommunicationHandler = ContentCommunicationHandler;
+    exports.CrossWindowChildComponent = CrossWindowChildComponent;
+    exports.InWindowChildComponent = InWindowChildComponent;
+    exports.InWindowCommunicationManager = InWindowCommunicationManager;
+    exports.InWindowContainerCommunicationHandler = InWindowContainerCommunicationHandler;
+    exports.InWindowContentCommunicationHandler = InWindowContentCommunicationHandler;
     exports.ResourceConfiguration = ResourceConfiguration;
     exports.RootComponent = RootComponent;
     exports.RootComponentFacade = RootComponentFacade;
     exports.RootComponentOptions = RootComponentOptions;
-    exports.ScriptChildComponent = ScriptChildComponent;
-    exports.ScriptChildComponentOptions = ScriptChildComponentOptions;
     exports.generateUniqueId = generateUniqueId;
     exports.getHashCode = getHashCode;
     exports.getRandomString = getRandomString;

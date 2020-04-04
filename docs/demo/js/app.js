@@ -96,7 +96,7 @@
 
   var mfe = new ufe.RootComponent(window, configuration);
 
-  var mainNavBar = new ufe.ScriptChildComponentOptions();
+  var mainNavBar = new ufe.ChildComponentOptions();
   mainNavBar.handlers = Object.assign({}, globalHandlers, {
     'created': function (e) {
       e.el.parentElement.insertBefore(e.el, e.el.parentElement.firstChild);
@@ -108,11 +108,11 @@
       globalHandlers['destroyed'](e);
     }
   });
-  mainNavBar.inject = function (el, bridge) {
-    new app.jsComponents['MainNavBarComponent'](el, bridge);
+  mainNavBar.inject = function (el) {
+    new app.inWindow['MainNavBarComponent'](el);
   }
   mainNavBar.skipResourceLoading = function () {
-    return !!app.jsComponents['MainNavBarComponent'];
+    return !!app.inWindow['MainNavBarComponent'];
   }
   var mainNavBarScript = new ufe.ResourceConfiguration();
   mainNavBarScript.url = './js/main-nav-bar.js';
@@ -179,7 +179,7 @@
   window.app = {
     ready: ready,
     init: init,
-    jsComponents: {},
+    inWindow: {},
   };
 })(window, window.validide_uFrontEnds, void 0);
 

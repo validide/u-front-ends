@@ -1,5 +1,3 @@
-export * from './adapterEvent';
-export * from './baseAdapter';
 export * from './children/index';
 export * from './component';
 export * from './componentEvent';

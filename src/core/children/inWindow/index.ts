@@ -1,4 +1,4 @@
-export * from './inWindowAdapter';
 export * from './inWindowChildComponent';
-export * from './inWindowEventFacade';
-export * from './inWindowWrapperAdapter';
+export * from './inWindowCommunicationManager';
+export * from './inWindowContainerCommunicationHandler';
+export * from './inWindowContentComunicationHandler';

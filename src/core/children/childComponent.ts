@@ -1,36 +1,36 @@
 import { ChildComponentOptions } from './childComponentOptions';
-import { WrapperAdapter, WrapperAdapterMethods } from '../wrapperAdapter';
 import { Component } from '../component';
 import { RootComponentFacade } from '../rootComponentFacade';
 import { ComponentEventType } from '../componentEvent';
+import { ContainerCommunicationHandler, ContainerCommunicationHandlerMethods } from './communications/index';
 
 export abstract class ChildComponent extends Component {
   private rootFacade: RootComponentFacade | null;
-  private wrapperAdapter: WrapperAdapter | null;
+  private communicationHandler: ContainerCommunicationHandler | null;
   private contentDisposePromise: Promise<void> | null;
   private contentDisposePromiseResolver: (() => void) | null;
 
   constructor(window: Window, options: ChildComponentOptions, rootFacade: RootComponentFacade) {
     super(window, options);
     this.rootFacade = rootFacade;
-    this.wrapperAdapter = null;
+    this.communicationHandler = null;
     this.contentDisposePromise = null;
     this.contentDisposePromiseResolver = null;
   }
 
-  protected abstract getWrapperAdapterCore(methods: WrapperAdapterMethods): WrapperAdapter;
+  protected abstract getCommunicationHandlerCore(methods: ContainerCommunicationHandlerMethods): ContainerCommunicationHandler;
 
-  protected getWrapperAdapter(): WrapperAdapter {
-    if (!this.wrapperAdapter) {
-      const methods = new WrapperAdapterMethods();
+  protected getCommunicationHandler(): ContainerCommunicationHandler {
+    if (!this.communicationHandler) {
+      const methods = new ContainerCommunicationHandlerMethods();
       methods.callMounterHandler = () => this.callHandler(ComponentEventType.Mounted);
       methods.callBeforeUpdateHandler = () => this.callHandler(ComponentEventType.BeforeUpdate);
       methods.callUpdatedHandler = () => this.callHandler(ComponentEventType.Updated);
       methods.contentBeginDisposed = () => this.contentBeginDisposed();
       methods.contentDisposed = () => this.contentDisposed();
-      this.wrapperAdapter = this.getWrapperAdapterCore(methods);
+      this.communicationHandler = this.getCommunicationHandlerCore(methods);
     }
-    return this.wrapperAdapter;
+    return this.communicationHandler;
   }
 
   protected getOptions(): ChildComponentOptions {
@@ -53,7 +53,7 @@ export abstract class ChildComponent extends Component {
     this.setContentDisposePromise();
 
     // This should trigger the child component dispose.
-    this.getWrapperAdapter().requestContentDispose();
+    this.getCommunicationHandler().requestContentDispose();
   }
 
   private setContentDisposePromise(): void {
@@ -93,9 +93,9 @@ export abstract class ChildComponent extends Component {
     this.startDisposingContent();
     await (<Promise<void>>this.contentDisposePromise);
 
-    if (this.wrapperAdapter) {
-      this.wrapperAdapter.dispose();
-      this.wrapperAdapter = null;
+    if (this.communicationHandler) {
+      this.communicationHandler.dispose();
+      this.communicationHandler = null;
     }
     this.contentDisposePromiseResolver = null;
     this.contentDisposePromise = null;
