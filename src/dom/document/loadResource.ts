@@ -1,3 +1,11 @@
+/**
+ * A function to load a resource and wait for it to load.
+ * @param document The reference to the document object.
+ * @param url The resource URL.
+ * @param isScript Is this resource a script or a stylesheet?
+ * @param skipLoading Function to determine if the resource should not be loaded.
+ * @param attributes Extra attributes to add on the HTML element before attaching it to the document.
+ */
 export function loadResource(
   document: Document,
   url: string,
