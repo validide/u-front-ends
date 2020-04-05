@@ -7,54 +7,131 @@ import { generateUniqueId } from '../../../dom/document/generateIds';
 import { getUrlOrigin } from '../../../dom/document/getUrlOrigin';
 
 export class CrossWindowChildComponent extends ChildComponent {
-  private iframeId: string;
+  private embededId: string;
+  private embededLoadPromise: Promise<void> | null;
+  private embededLoadResolver: (() => void) | null;
+  private embededErrorRejecter: ((e: Error) => void) | null;
+  private embededLoadHandlerRef: ((e: Event) => void) | null;
+  private embededErrorHandlerRef: ((e: ErrorEvent) => void) | null;
 
   constructor(window: Window, options: CrossWindowChildComponentOptions, rootFacade: RootComponentFacade) {
     super(window, options, rootFacade);
-    this.iframeId = '';
+    this.embededId = '';
+    this.embededLoadResolver = null;
+    this.embededErrorRejecter = null;
+    this.embededLoadPromise = new Promise((resolve, reject) => {
+      this.embededLoadResolver = resolve;
+      this.embededErrorRejecter = reject;
+    });
+    this.embededLoadHandlerRef = this.embededLoadHandler.bind(this);
+    this.embededErrorHandlerRef = this.embededErrorHandler.bind(this);
+
   }
 
-  private defaultInjection(): string {
-    const iframe = this.getDocument().createElement('iframe');
-    const opt = this.getOptions();
-    if (opt.iframeAttributes) {
-      const keys = Object.keys(opt.iframeAttributes);
-      for (let index = 0; index < keys.length; index++) {
-        const key = keys[index];
-        iframe.setAttribute(key, opt.iframeAttributes[key])
+  protected disposeCore(): Promise<void> {
+    if (this.embededId) {
+      const embed = (<HTMLElement>this.rootElement).querySelector<HTMLIFrameElement>(`#${this.embededId}`);
+      if (embed) {
+        if (this.embededLoadHandlerRef) {
+          embed.removeEventListener('load', this.embededLoadHandlerRef);
+        }
+
+        if (this.embededErrorHandlerRef) {
+          embed.removeEventListener('error', this.embededErrorHandlerRef);
+        }
+        // Do not remove the embede element now as we still need it to comunicate with the content.
+        // The parent "rootElement" will be removed latter anyhow.
+        // (<HTMLElement>embed.parentElement).removeChild(embed);
       }
     }
+    this.embededLoadHandlerRef = null;
+    this.embededErrorHandlerRef = null;
+    this.embededLoadResolver = null;
+    this.embededErrorRejecter = null;
+    this.embededLoadPromise = null;
+    return super.disposeCore();
+  }
 
-    iframe.setAttribute('src', opt.url);
-    const iframeId = generateUniqueId(this.getDocument(), 'ufe-cross-');
-    (<HTMLDivElement>this.rootElement).appendChild(iframe);
-    return iframeId;
+  protected getOptions(): CrossWindowChildComponentOptions {
+    return <CrossWindowChildComponentOptions>super.getOptions();
+  }
+
+  protected mountCore(): Promise<void> {
+    const createEmbedElementFn = this.getOptions().createEmbedElement;
+    let embed: HTMLElement | null = null;
+    if (createEmbedElementFn) {
+      embed = createEmbedElementFn(<HTMLElement>this.rootElement);
+    } else {
+      embed = this.createEmbedElement();
+    }
+    if (!embed)
+      throw new Error('Failed to create embed element!');
+
+    const embedId = generateUniqueId(this.getDocument(), 'ufe-cross-');
+    embed.id = embedId;
+    this.embededId = embedId;
+
+    if (this.embededLoadHandlerRef) {
+      embed.addEventListener('load', this.embededLoadHandlerRef);
+    }
+
+    if (this.embededErrorHandlerRef) {
+      embed.addEventListener('error', this.embededErrorHandlerRef);
+    }
+
+    (<HTMLDivElement>this.rootElement).appendChild(embed);
+    return (<Promise<void>>(this.embededLoadPromise))
+      .then(() => {
+        super.mountCore();
+      });
   }
 
   protected getCommunicationHandlerCore(methods: ContainerCommunicationHandlerMethods): ContainerCommunicationHandler {
     const document = this.getDocument();
     return new CrossWindowContainerCommunicationHandler(
       <Window>(document).defaultView,
-      this.iframeId,
+      this.outboundEndpointAccesor(),
+      this.embededId,
       getUrlOrigin(document, this.getOptions().url),
       methods
     );
   }
 
-  protected async mountCore(): Promise<void> {
-    const injectionFunction = this.getOptions().inject;
-    if (injectionFunction) {
-      this.iframeId = injectionFunction(<HTMLElement>this.rootElement);
-    } else {
-      this.iframeId = this.defaultInjection();
+  private embededLoadHandler(e: Event): void {
+    if (this.embededLoadResolver) {
+      this.embededLoadResolver();
     }
-    if (!this.iframeId)
-      throw new Error(`Iframe Id("${this.iframeId}") is not valid.`)
-
-    await super.mountCore();
   }
 
-  protected getOptions(): CrossWindowChildComponentOptions {
-    return <CrossWindowChildComponentOptions>super.getOptions();
+  private embededErrorHandler(e: ErrorEvent): void {
+    if (this.embededErrorRejecter) {
+      this.embededErrorRejecter(e.error);
+    }
+  }
+
+  private createEmbedElement(): HTMLElement {
+    const embed = this.getDocument().createElement('iframe');
+    const opt = this.getOptions();
+    if (opt.embededAttributes) {
+      const keys = Object.keys(opt.embededAttributes);
+      for (let index = 0; index < keys.length; index++) {
+        const key = keys[index];
+        embed.setAttribute(key, opt.embededAttributes[key])
+      }
+    }
+
+    embed.setAttribute('src', opt.url);
+    return embed;
+  }
+
+  private outboundEndpointAccesor(): Window {
+    const iframe = (<HTMLElement>this.rootElement).querySelector<HTMLIFrameElement>(`#${this.embededId}`);
+    if (!iframe)
+      throw new Error(`No iframe with "${this.embededId}" id found.`);
+
+    if (!iframe.contentWindow)
+      throw new Error(`iframe with "${this.embededId}" id does not have a "contentWindow"(${iframe.contentWindow}).`);
+
+    return iframe.contentWindow;
   }
 }

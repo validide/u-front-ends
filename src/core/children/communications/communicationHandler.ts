@@ -3,7 +3,7 @@ import { ICommunicationsManager } from './iCommunicationsManager';
 import { CommunicationEvent } from './communicationEvent';
 
 export abstract class CommunicationHandler {
-  private endpoint: ICommunicationsEndpoint | null;
+  private inboundEndpoint: ICommunicationsEndpoint | null;
   private messageType: string;
   private manager: ICommunicationsManager | null;
   private handlerAction: ((e: Event) => void) | null;
@@ -11,11 +11,11 @@ export abstract class CommunicationHandler {
 
   constructor(
     messageType: string,
-    endpoint: ICommunicationsEndpoint,
+    inboundEndpoint: ICommunicationsEndpoint,
     manager: ICommunicationsManager
   ) {
     this.messageType = messageType;
-    this.endpoint = endpoint;
+    this.inboundEndpoint = inboundEndpoint;
     this.manager = manager;
     this.handlerAction = this.handleEvent.bind(this);
     this.disposed = false;
@@ -37,17 +37,17 @@ export abstract class CommunicationHandler {
   protected abstract disposeCore(): void;
 
   private attachCommandHandler(): void {
-    if(!this.endpoint || !this.handlerAction)
+    if(!this.inboundEndpoint || !this.handlerAction)
       return;
 
-    this.endpoint.addEventListener(this.messageType, this.handlerAction);
+    this.inboundEndpoint.addEventListener(this.messageType, this.handlerAction);
   }
 
   private detachCommandHandler(): void{
-    if(!this.endpoint || !this.handlerAction)
+    if(!this.inboundEndpoint || !this.handlerAction)
       return;
 
-    this.endpoint.removeEventListener(this.messageType, this.handlerAction);
+    this.inboundEndpoint.removeEventListener(this.messageType, this.handlerAction);
   }
 
   protected dispatchEvent<T>(information: T): void {

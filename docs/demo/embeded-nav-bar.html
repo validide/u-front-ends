@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <title>Micro Front Ends</title>
+  <meta name="description" content="Micro Front Ends">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="./css/app.css" />
+  <link rel="icon" href="./favicon.ico" type="image/x-icon" />
+  <style>
+    .d-none {
+      display: none !important;
+    }
+  </style>
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" rel="stylesheet"
+    crossorigin="anonymous" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh">
+  <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" rel="stylesheet" crossorigin="anonymous"
+    integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n"></script>
+  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" rel="stylesheet"
+    crossorigin="anonymous"
+    integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" rel="stylesheet"
+    crossorigin="anonymous"
+    integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"></script>
+</head>
+
+<body>
+  <nav class="navbar navbar-expand-lg navbar-dark bg-primary" id="the-nav-bar">
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarTogglerDemo01"
+      aria-controls="navbarTogglerDemo01" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarTogglerDemo01">
+      <a class="navbar-brand" href="#/">Micro Front Ends</a>
+      <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
+        <li class="nav-item active">
+          <a class="nav-link" href="#/">Home <span class="sr-only">(current)</span></a>
+        </li>
+      </ul>
+      <form class="form-inline my-2 my-lg-0 d-none" action="#/" id="actions">
+        <button class="btn btn-outline-secondary my-2 my-sm-0" type="button" data-demo-action="busy"
+          value="busy">Simulate Busy</button>
+        <button type="button" data-demo-action="close" class="close mx-2" aria-label="Close" value="close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </form>
+    </div>
+  </nav>
+  <script src="./lib/bundle/index.js"></script>
+  <script src="./js/app.js"></script>
+  <script>
+    (function (window, app, ufe, undefined) {
+
+      var communicationHandler = null;
+      if (window.parent !== window) {
+        communicationHandler = new ufe.CrossWindowContentCommunicationHandler(
+          window, //inboundEndpoint: Window
+          window.parent, //outboundEndpoint: Window
+          ufe.getUrlOrigin(document, window.location.href), //origin: string,
+          function() {
+            dispose();
+          } //disposeCommandCallback: () => void
+        );
+      }
+
+      function dispose() {
+        if (communicationHandler) {
+          communicationHandler.dispatchBeforeDispose();
+        }
+
+          setTimeout(() => {
+          disposeCore();
+        }, 1000)
+      }
+
+      function disposeCore() {
+        var navbar = window.document.getElementById('the-nav-bar');
+        var els = navbar.querySelectorAll('[data-demo-action]');
+        for (var index = 0; index < els.length; index++) {
+          els[index].removeEventListener('click', submitHandler);
+        }
+
+        submitHandler = null;
+        if (communicationHandler) {
+          communicationHandler.dispatchDisposed();
+          communicationHandler.dispose();
+        }
+        communicationHandler = null;
+        console.log('MainNavBarComponent -> finished');
+      }
+
+      function submitHandler(e) {
+        e.preventDefault();
+        var action = e.currentTarget.getAttribute('data-demo-action');
+        if (action === 'close') {
+          dispose();
+        } else {
+          if (communicationHandler) {
+            communicationHandler.dispatchBeforeUpdate();
+            setTimeout(() => {
+              communicationHandler.dispatchUpdated();
+            }, 1000);
+          }
+        }
+      }
+
+      function intiActions() {
+        var navbar = window.document.getElementById('the-nav-bar');
+        var els = navbar.querySelectorAll('[data-demo-action]');
+        for (var index = 0; index < els.length; index++) {
+          els[index].addEventListener('click', submitHandler);
+        }
+        navbar.querySelector('form').classList.remove('d-none');
+
+        if (communicationHandler) {
+          // Simulate a delay to consider exts processing
+          window.setTimeout(() => {
+            communicationHandler.dispatchMounted();
+          }, 1000);
+        }
+      }
+
+      app.ready(function () {
+        intiActions();
+      });
+    })(window, window.app, window.validide_uFrontEnds, void (0))
+  </script>
+</body>
+
+</html>

@@ -17,11 +17,11 @@ export abstract class ContainerCommunicationHandler extends CommunicationHandler
 
   constructor(
     messageType: string,
-    endpoint: ICommunicationsEndpoint,
+    inboundEndpoint: ICommunicationsEndpoint,
     manager: ICommunicationsManager,
     wrapperMethods: ContainerCommunicationHandlerMethods
   ) {
-    super(messageType, endpoint, manager);
+    super(messageType, inboundEndpoint, manager);
     this.wrapperMethods = wrapperMethods;
   }
 

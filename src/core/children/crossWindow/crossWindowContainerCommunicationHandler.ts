@@ -6,16 +6,17 @@ export class CrossWindowContainerCommunicationHandler extends ContainerCommunica
   private iframeId: string;
 
   constructor(
-    endpoint: Window,
+    inboundEndpoint: Window,
+    outboundEndpoint: Window,
     iframeId: string,
     origin: string,
     wrapperMethods: ContainerCommunicationHandlerMethods
   ) {
     super(
       'message',
-      endpoint,
+      inboundEndpoint,
       new CrossWindowCommunicationManager(
-        endpoint,
+        outboundEndpoint,
         origin,
         CommunicationEvent.CONTENT_EVENT_TYPE,
         CommunicationEvent.CONTAINER_EVENT_TYPE

@@ -5,18 +5,18 @@ import { ICrossWindowCommunicationData } from './iCrossWindowCommunication';
 
 
 export class CrossWindowCommunicationManager implements ICommunicationsManager {
-  private win: Window | null;
+  private outboundEndpoint: Window | null;
   private origin: string;
   private inboundEventType: string;
   private outboundEventType: string;
 
   constructor(
-    win: Window,
+    outboundEndpoint: Window,
     origin: string,
     inboundEventType: string,
     outboundEventType: string
   ) {
-    this.win = win;
+    this.outboundEndpoint = outboundEndpoint;
     this.origin = origin;
     this.inboundEventType = inboundEventType;
     this.outboundEventType = outboundEventType;
@@ -38,18 +38,19 @@ export class CrossWindowCommunicationManager implements ICommunicationsManager {
   }
 
   public dispatchEvent<T>(detail: T): void {
-    if (!this.win)
+    if (!this.outboundEndpoint)
       return;
 
     const event: ICrossWindowCommunicationData<T> = {
       type: this.outboundEventType,
       detail: detail
     };
-    this.win.postMessage(event, this.origin);
+
+    this.outboundEndpoint.postMessage(event, this.origin);
   }
 
   public dispose(): void {
-    this.win = null;
+    this.outboundEndpoint = null;
   }
 
 }

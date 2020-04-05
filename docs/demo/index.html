@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8">
   <title>Micro Front Ends</title>
-  <meta name="description" content="Micro Front Ends Library">
+  <meta name="description" content="Micro Front Ends">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="./css/app.css"/>
   <link rel="icon" href="./favicon.ico" type="image/x-icon" />
@@ -20,13 +20,17 @@
       </button>
     </div>
     <div class="row">
-      <div class="col-12 text-center">
+      <div class="col-12 text-center my-1">
         <a class="btn btn-outline-primary" href="#" role="button" data-demo-action="removeNavBar">Remove navigation bar</a>
         <a class="btn btn-outline-primary" href="#" role="button" data-demo-action="addNavBar">Add bar</a>
       </div>
-      <div class="col-12 text-center">
+      <div class="col-12 text-center my-1">
         <a class="btn btn-outline-primary" href="#" role="button" data-demo-action="removeNavBarCe">Remove navigation bar CE</a>
         <a class="btn btn-outline-primary" href="#" role="button" data-demo-action="addNavBarCe">Add bar CE</a>
+      </div>
+      <div class="col-12 text-center my-1">
+        <a class="btn btn-outline-primary" href="#" role="button" data-demo-action="removeNavBarIframe">Remove navigation bar Iframe</a>
+        <a class="btn btn-outline-primary" href="#" role="button" data-demo-action="addNavBarIframe">Add bar Iframe</a>
       </div>
     </div>
   </div>
@@ -58,6 +62,11 @@
   </script>
   <script src="./lib/bundle/index.js"></script>
   <script src="./js/app.js"></script>
+  <script>
+    window.app.ready(function () {
+      window.app.init();
+    });
+  </script>
 </body>
 
 </html>

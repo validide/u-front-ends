@@ -147,8 +147,28 @@
   }
   mainNavBarCustomEl.resources.push(mainNavBarCustomElScript);
 
+  var mainNavBarIframe = new ufe.CrossWindowChildComponentOptions();
+  mainNavBarIframe.url ='./embeded-nav-bar.html'
+  mainNavBarIframe.handlers = Object.assign({}, globalHandlers, {
+    'created': function (e) {
+      e.el.parentElement.insertBefore(e.el, e.el.parentElement.firstChild);
+      e.el.parentElement.classList.add('embeded-nav-bar');
+
+      globalHandlers['created'](e);
+    },
+    'destroyed': function (e) {
+      navbarIframeId = '';
+      globalHandlers['destroyed'](e);
+    }
+  });
+  mainNavBarIframe.embededAttributes = {
+    'allowtransparency': 'true',
+    'frameborder': 0
+  };
+
   var navbarId = '';
   var navbarCeId = '';
+  var navbarIframeId = '';
   var clickHandlers = {
     'addNavBar': async function (e) {
       if (navbarId)
@@ -176,6 +196,19 @@
       mfe.removeChild(navbarCeId);
       navbarCeId = '';
     },
+    'addNavBarIframe': async function (e) {
+      if (navbarIframeId)
+        return;
+
+      navbarIframeId = await mfe.addChild(mainNavBarIframe);
+    },
+    'removeNavBarIframe': function (e) {
+      if (!navbarIframeId)
+        return;
+
+      mfe.removeChild(navbarIframeId);
+      navbarIframeId = '';
+    }
   }
 
   function ready(fn) {
@@ -219,6 +252,9 @@
         }),
         rootMountProm.then(async function (root) {
           navbarCeId = await root.addChild(mainNavBarCustomEl);
+        }),
+        rootMountProm.then(async function (root) {
+          navbarIframeId = await root.addChild(mainNavBarIframe);
         })
       ])
       .then(function () {
@@ -233,6 +269,3 @@
   };
 })(window, window.validide_uFrontEnds, void 0);
 
-window.app.ready(function () {
-  window.app.init();
-});

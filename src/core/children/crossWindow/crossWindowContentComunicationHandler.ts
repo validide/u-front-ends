@@ -5,15 +5,16 @@ export class CrossWindowContentCommunicationHandler extends ContentCommunication
   private iframeId: string;
   private messageQueue: Array<CommunicationEvent>;
   constructor(
-    endpoint: Window,
+    inboundEndpoint: Window,
+    outboundEndpoint: Window,
     origin: string,
     disposeCommandCallback: () => void
   ) {
     super(
-      CommunicationEvent.CONTAINER_EVENT_TYPE,
-      endpoint,
+      'message',
+      inboundEndpoint,
       new CrossWindowCommunicationManager(
-        endpoint,
+        outboundEndpoint,
         origin,
         CommunicationEvent.CONTAINER_EVENT_TYPE,
         CommunicationEvent.CONTENT_EVENT_TYPE),

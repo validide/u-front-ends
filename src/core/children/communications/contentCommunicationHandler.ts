@@ -8,11 +8,11 @@ export abstract class ContentCommunicationHandler extends CommunicationHandler {
 
   constructor(
     messageType: string,
-    endpoint: ICommunicationsEndpoint,
+    inboundEndpoint: ICommunicationsEndpoint,
     manager: ICommunicationsManager,
     disposeCommandCallback: () => void
   ) {
-    super(messageType, endpoint, manager);
+    super(messageType, inboundEndpoint, manager);
     this.disposeCommandCallback = disposeCommandCallback;
   }
 
