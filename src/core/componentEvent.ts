@@ -1,3 +1,6 @@
+/**
+ * Lifecycle event types.
+ */
 export enum ComponentEventType {
   BeforeCreate = 'beforeCreate',
   Created = 'created',
@@ -10,8 +13,14 @@ export enum ComponentEventType {
   Error = 'error'
 }
 
+/**
+ * Handler type for a component event.
+ */
 export type ComponentEventHandler = (event: ComponentEvent) => void;
 
+/**
+ * Evnts triggered by the components
+ */
 export class ComponentEvent {
   public id: string;
   public type: ComponentEventType;
@@ -20,6 +29,14 @@ export class ComponentEvent {
   public error: Error | null;
   public timestamp: Date;
 
+  /**
+   * COnstructor.
+   * @param id Component unique idnetifyer.
+   * @param type The type of event.
+   * @param el The componenet root element.
+   * @param parentEl The parent element of the component.
+   * @param error The error data in case this is an error event.
+   */
   constructor(
     id: string,
     type: ComponentEventType,

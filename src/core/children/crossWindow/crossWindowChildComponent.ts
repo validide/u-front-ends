@@ -6,6 +6,9 @@ import { CrossWindowContainerCommunicationHandler } from './crossWindowContainer
 import { generateUniqueId } from '../../../dom/document/generateIds';
 import { getUrlOrigin } from '../../../dom/document/getUrlOrigin';
 
+/**
+ * Cross Window Child Component.
+ */
 export class CrossWindowChildComponent extends ChildComponent {
   private embededId: string;
   private embededLoadPromise: Promise<void> | null;
@@ -14,6 +17,12 @@ export class CrossWindowChildComponent extends ChildComponent {
   private embededLoadHandlerRef: ((e: Event) => void) | null;
   private embededErrorHandlerRef: ((e: ErrorEvent) => void) | null;
 
+  /**
+   * Constructor.
+   * @param window The window refrence.
+   * @param options The child options.
+   * @param rootFacade he root component facade.
+   */
   constructor(window: Window, options: CrossWindowChildComponentOptions, rootFacade: RootComponentFacade) {
     super(window, options, rootFacade);
     this.embededId = '';
@@ -28,6 +37,9 @@ export class CrossWindowChildComponent extends ChildComponent {
 
   }
 
+  /**
+   * @inheritdoc
+   */
   protected disposeCore(): Promise<void> {
     if (this.embededId) {
       const embed = (<HTMLElement>this.rootElement).querySelector<HTMLIFrameElement>(`#${this.embededId}`);
@@ -52,10 +64,16 @@ export class CrossWindowChildComponent extends ChildComponent {
     return super.disposeCore();
   }
 
+  /**
+   * Get the CrossWindowChildComponentOptions
+   */
   protected getOptions(): CrossWindowChildComponentOptions {
     return <CrossWindowChildComponentOptions>super.getOptions();
   }
 
+  /**
+   * @inheritdoc
+   */
   protected mountCore(): Promise<void> {
     const createEmbedElementFn = this.getOptions().createEmbedElement;
     let embed: HTMLElement | null = null;
@@ -86,6 +104,10 @@ export class CrossWindowChildComponent extends ChildComponent {
       });
   }
 
+  /**
+   *
+   * @param methods @inheritdoc
+   */
   protected getCommunicationHandlerCore(methods: ContainerCommunicationHandlerMethods): ContainerCommunicationHandler {
     const document = this.getDocument();
     return new CrossWindowContainerCommunicationHandler(
@@ -97,18 +119,29 @@ export class CrossWindowChildComponent extends ChildComponent {
     );
   }
 
+  /**
+   * Handle the loading of the embeded element.
+   * @param e The load event.
+   */
   private embededLoadHandler(e: Event): void {
     if (this.embededLoadResolver) {
       this.embededLoadResolver();
     }
   }
 
+  /**
+   * Handle the errir of the embeded element.
+   * @param e The error event.
+   */
   private embededErrorHandler(e: ErrorEvent): void {
     if (this.embededErrorRejecter) {
       this.embededErrorRejecter(e.error);
     }
   }
 
+  /**
+   * Create the embeded element.
+   */
   private createEmbedElement(): HTMLElement {
     const embed = this.getDocument().createElement('iframe');
     const opt = this.getOptions();
@@ -124,6 +157,9 @@ export class CrossWindowChildComponent extends ChildComponent {
     return embed;
   }
 
+  /**
+   * Access the outbound comunication endpoint.
+   */
   private outboundEndpointAccesor(): Window {
     const iframe = (<HTMLElement>this.rootElement).querySelector<HTMLIFrameElement>(`#${this.embededId}`);
     if (!iframe)

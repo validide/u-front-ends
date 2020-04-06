@@ -4,12 +4,22 @@ import { ICrossWindowCommunicationData } from './iCrossWindowCommunication';
 
 
 
+/**
+ * Cross Window Communication Manager.
+ */
 export class CrossWindowCommunicationManager implements ICommunicationsManager {
   private outboundEndpoint: Window | null;
   private origin: string;
   private inboundEventType: string;
   private outboundEventType: string;
 
+  /**
+   * Constructor.
+   * @param outboundEndpoint Outbound endpoint.
+   * @param origin The origin the manager should comunicate with.
+   * @param inboundEventType The inbound event type.
+   * @param outboundEventType The outbound event type.
+   */
   constructor(
     outboundEndpoint: Window,
     origin: string,
@@ -22,6 +32,9 @@ export class CrossWindowCommunicationManager implements ICommunicationsManager {
     this.outboundEventType = outboundEventType;
   }
 
+  /**
+   * @inheritdoc
+   */
   public readEvent(e: Event): CommunicationEvent | null {
     if (!e)
       return null;
@@ -37,6 +50,9 @@ export class CrossWindowCommunicationManager implements ICommunicationsManager {
     return data.detail;
   }
 
+  /**
+   * @inheritdoc
+   */
   public dispatchEvent<T>(detail: T): void {
     if (!this.outboundEndpoint)
       return;
@@ -49,6 +65,9 @@ export class CrossWindowCommunicationManager implements ICommunicationsManager {
     this.outboundEndpoint.postMessage(event, this.origin);
   }
 
+  /**
+   * @inheritdoc
+   */
   public dispose(): void {
     this.outboundEndpoint = null;
   }

@@ -1,3 +1,6 @@
+/**
+ * Configuration for retrieving a resource.
+ */
 export class ResourceConfiguration {
   public url: string = '';
   public isScript: boolean = true;

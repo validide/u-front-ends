@@ -2,15 +2,26 @@ import { ContainerCommunicationHandlerMethods, CommunicationEvent, ContainerComm
 import { CrossWindowCommunicationManager } from './crossWindowCommunicationManager';
 import { getHashCode } from '../../../utilities/getHashCode';
 
+/**
+ * @inheritdoc
+ */
 export class CrossWindowContainerCommunicationHandler extends ContainerCommunicationHandler {
-  private iframeId: string;
+  private embedId: string;
 
+  /**
+   * Constructor.
+   * @param inboundEndpoint The inbound comunication endpoint.
+   * @param outboundEndpoint The outbound communication endpoint.
+   * @param embedId The Id of the embeded element.
+   * @param origin The origin to communicate with.
+   * @param containerMethods The methods to communicate with the container.
+   */
   constructor(
     inboundEndpoint: Window,
     outboundEndpoint: Window,
-    iframeId: string,
+    embedId: string,
     origin: string,
-    wrapperMethods: ContainerCommunicationHandlerMethods
+    containerMethods: ContainerCommunicationHandlerMethods
   ) {
     super(
       'message',
@@ -21,13 +32,16 @@ export class CrossWindowContainerCommunicationHandler extends ContainerCommunica
         CommunicationEvent.CONTENT_EVENT_TYPE,
         CommunicationEvent.CONTAINER_EVENT_TYPE
       ),
-      wrapperMethods
+      containerMethods
     );
-    this.iframeId = iframeId;
+    this.embedId = embedId;
   }
 
+  /**
+   * @inheritdoc
+   */
   protected handleEventCore(e: CommunicationEvent): void {
-    if (!this.iframeId)
+    if (!this.embedId)
       return;
 
     if (!e.contentId && e.kind === CommunicationEventKind.Mounted) {
@@ -35,19 +49,22 @@ export class CrossWindowContainerCommunicationHandler extends ContainerCommunica
       return;
     }
 
-    if (this.iframeId !== e.contentId)
+    if (this.embedId !== e.contentId)
       return;
 
     super.handleEventCore(e);
   }
 
+  /**
+   * Attempt a andshake with the content.
+   */
   private attemptHandShake(e: CommunicationEvent): void{
-    const hash = getHashCode(this.iframeId).toString(10);
+    const hash = getHashCode(this.embedId).toString(10);
     const response = new CommunicationEvent(CommunicationEventKind.Mounted);
 
     // We got a message back so if the data matches the hash we sent send the id
     if (e.data && e.data === hash) {
-      response.contentId = this.iframeId;
+      response.contentId = this.embedId;
     } else {
       response.data = hash;
     }

@@ -1,6 +1,9 @@
 import { ComponentEventHandler, ComponentEventType } from './componentEvent';
 import { ResourceConfiguration } from './resourceConfiguration';
 
+/**
+ * Configuration object for the event handlers.
+ */
 export class ComponentEventHandlers {
   [ComponentEventType.BeforeCreate]?: ComponentEventHandler;
   [ComponentEventType.Created]?: ComponentEventHandler;
@@ -13,6 +16,9 @@ export class ComponentEventHandlers {
   [ComponentEventType.Error]?: ComponentEventHandler;
 }
 
+/**
+ * Compoent configuration options.
+ */
 export class ComponentOptions {
   public parent: string | HTMLElement = 'body';
   public tag: string = 'div';

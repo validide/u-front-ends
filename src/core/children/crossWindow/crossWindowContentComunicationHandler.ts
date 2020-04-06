@@ -1,9 +1,20 @@
 import { ContentCommunicationHandler, CommunicationEvent, CommunicationEventKind } from '../communications/index';
 import { CrossWindowCommunicationManager } from './crossWindowCommunicationManager';
 
+/**
+ * @inheritdoc
+ */
 export class CrossWindowContentCommunicationHandler extends ContentCommunicationHandler {
   private iframeId: string;
   private messageQueue: Array<CommunicationEvent>;
+
+  /**
+   * Constructor.
+   * @param inboundEndpoint The inbound communication endpoint.
+   * @param outboundEndpoint The outbund communication endpoint.
+   * @param origin The origin to communicate with.
+   * @param disposeCommandCallback The command to dispose the content.
+   */
   constructor(
     inboundEndpoint: Window,
     outboundEndpoint: Window,
@@ -25,11 +36,17 @@ export class CrossWindowContentCommunicationHandler extends ContentCommunication
     this.messageQueue = [];
   }
 
+  /**
+   * @inheritdoc
+   */
   protected disposeCore(): void {
     this.messageQueue = [];
     super.disposeCore();
   }
 
+  /**
+   * @inheritdoc
+   */
   protected handleEventCore(e: CommunicationEvent): void {
     if (!this.iframeId) {
       this.attemptHandShake(e);
@@ -39,6 +56,9 @@ export class CrossWindowContentCommunicationHandler extends ContentCommunication
     super.handleEventCore(e);
   }
 
+  /**
+   * @inheritdoc
+   */
   protected dispatchEvent<T>(information: T): void {
     const message = (<unknown>information) as CommunicationEvent;
     if (message) {
@@ -56,6 +76,10 @@ export class CrossWindowContentCommunicationHandler extends ContentCommunication
     super.dispatchEvent(information);
   }
 
+  /**
+   * Attempt a handshake with the container.
+   * @param e The communication event.
+   */
   private attemptHandShake(e: CommunicationEvent): void {
     if (e.contentId) {
       // Phase 2 of the handshake - we got the id.
@@ -78,6 +102,9 @@ export class CrossWindowContentCommunicationHandler extends ContentCommunication
     }
   }
 
+  /**
+   * Flush all the messages that were enqueues before the handhake.
+   */
   private flushMessages(): void {
     for (let index = 0; index < this.messageQueue.length; index++) {
       const msg = this.messageQueue[index];

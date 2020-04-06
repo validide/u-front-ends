@@ -1,6 +1,9 @@
 import { ContainerCommunicationHandlerMethods, CommunicationEvent, ContainerCommunicationHandler } from '../communications/index';
 import { InWindowCommunicationManager } from './inWindowCommunicationManager';
 
+/**
+ * @inheritdoc
+ */
 export class InWindowContainerCommunicationHandler extends ContainerCommunicationHandler {
   constructor(el: HTMLElement, wrapperMethods: ContainerCommunicationHandlerMethods) {
     super(

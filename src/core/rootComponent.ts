@@ -4,6 +4,10 @@ import { Component } from './component';
 import { ComponentEventType } from './componentEvent';
 import { ChildComponent, ChildComponentOptions } from './children/index';
 
+/**
+ * The root component to host the rest of the components.
+ * There is not limitation right no but ideally there should only be one of these on a page.
+ */
 export class RootComponent extends Component {
   private children: { [id: string]: ChildComponent | null };
   constructor(window: Window, options: RootComponentOptions) {
@@ -11,6 +15,11 @@ export class RootComponent extends Component {
     this.children = {};
   }
 
+  /**
+   * Schedule the disposing of the child on exiting the function.
+   * The dispose method is async but we do not want to wait for that.
+   * @param child The child that was disposed.
+   */
   private scheduleDisposeChild(child: ChildComponent): void {
     // Schedule this later
     this.getWindow().setTimeout(() => {
@@ -18,22 +27,18 @@ export class RootComponent extends Component {
     }, 0);
   }
 
-  private getChildId(child: ChildComponent): string | null {
-    const childIds = Object.keys(this.children);
-    for (let index = 0; index < childIds.length; index++) {
-      const id = childIds[index];
-      if (this.children[id] === child) {
-        return id;
-      }
-    }
-
-    return null;
-  }
-
+  /**
+   * Dispose a child using it's reference.
+   * @param child
+   */
   private disposeChildByRef(child: ChildComponent): Promise<void> {
-    return this.disposeChild(this.getChildId(child));
+    return this.disposeChild(child.id);
   }
 
+  /**
+   * Dispose a child by using it's id.
+   * @param childId The child identifyer.
+   */
   private disposeChild(childId: string | null): Promise<void> {
     const child = childId
       ? this.children[childId]
@@ -49,11 +54,18 @@ export class RootComponent extends Component {
       });
   }
 
+  /**
+   * @@inheritdoc
+   */
   protected mountCore(): Promise<void> {
     this.callHandler(ComponentEventType.Mounted);
     return super.mountCore();
   }
 
+  /**
+   * Add a child component.
+   * @param options Child component options.
+   */
   public async addChild(options: ChildComponentOptions): Promise<string> {
     if (!this.isMounted)
       throw new Error('Wait for the component to mount before starting to add children.');
@@ -70,9 +82,13 @@ export class RootComponent extends Component {
     return id;
   }
 
-  public removeChild(childId: string): void {
+  /**
+   * Remove a child component.
+   * @param id The child component identifyer.
+   */
+  public removeChild(id: string): void {
     this.getWindow().setTimeout(() => {
-      this.disposeChild(childId);
+      this.disposeChild(id);
     }, 0);
   }
 }

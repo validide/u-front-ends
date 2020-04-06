@@ -1,6 +1,9 @@
 import { ContentCommunicationHandler, CommunicationEvent } from '../communications/index';
 import { InWindowCommunicationManager } from './inWindowCommunicationManager';
 
+/**
+ * @inheritdoc
+ */
 export class InWindowContentCommunicationHandler extends ContentCommunicationHandler {
   constructor(el: HTMLElement, disposeCommandCallback: () => void) {
     super(

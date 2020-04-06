@@ -2,6 +2,9 @@ import { generateUniqueId, loadResource } from '../dom/index';
 import { ComponentEvent, ComponentEventType } from './componentEvent';
 import { ComponentOptions } from './componentOptions';
 
+/**
+ * Base class for all components.
+ */
 export abstract class Component {
   public id: string;
   public isInitialized: boolean;
@@ -12,6 +15,11 @@ export abstract class Component {
   protected resourcesLoaded: boolean;
   private disposed: boolean;
 
+  /**
+   * Constructor
+   * @param window The reference to the window object
+   * @param options The component options
+   */
   constructor(window: Window, options: ComponentOptions) {
     if (!window)
       throw new Error('Missing "window" argument.');
@@ -29,6 +37,9 @@ export abstract class Component {
     this.disposed = false;
   }
 
+  /**
+   * Create the root element hat will "encapsulate" the rest of the elements.
+   */
   private createRootElement(): void {
     if (this.rootElement)
       return;
@@ -40,6 +51,9 @@ export abstract class Component {
     parent.appendChild(this.rootElement);
   }
 
+  /**
+   * Get the parent element that hosts this component.
+   */
   private getParentElement(): HTMLElement {
     let parent: HTMLElement | null = null;
 
@@ -59,6 +73,9 @@ export abstract class Component {
     return parent;
   }
 
+  /**
+   * Load the resources required by the compoent.
+   */
   protected async loadResources(): Promise<void> {
     if (this.resourcesLoaded)
       return;
@@ -76,24 +93,50 @@ export abstract class Component {
     }
   }
 
+  /**
+   * Get the optons data.
+   */
   protected getOptions(): ComponentOptions {
     return (<ComponentOptions>this.options);
   }
 
+  /**
+   * Get the wndow reference.
+   */
   protected getWindow(): Window { return <Window>this.window; }
 
+  /**
+   * Get the document refrence.
+   */
   protected getDocument(): Document { return this.getWindow().document; }
 
+  /**
+   * Core initialization function.
+   * Any component derived should override this to add extra functionality.
+   */
   protected initializeCore(): Promise<void> { return Promise.resolve(); }
 
+  /**
+   * Core mount function.
+   * Any component derived should override this to add extra functionality.
+   */
   protected mountCore(): Promise<void> {
     // This needs to be handled by each component
     // this.callHandler(ComponentEventType.Mounted);
     return Promise.resolve();
   }
 
+
+  /**
+   * Core dispose function.
+   * Any component derived should override this to add clean-up after itself.
+   */
   protected disposeCore(): Promise<void> { return Promise.resolve(); }
 
+  /**
+   * Call the global error handler.
+   * @param e The error object
+   */
   protected callErrorHandler(e: Error): void {
     const handler = this.options.handlers?.error;
     if (handler) {
@@ -113,6 +156,10 @@ export abstract class Component {
     }
   }
 
+  /**
+   * Call a specific event handler.
+   * @param type The type of handler to call.
+   */
   protected callHandler(type: ComponentEventType): void {
     if (type === ComponentEventType.Error)
       throw new Error(`For calling the "${ComponentEventType.Error}" handler use the "callErrorHandler" method.`);
@@ -136,12 +183,21 @@ export abstract class Component {
     }
   }
 
+  /**
+   * Logging method.
+   * @param message The message.
+   * @param optionalParams Optional parameters.
+   */
   protected log(message?: any, ...optionalParams: any[]): void {
     const logMethod = this.window?.console?.log;
     if (logMethod)
       logMethod(message, optionalParams);
   }
 
+  /**
+   * Method invoked to initialize the component.
+   * It should create the root element and any base dependencies.
+   */
   public async initialize(): Promise<Component> {
     if (this.isInitialized)
       return this;
@@ -159,6 +215,9 @@ export abstract class Component {
     return this;
   }
 
+  /**
+   * Method invoked to mount the actual content of the component.
+   */
   public async mount(): Promise<Component> {
     if (!this.isInitialized) {
       this.callErrorHandler(new Error(`Call "initialize" before calling "mount".`));
@@ -178,6 +237,9 @@ export abstract class Component {
     return this;
   }
 
+  /**
+   * Method invoked to dispose of the component.
+   */
   public async dispose(): Promise<void> {
     if (this.disposed)
       return;
