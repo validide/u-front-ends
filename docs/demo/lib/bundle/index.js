@@ -40,6 +40,9 @@
      */
     function getRandomString() { return Math.random().toString(36).substring(2); }
 
+    /**
+     * A function that does nothing.
+     */
     function noop() { }
 
     /**
@@ -86,6 +89,14 @@
         return a.protocol + "//" + a.hostname + (a.port && ":" + a.port);
     }
 
+    /**
+     * A function to load a resource and wait for it to load.
+     * @param document The reference to the document object.
+     * @param url The resource URL.
+     * @param isScript Is this resource a script or a stylesheet?
+     * @param skipLoading Function to determine if the resource should not be loaded.
+     * @param attributes Extra attributes to add on the HTML element before attaching it to the document.
+     */
     function loadResource(document, url, isScript = true, skipLoading, attributes) {
         if (skipLoading && skipLoading())
             return Promise.resolve();
@@ -112,6 +123,9 @@
         });
     }
 
+    /**
+     * Lifecycle event types.
+     */
     (function (ComponentEventType) {
         ComponentEventType["BeforeCreate"] = "beforeCreate";
         ComponentEventType["Created"] = "created";
@@ -123,7 +137,18 @@
         ComponentEventType["Destroyed"] = "destroyed";
         ComponentEventType["Error"] = "error";
     })(exports.ComponentEventType || (exports.ComponentEventType = {}));
+    /**
+     * Evnts triggered by the components
+     */
     class ComponentEvent {
+        /**
+         * COnstructor.
+         * @param id Component unique idnetifyer.
+         * @param type The type of event.
+         * @param el The componenet root element.
+         * @param parentEl The parent element of the component.
+         * @param error The error data in case this is an error event.
+         */
         constructor(id, type, el, parentEl, error) {
             this.id = id;
             this.type = type;
@@ -143,7 +168,15 @@
             step((generator = generator.apply(thisArg, _arguments || [])).next());
         });
     };
+    /**
+     * Base class for all components.
+     */
     class Component {
+        /**
+         * Constructor
+         * @param window The reference to the window object
+         * @param options The component options
+         */
         constructor(window, options) {
             if (!window)
                 throw new Error('Missing "window" argument.');
@@ -158,6 +191,9 @@
             this.options = options;
             this.disposed = false;
         }
+        /**
+         * Create the root element hat will "encapsulate" the rest of the elements.
+         */
         createRootElement() {
             if (this.rootElement)
                 return;
@@ -167,6 +203,9 @@
             this.rootElement.id = this.id;
             parent.appendChild(this.rootElement);
         }
+        /**
+         * Get the parent element that hosts this component.
+         */
         getParentElement() {
             let parent = null;
             const opt = this.getOptions();
@@ -182,6 +221,9 @@
                 throw new Error(`Failed to find parent "${opt.parent}".`);
             return parent;
         }
+        /**
+         * Load the resources required by the compoent.
+         */
         loadResources() {
             return __awaiter(this, void 0, void 0, function* () {
                 if (this.resourcesLoaded)
@@ -199,18 +241,43 @@
                 }
             });
         }
+        /**
+         * Get the optons data.
+         */
         getOptions() {
             return this.options;
         }
+        /**
+         * Get the wndow reference.
+         */
         getWindow() { return this.window; }
+        /**
+         * Get the document refrence.
+         */
         getDocument() { return this.getWindow().document; }
+        /**
+         * Core initialization function.
+         * Any component derived should override this to add extra functionality.
+         */
         initializeCore() { return Promise.resolve(); }
+        /**
+         * Core mount function.
+         * Any component derived should override this to add extra functionality.
+         */
         mountCore() {
             // This needs to be handled by each component
             // this.callHandler(ComponentEventType.Mounted);
             return Promise.resolve();
         }
+        /**
+         * Core dispose function.
+         * Any component derived should override this to add clean-up after itself.
+         */
         disposeCore() { return Promise.resolve(); }
+        /**
+         * Call the global error handler.
+         * @param e The error object
+         */
         callErrorHandler(e) {
             var _a;
             const handler = (_a = this.options.handlers) === null || _a === void 0 ? void 0 : _a.error;
@@ -226,6 +293,10 @@
                 this.log(e);
             }
         }
+        /**
+         * Call a specific event handler.
+         * @param type The type of handler to call.
+         */
         callHandler(type) {
             if (type === exports.ComponentEventType.Error)
                 throw new Error(`For calling the "${exports.ComponentEventType.Error}" handler use the "callErrorHandler" method.`);
@@ -241,12 +312,21 @@
                 }
             }
         }
+        /**
+         * Logging method.
+         * @param message The message.
+         * @param optionalParams Optional parameters.
+         */
         log(message, ...optionalParams) {
             var _a, _b;
             const logMethod = (_b = (_a = this.window) === null || _a === void 0 ? void 0 : _a.console) === null || _b === void 0 ? void 0 : _b.log;
             if (logMethod)
                 logMethod(message, optionalParams);
         }
+        /**
+         * Method invoked to initialize the component.
+         * It should create the root element and any base dependencies.
+         */
         initialize() {
             return __awaiter(this, void 0, void 0, function* () {
                 if (this.isInitialized)
@@ -265,6 +345,9 @@
                 return this;
             });
         }
+        /**
+         * Method invoked to mount the actual content of the component.
+         */
         mount() {
             return __awaiter(this, void 0, void 0, function* () {
                 if (!this.isInitialized) {
@@ -284,6 +367,9 @@
                 return this;
             });
         }
+        /**
+         * Method invoked to dispose of the component.
+         */
         dispose() {
             var _a, _b;
             return __awaiter(this, void 0, void 0, function* () {
@@ -316,7 +402,14 @@
         CommunicationEventKind["BeforeDispose"] = "beforeDispose";
         CommunicationEventKind["Disposed"] = "disposed";
     })(exports.CommunicationEventKind || (exports.CommunicationEventKind = {}));
+    /**
+     * Event used to comunicate between content and container component.
+     */
     class CommunicationEvent {
+        /**
+         * Constructor.
+         * @param kind The kind of event.
+         */
         constructor(kind) {
             this.kind = kind;
             this.uuid = getUuidV4();
@@ -324,10 +417,25 @@
             this.contentId = '';
         }
     }
+    /**
+     * The type of event dispatched by the child component.
+     */
     CommunicationEvent.CONTENT_EVENT_TYPE = 'content_event.communication.children.validide_micro_front_ends';
+    /**
+     * The type of event dispatched by the content.
+     */
     CommunicationEvent.CONTAINER_EVENT_TYPE = 'container_event.communication.children.validide_micro_front_ends';
 
+    /**
+     * Communication handler.
+     */
     class CommunicationHandler {
+        /**
+         * Constructor.
+         * @param messageType The type of message to listen for.
+         * @param inboundEndpoint The inbound "endpoint"(element) to listen to.
+         * @param manager The communications manager.
+         */
         constructor(messageType, inboundEndpoint, manager) {
             this.messageType = messageType;
             this.inboundEndpoint = inboundEndpoint;
@@ -336,6 +444,10 @@
             this.disposed = false;
             this.attachCommandHandler();
         }
+        /**
+         * Handle a communication event.
+         * @param e The event.
+         */
         handleEvent(e) {
             if (!this.manager)
                 return;
@@ -344,21 +456,34 @@
                 return;
             this.handleEventCore(evt);
         }
+        /**
+         * Attach the command handler to the endpoint.
+         */
         attachCommandHandler() {
             if (!this.inboundEndpoint || !this.handlerAction)
                 return;
             this.inboundEndpoint.addEventListener(this.messageType, this.handlerAction);
         }
+        /**
+         * Detach the command handler from the endpoint.
+         */
         detachCommandHandler() {
             if (!this.inboundEndpoint || !this.handlerAction)
                 return;
             this.inboundEndpoint.removeEventListener(this.messageType, this.handlerAction);
         }
+        /**
+         * Dispatch a communication event.
+         * @param information The event information.
+         */
         dispatchEvent(information) {
             if (!this.manager)
                 return;
             this.manager.dispatchEvent(information);
         }
+        /**
+         * Dispose the handler.
+         */
         dispose() {
             if (this.disposed)
                 return;
@@ -375,56 +500,107 @@
         }
     }
 
+    /**
+     * The communication handler methods.
+     */
     class ContainerCommunicationHandlerMethods {
         constructor() {
+            /**
+             * Call the container to signal that the content finished mounting.
+             */
             this.callMounterHandler = noop;
+            /**
+             * Call the container to signal an update is about to happen.
+             */
             this.callBeforeUpdateHandler = noop;
+            /**
+             * Call the container to signal an update finished.
+             */
             this.callUpdatedHandler = noop;
+            /**
+             * Call the container to signal dispose started.
+             */
             this.contentBeginDisposed = noop;
+            /**
+             * Call the container to signal the component has disposed(almost).
+             */
             this.contentDisposed = noop;
         }
     }
+    /**
+     * Communication handler for the container(child component).
+     */
     class ContainerCommunicationHandler extends CommunicationHandler {
-        constructor(messageType, inboundEndpoint, manager, wrapperMethods) {
+        /**
+         * Constructor.
+         * @param messageType The message to handle.
+         * @param inboundEndpoint The inbound "endpoint" to listen to.
+         * @param manager The manager to handle outgoing communication.
+         * @param containerMethods The container methods.
+         */
+        constructor(messageType, inboundEndpoint, manager, containerMethods) {
             super(messageType, inboundEndpoint, manager);
-            this.wrapperMethods = wrapperMethods;
+            this.containerMethods = containerMethods;
         }
+        /**
+         * @inheritdoc
+         */
         handleEventCore(e) {
-            if (!this.wrapperMethods)
+            if (!this.containerMethods)
                 return;
             switch (e.kind) {
                 case exports.CommunicationEventKind.Mounted:
-                    this.wrapperMethods.callMounterHandler();
+                    this.containerMethods.callMounterHandler();
                     break;
                 case exports.CommunicationEventKind.BeforeUpdate:
-                    this.wrapperMethods.callBeforeUpdateHandler();
+                    this.containerMethods.callBeforeUpdateHandler();
                     break;
                 case exports.CommunicationEventKind.Updated:
-                    this.wrapperMethods.callUpdatedHandler();
+                    this.containerMethods.callUpdatedHandler();
                     break;
                 case exports.CommunicationEventKind.BeforeDispose:
-                    this.wrapperMethods.contentBeginDisposed();
+                    this.containerMethods.contentBeginDisposed();
                     break;
                 case exports.CommunicationEventKind.Disposed:
-                    this.wrapperMethods.contentDisposed();
+                    this.containerMethods.contentDisposed();
                     break;
                 default:
                     throw new Error(`The "${e.kind}" event is not configured.`);
             }
         }
+        /**
+         * @inheritdoc
+         */
         disposeCore() {
-            this.wrapperMethods = null;
+            this.containerMethods = null;
         }
+        /**
+         * Reuest that the content begins disposing.
+         */
         requestContentDispose() {
             this.dispatchEvent(new CommunicationEvent(exports.CommunicationEventKind.BeforeDispose));
         }
     }
 
+    /**
+     *Communication handler for the content(the component beeing integrated).
+     * The integrated component should create an instance of this to comunicate with the container.
+     */
     class ContentCommunicationHandler extends CommunicationHandler {
+        /**
+         * Constructor.
+         * @param messageType The message to handle.
+         * @param inboundEndpoint The inbound "endpoint" to listen to.
+         * @param manager The manager to handle outgoing communication.
+         * @param disposeCommandCallback The command to dispose the content.
+         */
         constructor(messageType, inboundEndpoint, manager, disposeCommandCallback) {
             super(messageType, inboundEndpoint, manager);
             this.disposeCommandCallback = disposeCommandCallback;
         }
+        /**
+         * @inheritdoc
+         */
         handleEventCore(e) {
             switch (e.kind) {
                 case exports.CommunicationEventKind.BeforeDispose:
@@ -437,21 +613,39 @@
                     throw new Error(`The "${e.kind}" event is not configured.`);
             }
         }
+        /**
+         * Dispatch event to signal mounting finished.
+         */
         dispatchMounted() {
             this.dispatchEvent(new CommunicationEvent(exports.CommunicationEventKind.Mounted));
         }
+        /**
+         * Dispatch event to signal update is about to start.
+         */
         dispatchBeforeUpdate() {
             this.dispatchEvent(new CommunicationEvent(exports.CommunicationEventKind.BeforeUpdate));
         }
+        /**
+         * Dispatch event to signal update finished.
+         */
         dispatchUpdated() {
             this.dispatchEvent(new CommunicationEvent(exports.CommunicationEventKind.Updated));
         }
+        /**
+         * Dispatch event to disposing started.
+         */
         dispatchBeforeDispose() {
             this.dispatchEvent(new CommunicationEvent(exports.CommunicationEventKind.BeforeDispose));
         }
+        /**
+         * Dispatch event to mount finished.
+         */
         dispatchDisposed() {
             this.dispatchEvent(new CommunicationEvent(exports.CommunicationEventKind.Disposed));
         }
+        /**
+         * @inheritdoc
+         */
         disposeCore() {
             this.disposeCommandCallback = null;
         }
@@ -466,7 +660,16 @@
             step((generator = generator.apply(thisArg, _arguments || [])).next());
         });
     };
+    /**
+     * Child component base class.
+     */
     class ChildComponent extends Component {
+        /**
+         * Constructor.
+         * @param window The window reference.
+         * @param options The child options.
+         * @param rootFacade The facade to the root component.
+         */
         constructor(window, options, rootFacade) {
             super(window, options);
             this.rootFacade = rootFacade;
@@ -474,6 +677,9 @@
             this.contentDisposePromise = null;
             this.contentDisposePromiseResolver = null;
         }
+        /**
+         * Get the comunication handler.
+         */
         getCommunicationHandler() {
             const methods = new ContainerCommunicationHandlerMethods();
             methods.callMounterHandler = () => this.callHandler(exports.ComponentEventType.Mounted);
@@ -483,9 +689,15 @@
             methods.contentDisposed = () => this.contentDisposed();
             return this.getCommunicationHandlerCore(methods);
         }
+        /**
+         * Get the child component options.
+         */
         getOptions() {
             return super.getOptions();
         }
+        /**
+         * Handler for the signal that the component started to dispose.
+         */
         contentBeginDisposed() {
             if (this.contentDisposePromise !== null)
                 return; // Dispose has already started.
@@ -493,6 +705,9 @@
             // Inform parent the content is beeing disposed.
             this.rootFacade.signalDisposed(this);
         }
+        /**
+         * Signal the content that it will be disposed.
+         */
         startDisposingContent() {
             if (this.contentDisposePromise !== null)
                 return; // Dispose has already started.
@@ -500,6 +715,9 @@
             // This should trigger the child component dispose.
             this.communicationHandler.requestContentDispose();
         }
+        /**
+         * Set the promise that is used fof the disposing of the component.
+         */
         setContentDisposePromise() {
             if (this.contentDisposePromise !== null)
                 return;
@@ -518,6 +736,9 @@
                 this.callErrorHandler(err);
             });
         }
+        /**
+         * Handler for the signal that the content has finished disposing.
+         */
         contentDisposed() {
             if (this.contentDisposePromiseResolver === null) {
                 // For some reason we got the disposed call without getting the 'beginDispose' call.
@@ -528,12 +749,18 @@
                 this.contentDisposePromiseResolver();
             }
         }
+        /**
+         * @@inheritdoc
+         */
         mountCore() {
             if (!this.communicationHandler) {
                 this.communicationHandler = this.getCommunicationHandler();
             }
             return super.mountCore();
         }
+        /**
+         * @@inheritdoc
+         */
         disposeCore() {
             const _super = Object.create(null, {
                 disposeCore: { get: () => super.disposeCore }
@@ -552,32 +779,79 @@
         }
     }
 
+    /**
+     * The type of child component.
+     */
     (function (ChildComponentType) {
+        /**
+         * In window component(JavaScript or WebComponent Custom Element)
+         */
         ChildComponentType["InWindow"] = "inWindow";
+        /**
+         * Cross window component(loaded in an embedable form - Iframe)
+         */
         ChildComponentType["CrossWindow"] = "crossWindow";
     })(exports.ChildComponentType || (exports.ChildComponentType = {}));
 
+    function customEventPolyfill(typeArg, eventInitDict) {
+        const params = eventInitDict || { bubbles: false, cancelable: false, detail: null };
+        var evt = document.createEvent('CustomEvent');
+        evt.initCustomEvent(typeArg, params.bubbles || false, params.cancelable || false, params.detail);
+        return evt;
+    }
+    function createCustomEvent(document, typeArg, eventInitDict) {
+        const win = document.defaultView;
+        if (!win)
+            throw new Error('Document does not have a defualt view.');
+        if (typeof win.CustomEvent !== 'function') {
+            win.CustomEvent = customEventPolyfill;
+        }
+        return new win.CustomEvent(typeArg, eventInitDict);
+    }
+
+    /**
+     * In Window Child Comunication Manager.
+     */
     class InWindowCommunicationManager {
+        /**
+         * Constructor
+         * @param outboundEndpoint The outbound communication endpoint.
+         * @param inboundEventType The inbound event type.
+         * @param outboundEventType The outbound event type.
+         */
         constructor(el, inboundEventType, outboundEventType) {
-            this.el = el;
+            this.outboundEndpoint = el;
             this.inboundEventType = inboundEventType;
             this.outboundEventType = outboundEventType;
         }
+        /**
+         * @inheritdoc
+         */
         readEvent(e) {
             if (!e || e.type !== this.inboundEventType)
                 return null;
             return e.detail;
         }
+        /**
+         * @inheritdoc
+         */
         dispatchEvent(detail) {
-            if (!this.el)
+            if (!this.outboundEndpoint || !this.outboundEndpoint.ownerDocument)
                 return;
-            this.el.dispatchEvent(new CustomEvent(this.outboundEventType, { detail: detail }));
+            const evt = createCustomEvent(this.outboundEndpoint.ownerDocument, this.outboundEventType, { detail: detail });
+            this.outboundEndpoint.dispatchEvent(evt);
         }
+        /**
+         * @inheritdoc
+         */
         dispose() {
-            this.el = null;
+            this.outboundEndpoint = null;
         }
     }
 
+    /**
+     * @inheritdoc
+     */
     class InWindowContainerCommunicationHandler extends ContainerCommunicationHandler {
         constructor(el, wrapperMethods) {
             super(CommunicationEvent.CONTENT_EVENT_TYPE, el, new InWindowCommunicationManager(el, CommunicationEvent.CONTENT_EVENT_TYPE, CommunicationEvent.CONTAINER_EVENT_TYPE), wrapperMethods);
@@ -593,16 +867,34 @@
             step((generator = generator.apply(thisArg, _arguments || [])).next());
         });
     };
+    /**
+     * In Window Child Component.
+     */
     class InWindowChildComponent extends ChildComponent {
+        /**
+         * Constructor.
+         * @param window The window reference.
+         * @param options The child component options.
+         * @param rootFacade The facade to the root component.
+         */
         constructor(window, options, rootFacade) {
             super(window, options, rootFacade);
         }
+        /**
+         * @inheritdoc
+         */
         getCommunicationHandlerCore(methods) {
             return new InWindowContainerCommunicationHandler(this.rootElement, methods);
         }
+        /**
+         * Get the InWindowChildComponentOptions
+         */
         getOptions() {
             return super.getOptions();
         }
+        /**
+         * @inheritdoc
+         */
         mountCore() {
             const _super = Object.create(null, {
                 mountCore: { get: () => super.mountCore }
@@ -618,13 +910,26 @@
         }
     }
 
+    /**
+     * Cross Window Communication Manager.
+     */
     class CrossWindowCommunicationManager {
+        /**
+         * Constructor.
+         * @param outboundEndpoint Outbound endpoint.
+         * @param origin The origin the manager should comunicate with.
+         * @param inboundEventType The inbound event type.
+         * @param outboundEventType The outbound event type.
+         */
         constructor(outboundEndpoint, origin, inboundEventType, outboundEventType) {
             this.outboundEndpoint = outboundEndpoint;
             this.origin = origin;
             this.inboundEventType = inboundEventType;
             this.outboundEventType = outboundEventType;
         }
+        /**
+         * @inheritdoc
+         */
         readEvent(e) {
             if (!e)
                 return null;
@@ -636,6 +941,9 @@
                 return null;
             return data.detail;
         }
+        /**
+         * @inheritdoc
+         */
         dispatchEvent(detail) {
             if (!this.outboundEndpoint)
                 return;
@@ -645,33 +953,53 @@
             };
             this.outboundEndpoint.postMessage(event, this.origin);
         }
+        /**
+         * @inheritdoc
+         */
         dispose() {
             this.outboundEndpoint = null;
         }
     }
 
+    /**
+     * @inheritdoc
+     */
     class CrossWindowContainerCommunicationHandler extends ContainerCommunicationHandler {
-        constructor(inboundEndpoint, outboundEndpoint, iframeId, origin, wrapperMethods) {
-            super('message', inboundEndpoint, new CrossWindowCommunicationManager(outboundEndpoint, origin, CommunicationEvent.CONTENT_EVENT_TYPE, CommunicationEvent.CONTAINER_EVENT_TYPE), wrapperMethods);
-            this.iframeId = iframeId;
+        /**
+         * Constructor.
+         * @param inboundEndpoint The inbound comunication endpoint.
+         * @param outboundEndpoint The outbound communication endpoint.
+         * @param embedId The Id of the embeded element.
+         * @param origin The origin to communicate with.
+         * @param containerMethods The methods to communicate with the container.
+         */
+        constructor(inboundEndpoint, outboundEndpoint, embedId, origin, containerMethods) {
+            super('message', inboundEndpoint, new CrossWindowCommunicationManager(outboundEndpoint, origin, CommunicationEvent.CONTENT_EVENT_TYPE, CommunicationEvent.CONTAINER_EVENT_TYPE), containerMethods);
+            this.embedId = embedId;
         }
+        /**
+         * @inheritdoc
+         */
         handleEventCore(e) {
-            if (!this.iframeId)
+            if (!this.embedId)
                 return;
             if (!e.contentId && e.kind === exports.CommunicationEventKind.Mounted) {
                 this.attemptHandShake(e);
                 return;
             }
-            if (this.iframeId !== e.contentId)
+            if (this.embedId !== e.contentId)
                 return;
             super.handleEventCore(e);
         }
+        /**
+         * Attempt a andshake with the content.
+         */
         attemptHandShake(e) {
-            const hash = getHashCode(this.iframeId).toString(10);
+            const hash = getHashCode(this.embedId).toString(10);
             const response = new CommunicationEvent(exports.CommunicationEventKind.Mounted);
             // We got a message back so if the data matches the hash we sent send the id
             if (e.data && e.data === hash) {
-                response.contentId = this.iframeId;
+                response.contentId = this.embedId;
             }
             else {
                 response.data = hash;
@@ -680,7 +1008,16 @@
         }
     }
 
+    /**
+     * Cross Window Child Component.
+     */
     class CrossWindowChildComponent extends ChildComponent {
+        /**
+         * Constructor.
+         * @param window The window refrence.
+         * @param options The child options.
+         * @param rootFacade he root component facade.
+         */
         constructor(window, options, rootFacade) {
             super(window, options, rootFacade);
             this.embededId = '';
@@ -693,6 +1030,9 @@
             this.embededLoadHandlerRef = this.embededLoadHandler.bind(this);
             this.embededErrorHandlerRef = this.embededErrorHandler.bind(this);
         }
+        /**
+         * @inheritdoc
+         */
         disposeCore() {
             if (this.embededId) {
                 const embed = this.rootElement.querySelector(`#${this.embededId}`);
@@ -715,9 +1055,15 @@
             this.embededLoadPromise = null;
             return super.disposeCore();
         }
+        /**
+         * Get the CrossWindowChildComponentOptions
+         */
         getOptions() {
             return super.getOptions();
         }
+        /**
+         * @inheritdoc
+         */
         mountCore() {
             const createEmbedElementFn = this.getOptions().createEmbedElement;
             let embed = null;
@@ -744,20 +1090,35 @@
                 super.mountCore();
             });
         }
+        /**
+         *
+         * @param methods @inheritdoc
+         */
         getCommunicationHandlerCore(methods) {
             const document = this.getDocument();
             return new CrossWindowContainerCommunicationHandler((document).defaultView, this.outboundEndpointAccesor(), this.embededId, getUrlOrigin(document, this.getOptions().url), methods);
         }
+        /**
+         * Handle the loading of the embeded element.
+         * @param e The load event.
+         */
         embededLoadHandler(e) {
             if (this.embededLoadResolver) {
                 this.embededLoadResolver();
             }
         }
+        /**
+         * Handle the errir of the embeded element.
+         * @param e The error event.
+         */
         embededErrorHandler(e) {
             if (this.embededErrorRejecter) {
                 this.embededErrorRejecter(e.error);
             }
         }
+        /**
+         * Create the embeded element.
+         */
         createEmbedElement() {
             const embed = this.getDocument().createElement('iframe');
             const opt = this.getOptions();
@@ -771,6 +1132,9 @@
             embed.setAttribute('src', opt.url);
             return embed;
         }
+        /**
+         * Access the outbound comunication endpoint.
+         */
         outboundEndpointAccesor() {
             const iframe = this.rootElement.querySelector(`#${this.embededId}`);
             if (!iframe)
@@ -781,9 +1145,15 @@
         }
     }
 
+    /**
+     * Configuration object for the event handlers.
+     */
     class ComponentEventHandlers {
     }
     exports.ComponentEventType.BeforeCreate, exports.ComponentEventType.Created, exports.ComponentEventType.BeforeMount, exports.ComponentEventType.Mounted, exports.ComponentEventType.BeforeUpdate, exports.ComponentEventType.Updated, exports.ComponentEventType.BeforeDestroy, exports.ComponentEventType.Destroyed, exports.ComponentEventType.Error;
+    /**
+     * Compoent configuration options.
+     */
     class ComponentOptions {
         constructor() {
             this.parent = 'body';
@@ -793,14 +1163,23 @@
         }
     }
 
+    /**
+     * Child component options.
+     */
     class ChildComponentOptions extends ComponentOptions {
         constructor() {
             super();
             this.type = exports.ChildComponentType.InWindow;
+            /**
+             * The the interval to wait for the component before triggering an error and the 'disposed' event.
+             */
             this.contentDisposeTimeout = 3000;
         }
     }
 
+    /**
+     * Cross Window Child Component Options.
+     */
     class CrossWindowChildComponentOptions extends ChildComponentOptions {
         constructor() {
             super();
@@ -809,16 +1188,32 @@
         }
     }
 
+    /**
+     * @inheritdoc
+     */
     class CrossWindowContentCommunicationHandler extends ContentCommunicationHandler {
+        /**
+         * Constructor.
+         * @param inboundEndpoint The inbound communication endpoint.
+         * @param outboundEndpoint The outbund communication endpoint.
+         * @param origin The origin to communicate with.
+         * @param disposeCommandCallback The command to dispose the content.
+         */
         constructor(inboundEndpoint, outboundEndpoint, origin, disposeCommandCallback) {
             super('message', inboundEndpoint, new CrossWindowCommunicationManager(outboundEndpoint, origin, CommunicationEvent.CONTAINER_EVENT_TYPE, CommunicationEvent.CONTENT_EVENT_TYPE), disposeCommandCallback);
             this.iframeId = '';
             this.messageQueue = [];
         }
+        /**
+         * @inheritdoc
+         */
         disposeCore() {
             this.messageQueue = [];
             super.disposeCore();
         }
+        /**
+         * @inheritdoc
+         */
         handleEventCore(e) {
             if (!this.iframeId) {
                 this.attemptHandShake(e);
@@ -826,6 +1221,9 @@
             }
             super.handleEventCore(e);
         }
+        /**
+         * @inheritdoc
+         */
         dispatchEvent(information) {
             const message = information;
             if (message) {
@@ -843,6 +1241,10 @@
             }
             super.dispatchEvent(information);
         }
+        /**
+         * Attempt a handshake with the container.
+         * @param e The communication event.
+         */
         attemptHandShake(e) {
             if (e.contentId) {
                 // Phase 2 of the handshake - we got the id.
@@ -862,6 +1264,9 @@
                 this.dispatchEvent(response);
             }
         }
+        /**
+         * Flush all the messages that were enqueues before the handhake.
+         */
         flushMessages() {
             for (let index = 0; index < this.messageQueue.length; index++) {
                 const msg = this.messageQueue[index];
@@ -871,7 +1276,16 @@
         }
     }
 
+    /**
+     * Factory to create child components.
+     */
     class ChildComponentFactory {
+        /**
+         * Create a child component.
+         * @param window The window reference.
+         * @param options The child component options.
+         * @param rootFacade The facade for the root component.
+         */
         createComponent(window, options, rootFacade) {
             switch (options.type) {
                 case exports.ChildComponentType.InWindow:
@@ -884,18 +1298,30 @@
         }
     }
 
+    /**
+     * In Window Child Component Options.
+     */
     class InWindowChildComponentOptions extends ChildComponentOptions {
+        /**
+         * Constructor.
+         */
         constructor() {
             super();
         }
     }
 
+    /**
+     * @inheritdoc
+     */
     class InWindowContentCommunicationHandler extends ContentCommunicationHandler {
         constructor(el, disposeCommandCallback) {
             super(CommunicationEvent.CONTAINER_EVENT_TYPE, el, new InWindowCommunicationManager(el, CommunicationEvent.CONTAINER_EVENT_TYPE, CommunicationEvent.CONTENT_EVENT_TYPE), disposeCommandCallback);
         }
     }
 
+    /**
+     * Configuration for retrieving a resource.
+     */
     class ResourceConfiguration {
         constructor() {
             this.url = '';
@@ -904,7 +1330,14 @@
         }
     }
 
+    /**
+     * Facade to interface with the the root component.
+     */
     class RootComponentFacade {
+        /**
+         * Constructor.
+         * @param signalDisposed The function to invoke to signal that the child was disposed.
+         */
         constructor(signalDisposed) {
             this.signalDisposed = signalDisposed;
         }
@@ -919,30 +1352,37 @@
             step((generator = generator.apply(thisArg, _arguments || [])).next());
         });
     };
+    /**
+     * The root component to host the rest of the components.
+     * There is not limitation right no but ideally there should only be one of these on a page.
+     */
     class RootComponent extends Component {
         constructor(window, options) {
             super(window, options);
             this.children = {};
         }
+        /**
+         * Schedule the disposing of the child on exiting the function.
+         * The dispose method is async but we do not want to wait for that.
+         * @param child The child that was disposed.
+         */
         scheduleDisposeChild(child) {
             // Schedule this later
             this.getWindow().setTimeout(() => {
                 this.disposeChildByRef(child);
             }, 0);
         }
-        getChildId(child) {
-            const childIds = Object.keys(this.children);
-            for (let index = 0; index < childIds.length; index++) {
-                const id = childIds[index];
-                if (this.children[id] === child) {
-                    return id;
-                }
-            }
-            return null;
-        }
+        /**
+         * Dispose a child using it's reference.
+         * @param child
+         */
         disposeChildByRef(child) {
-            return this.disposeChild(this.getChildId(child));
+            return this.disposeChild(child.id);
         }
+        /**
+         * Dispose a child by using it's id.
+         * @param childId The child identifyer.
+         */
         disposeChild(childId) {
             const child = childId
                 ? this.children[childId]
@@ -955,28 +1395,46 @@
                 this.children[childId] = null;
             });
         }
+        /**
+         * @@inheritdoc
+         */
         mountCore() {
             this.callHandler(exports.ComponentEventType.Mounted);
             return super.mountCore();
         }
+        /**
+         * Add a child component.
+         * @param options Child component options.
+         */
         addChild(options) {
             return __awaiter$3(this, void 0, void 0, function* () {
+                if (!this.isInitialized)
+                    throw new Error('Wait for the component to initilize before starting to add children.');
                 if (!this.isMounted)
                     throw new Error('Wait for the component to mount before starting to add children.');
-                const child = this.options.childFactory.createComponent(this.getWindow(), options, new RootComponentFacade((child) => this.scheduleDisposeChild(child)));
+                const child = this.options.childFactory.createComponent(this.getWindow(), options, new RootComponentFacade((child) => {
+                    this.scheduleDisposeChild(child);
+                }));
                 const id = (yield child.initialize()).id;
                 this.children[id] = child;
                 this.getWindow().setTimeout(() => { child.mount(); }, 0);
                 return id;
             });
         }
-        removeChild(childId) {
+        /**
+         * Remove a child component.
+         * @param id The child component identifyer.
+         */
+        removeChild(id) {
             this.getWindow().setTimeout(() => {
-                this.disposeChild(childId);
+                this.disposeChild(id);
             }, 0);
         }
     }
 
+    /**
+     * Options for the root component.
+     */
     class RootComponentOptions extends ComponentOptions {
         constructor() {
             super();

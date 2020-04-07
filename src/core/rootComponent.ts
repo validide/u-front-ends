@@ -40,9 +40,7 @@ export class RootComponent extends Component {
    * @param childId The child identifyer.
    */
   private disposeChild(childId: string | null): Promise<void> {
-    const child = childId
-      ? this.children[childId]
-      : null;
+    const child = this.getChild(childId);
 
     if (!child)
       return Promise.resolve();
@@ -67,19 +65,32 @@ export class RootComponent extends Component {
    * @param options Child component options.
    */
   public async addChild(options: ChildComponentOptions): Promise<string> {
+    if (!this.isInitialized)
+      throw new Error('Wait for the component to initilize before starting to add children.');
+
     if (!this.isMounted)
       throw new Error('Wait for the component to mount before starting to add children.');
 
     const child = (<RootComponentOptions>this.options).childFactory.createComponent(
       this.getWindow(),
       options,
-      new RootComponentFacade((child) => this.scheduleDisposeChild(child))
+      new RootComponentFacade((child) => {
+        this.scheduleDisposeChild(child);
+      })
     );
 
     const id = (await child.initialize()).id;
     this.children[id] = child;
     this.getWindow().setTimeout(() => { child.mount(); }, 0);
     return id;
+  }
+
+  /**
+   * Get the child with the given identifier.
+   * @param id The child identifier.
+   */
+  public getChild(id: string|null): ChildComponent | null {
+    return id ? (this.children[id] || null) : null;
   }
 
   /**

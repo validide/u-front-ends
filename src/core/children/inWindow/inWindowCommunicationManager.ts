@@ -1,5 +1,6 @@
 import { ICommunicationsManager } from '../communications/iCommunicationsManager';
 import { CommunicationEvent } from '../communications/index';
+import { createCustomEvent } from '../../../dom/document/createCustomEvent';
 
 /**
  * In Window Child Comunication Manager.
@@ -35,10 +36,11 @@ export class InWindowCommunicationManager implements ICommunicationsManager {
    * @inheritdoc
    */
   public dispatchEvent<T>(detail: T): void {
-    if (!this.outboundEndpoint)
+    if (!this.outboundEndpoint || !this.outboundEndpoint.ownerDocument)
       return;
 
-    this.outboundEndpoint.dispatchEvent(new CustomEvent(this.outboundEventType, { detail: detail }));
+    const evt = createCustomEvent(this.outboundEndpoint.ownerDocument, this.outboundEventType, { detail: detail });
+    this.outboundEndpoint.dispatchEvent(evt);
   }
 
   /**
