@@ -176,11 +176,11 @@
 
       navbarId = await mfe.addChild(mainNavBar);
     },
-    'removeNavBar': function (e) {
+    'removeNavBar': async function (e) {
       if (!navbarId)
         return;
 
-      mfe.removeChild(navbarId);
+      await mfe.removeChild(navbarId);
       navbarId = '';
     },
     'addNavBarCe': async function (e) {
@@ -189,11 +189,11 @@
 
       navbarCeId = await mfe.addChild(mainNavBarCustomEl);
     },
-    'removeNavBarCe': function (e) {
+    'removeNavBarCe': async function (e) {
       if (!navbarCeId)
         return;
 
-      mfe.removeChild(navbarCeId);
+      await mfe.removeChild(navbarCeId);
       navbarCeId = '';
     },
     'addNavBarIframe': async function (e) {
@@ -202,11 +202,11 @@
 
       navbarIframeId = await mfe.addChild(mainNavBarIframe);
     },
-    'removeNavBarIframe': function (e) {
+    'removeNavBarIframe': async function (e) {
       if (!navbarIframeId)
         return;
 
-      mfe.removeChild(navbarIframeId);
+      await mfe.removeChild(navbarIframeId);
       navbarIframeId = '';
     }
   }

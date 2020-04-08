@@ -793,18 +793,18 @@
         ChildComponentType["CrossWindow"] = "crossWindow";
     })(exports.ChildComponentType || (exports.ChildComponentType = {}));
 
-    function customEventPolyfill(typeArg, eventInitDict) {
+    function customEventPolyfill(document, typeArg, eventInitDict) {
         const params = eventInitDict || { bubbles: false, cancelable: false, detail: null };
         var evt = document.createEvent('CustomEvent');
         evt.initCustomEvent(typeArg, params.bubbles || false, params.cancelable || false, params.detail);
         return evt;
     }
     function createCustomEvent(document, typeArg, eventInitDict) {
-        const win = document.defaultView;
+        const win = document === null || document === void 0 ? void 0 : document.defaultView;
         if (!win)
             throw new Error('Document does not have a defualt view.');
         if (typeof win.CustomEvent !== 'function') {
-            win.CustomEvent = customEventPolyfill;
+            return new customEventPolyfill(document, typeArg, eventInitDict);
         }
         return new win.CustomEvent(typeArg, eventInitDict);
     }
@@ -1384,9 +1384,7 @@
          * @param childId The child identifyer.
          */
         disposeChild(childId) {
-            const child = childId
-                ? this.children[childId]
-                : null;
+            const child = this.getChild(childId);
             if (!child)
                 return Promise.resolve();
             return child
@@ -1412,23 +1410,26 @@
                     throw new Error('Wait for the component to initilize before starting to add children.');
                 if (!this.isMounted)
                     throw new Error('Wait for the component to mount before starting to add children.');
-                const child = this.options.childFactory.createComponent(this.getWindow(), options, new RootComponentFacade((child) => {
-                    this.scheduleDisposeChild(child);
-                }));
+                const child = this.options.childFactory.createComponent(this.getWindow(), options, new RootComponentFacade(this.scheduleDisposeChild.bind(this)));
                 const id = (yield child.initialize()).id;
                 this.children[id] = child;
-                this.getWindow().setTimeout(() => { child.mount(); }, 0);
+                yield child.mount();
                 return id;
             });
+        }
+        /**
+         * Get the child with the given identifier.
+         * @param id The child identifier.
+         */
+        getChild(id) {
+            return id ? (this.children[id] || null) : null;
         }
         /**
          * Remove a child component.
          * @param id The child component identifyer.
          */
         removeChild(id) {
-            this.getWindow().setTimeout(() => {
-                this.disposeChild(id);
-            }, 0);
+            return this.disposeChild(id);
         }
     }
 

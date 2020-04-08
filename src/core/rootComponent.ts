@@ -39,17 +39,14 @@ export class RootComponent extends Component {
    * Dispose a child by using it's id.
    * @param childId The child identifyer.
    */
-  private disposeChild(childId: string | null): Promise<void> {
+  private async disposeChild(childId: string | null): Promise<void> {
     const child = this.getChild(childId);
 
     if (!child)
       return Promise.resolve();
 
-    return child
-      .dispose()
-      .then(() => {
-        this.children[(<string>childId)] = null;
-      });
+    await child.dispose();
+    this.children[(<string>childId)] = null;
   }
 
   /**
@@ -74,14 +71,12 @@ export class RootComponent extends Component {
     const child = (<RootComponentOptions>this.options).childFactory.createComponent(
       this.getWindow(),
       options,
-      new RootComponentFacade((child) => {
-        this.scheduleDisposeChild(child);
-      })
+      new RootComponentFacade(this.scheduleDisposeChild.bind(this))
     );
 
     const id = (await child.initialize()).id;
     this.children[id] = child;
-    this.getWindow().setTimeout(() => { child.mount(); }, 0);
+    await child.mount();
     return id;
   }
 
@@ -97,9 +92,7 @@ export class RootComponent extends Component {
    * Remove a child component.
    * @param id The child component identifyer.
    */
-  public removeChild(id: string): void {
-    this.getWindow().setTimeout(() => {
-      this.disposeChild(id);
-    }, 0);
+  public removeChild(id: string): Promise<void> {
+    return this.disposeChild(id);
   }
 }

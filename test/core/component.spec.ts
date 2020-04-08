@@ -1,9 +1,16 @@
 import 'mocha';
-import { JSDOM } from 'jsdom';
+import { JSDOM, ResourceLoader, FetchOptions } from 'jsdom';
 import { expect } from 'chai';
-import { Component, ComponentEvent, ComponentEventType } from '../../src';
+import { Component, ComponentEvent, ComponentEventType, ResourceConfiguration } from '../../src';
 import { values_falsies, getDelayPromise } from '../utils';
 import { ComponentOptions, ComponentEventHandlers } from '../../src/core/componentOptions';
+
+class CustomResourceLoader extends ResourceLoader {
+  fetch(url: string, options: FetchOptions) {
+    //return Promise.resolve(Buffer.from(`console.log('${url}');`));
+    return Promise.resolve(Buffer.from(``));
+  }
+}
 
 class StubComponent extends Component {
   public timesDisposedCalled: number;
@@ -89,7 +96,11 @@ export function test_Component() {
     let _options: ComponentOptions = new ComponentOptions()
 
     beforeEach(() => {
-      _jsDom = new JSDOM(undefined, { url: 'http://localhost:8080/' });
+      _jsDom = new JSDOM(undefined, {
+        url: 'http://localhost:8080/',
+        runScripts: 'dangerously',
+        resources: new CustomResourceLoader()
+      });
       if (!_jsDom.window?.document?.defaultView)
         throw new Error('Setup failure!');
       _win = _jsDom.window.document.defaultView;
@@ -183,6 +194,11 @@ export function test_Component() {
       it('Creates the root element', async () => {
         const opt = new ComponentOptions();
         opt.handlers = <ComponentEventHandlers><unknown>undefined;
+        const resource = new ResourceConfiguration();
+        resource.isScript = true;
+        resource.url = 'http://localhost:8080/test.js';
+        resource.skip = () => false;
+        opt.resources.push(resource);
         const comp = new StubComponent(_win, opt);
 
         expect(comp.id).to.be.empty;
@@ -191,6 +207,7 @@ export function test_Component() {
         expect(comp.timesInitializedCalled).to.eq(1);
         expect(_win.document.getElementById(comp.id)).to.not.be.null;
         expect(_win.document.getElementById(comp.id)).to.eq(comp.rootElementAccessor());
+        expect(_win.document.querySelector('script[src="http://localhost:8080/test.js"]')).to.not.be.null;
       })
 
       it('Creates the root element within parent', async () => {

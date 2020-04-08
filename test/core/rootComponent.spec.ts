@@ -1,24 +1,25 @@
 import 'mocha';
 import { JSDOM } from 'jsdom';
 import { expect } from 'chai';
-import { RootComponent, RootComponentOptions, InWindowChildComponentOptions, InWindowContentCommunicationHandler, ChildComponentOptions, ChildComponent } from '../../src';
+import { RootComponent, RootComponentOptions, ChildComponentOptions } from '../../src';
 import { values_falsies, getDelayPromise } from '../utils';
+import { MockChildComponentFactory, MockChildComponent } from '../mocks/mockChildComponentFactory';
 
 export function test_RootComponent() {
   describe('RootComponent', () => {
     let _jsDom: JSDOM;
     let _win: Window;
-    let _options: RootComponentOptions = new RootComponentOptions();
-    let _childOptions: InWindowChildComponentOptions;
-    let _childEl: HTMLElement;
+    let _options: RootComponentOptions;
+    let _childOptions: ChildComponentOptions;
 
     beforeEach(() => {
       _jsDom = new JSDOM(undefined, { url: 'http://localhost:8080/' });
       if (!_jsDom.window?.document?.defaultView)
         throw new Error('Setup failure!');
       _win = _jsDom.window.document.defaultView;
-      _childOptions = new InWindowChildComponentOptions();
-      _childOptions.inject = (el) => { _childEl = el; };
+      _options = new RootComponentOptions();
+      _options.childFactory = new MockChildComponentFactory();
+      _childOptions = new ChildComponentOptions();
     });
 
     afterEach(() => {
@@ -101,40 +102,42 @@ export function test_RootComponent() {
     })
 
     describe('remove child', () => {
-      // it('should remove child', async () => {
-      //   const root = new RootComponent(_win, _options);
-      //   await root.initialize();
-      //   await root.mount();
-      //   const childOpts = _childOptions;
-      //   childOpts.inject = () => {};
-      //   const id = await root.addChild(childOpts);
+      it('should not throw if ID does not exist', async () => {
+        const root = new RootComponent(_win, _options);
+        expect(async () => await root.removeChild('some_id_that_does_not_exit'))
+            .not.to.throw();
+      })
 
-      //   root.removeChild(id);
-      //   // This is not imediate
-      //   expect(_win.document.getElementById(id)).to.not.be.null;
+      it('should remove child', async () => {
+        const root = new RootComponent(_win, _options);
+        await root.initialize();
+        await root.mount();
+        const childOpts = _childOptions;
+        const id = await root.addChild(childOpts);
 
-      //   await getDelayPromise(5);
+        await root.removeChild(id);
 
-      //   expect(_win.document.getElementById(id)).to.be.null;
-      // })
+        expect(_win.document.getElementById(id)).to.be.null;
+      })
 
-      // it('should handle child dispose request', async () => {
-      //   const root = new RootComponent(_win, _options);
-      //   await root.initialize();
-      //   await root.mount();
-      //   const id = await root.addChild(_childOptions)
+      it('should handle child dispose request', async () => {
+        const root = new RootComponent(_win, _options);
+        await root.initialize();
+        await root.mount();
+        const childOpts = _childOptions;
+        const id = await root.addChild(childOpts);
 
-      //   const child = root.getChild(id);
-      //   expect(child).to.not.be.null;
+        const child = root.getChild(id);
+        expect(child).to.not.be.null;
 
-      //   (<ChildComponent>child).dispose();
-      //   // This is not imediate
-      //   expect(_win.document.getElementById(id)).to.not.be.null;
+        (<MockChildComponent>child).signalDisposeToParent();
+        // This is not imediate
+        expect(_win.document.getElementById(id)).to.not.be.null;
 
-      //   await getDelayPromise(5);
+        await getDelayPromise(5);
 
-      //   expect(_win.document.getElementById(id)).to.be.null;
-      // })
+        expect(_win.document.getElementById(id)).to.be.null;
+      })
     })
   })
 }
