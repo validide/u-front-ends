@@ -83,9 +83,6 @@ export abstract class ChildComponent extends Component {
    * Set the promise that is used fof the disposing of the component.
    */
   private setContentDisposePromise(): void {
-    if (this.contentDisposePromise !== null)
-      return;
-
     this.contentDisposePromise = Promise
       .race<void>([
         new Promise<void>((resolver, rejecter) => {
@@ -95,7 +92,7 @@ export abstract class ChildComponent extends Component {
           this
             .getWindow()
             .setTimeout(
-              () => rejectTimeout(`Child dispose timeout.`),
+              () => rejectTimeout(new Error(`Child dispose timeout.`)),
               this.getOptions().contentDisposeTimeout
             );
         })
@@ -136,10 +133,8 @@ export abstract class ChildComponent extends Component {
     this.startDisposingContent();
     await (<Promise<void>>this.contentDisposePromise);
 
-    if (this.communicationHandler) {
-      this.communicationHandler.dispose();
-      this.communicationHandler = null;
-    }
+    (<ContainerCommunicationHandler>this.communicationHandler).dispose();
+    this.communicationHandler = null;
     this.contentDisposePromiseResolver = null;
     this.contentDisposePromise = null;
     await super.disposeCore();

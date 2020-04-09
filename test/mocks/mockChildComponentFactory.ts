@@ -9,21 +9,36 @@ export class MockChildComponentFactory extends ChildComponentFactory {
 
 export class MockChildComponent extends ChildComponent {
   _rootFacade: RootComponentFacade;
+  public callsTo_getCommunicationHandlerCore: number = 0;
+  public comunicationMethods: ContainerCommunicationHandlerMethods = new ContainerCommunicationHandlerMethods();
+  public public_containerCommunicationHandler: ContainerCommunicationHandler | null = null;
+
   constructor(window: Window, options: ChildComponentOptions, rootFacade: RootComponentFacade) {
     super(window, options, rootFacade);
     this._rootFacade = rootFacade;
   }
 
   protected getCommunicationHandlerCore(methods: ContainerCommunicationHandlerMethods): ContainerCommunicationHandler {
-    return new MockContainerCommunicationHandler(
+    this.callsTo_getCommunicationHandlerCore++;
+    this.comunicationMethods = methods;
+
+    if ((<HTMLElement>this.rootElement).tagName.toLowerCase() === 'ce-dipose-tests-null-handler'){
+      return <ContainerCommunicationHandler><unknown>null;
+    }
+
+    this.public_containerCommunicationHandler = new MockContainerCommunicationHandler(
       'click',
       <HTMLElement>this.rootElement,
       new MockCommunicationManager(),
       methods
     );
+    return this.public_containerCommunicationHandler;
   }
 
-  protected disposeCore(): Promise<void> {
+  public disposeCore(): Promise<void> {
+    if ((<HTMLElement>this.rootElement).tagName.toLowerCase() === 'ce-dipose-tests'){
+      return super.disposeCore();
+    }
     return Promise.resolve()
   }
 
@@ -33,6 +48,11 @@ export class MockChildComponent extends ChildComponent {
 }
 
 export class MockContainerCommunicationHandler extends ContainerCommunicationHandler {
+  public calls_requestContentDispose = 0;
+  public requestContentDispose() {
+    this.calls_requestContentDispose++;
+    super.requestContentDispose();
+  }
 }
 
 export class MockCommunicationHandler extends CommunicationHandler {
