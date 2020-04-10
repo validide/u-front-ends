@@ -45,7 +45,15 @@
   class MainNavBarComponent extends MainNavBar {
     constructor(el) {
       super(el);
-      this.communicationHandler = new ufe.InWindowContentCommunicationHandler(el, () => this.dispose());
+      var manager = new ufe.HTMLElementCommunicationsManager(
+        el,
+        ufe.CommunicationsEvent.CONTAINER_EVENT_TYPE,
+        el,
+        ufe.CommunicationsEvent.CONTENT_EVENT_TYPE
+      );
+      manager.initialize();
+
+      this.communicationHandler = new ufe.InWindowContentCommunicationHandler(manager, () => this.dispose());
 
       this.submitHandler = (e) => {
         e.preventDefault();

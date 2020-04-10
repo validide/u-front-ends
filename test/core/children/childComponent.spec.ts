@@ -3,7 +3,6 @@ import { JSDOM } from 'jsdom';
 import { expect } from 'chai';
 import { ChildComponentOptions, RootComponentFacade, noop } from '../../../src';
 import { MockChildComponent, MockContainerCommunicationHandler } from '../../mocks/mockChildComponentFactory';
-import { getDelayPromise } from '../../utils';
 
 export function test_ChildComponent() {
   describe('ChildComponent', () => {

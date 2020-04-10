@@ -1,13 +1,13 @@
 import { ChildComponent } from '../childComponent';
 import { RootComponentFacade } from '../../rootComponentFacade';
-import { ContainerCommunicationHandlerMethods, ContainerCommunicationHandler } from '../communications/index';
+import { ContainerCommunicationHandlerMethods, ContainerCommunicationHandler, CommunicationsEvent, HTMLElementCommunicationsManager } from '../communications/index';
 import { InWindowChildComponentOptions } from './childComponentOptions';
 import { InWindowContainerCommunicationHandler } from './containerCommunicationHandler';
 
 /**
  * In Window Child Component.
  */
-export class InWindowChildComponent extends ChildComponent<HTMLElement> {
+export class InWindowChildComponent extends ChildComponent {
   /**
    * Constructor.
    * @param window The window reference.
@@ -21,8 +21,16 @@ export class InWindowChildComponent extends ChildComponent<HTMLElement> {
   /**
    * @inheritdoc
    */
-  protected getCommunicationHandlerCore(methods: ContainerCommunicationHandlerMethods): ContainerCommunicationHandler<HTMLElement> {
-    return new InWindowContainerCommunicationHandler(<HTMLElement>this.rootElement, methods);
+  protected getCommunicationHandlerCore(methods: ContainerCommunicationHandlerMethods): ContainerCommunicationHandler {
+    const endpoint = <HTMLElement>this.rootElement;
+    const manager = new HTMLElementCommunicationsManager(
+      endpoint,
+      CommunicationsEvent.CONTENT_EVENT_TYPE,
+      endpoint,
+      CommunicationsEvent.CONTAINER_EVENT_TYPE
+    );
+    manager.initialize();
+    return new InWindowContainerCommunicationHandler(manager, methods);
   }
 
   /**

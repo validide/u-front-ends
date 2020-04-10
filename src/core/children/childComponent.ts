@@ -7,9 +7,9 @@ import { ContainerCommunicationHandler, ContainerCommunicationHandlerMethods } f
 /**
  * Child component base class.
  */
-export abstract class ChildComponent<TEndpoint> extends Component {
+export abstract class ChildComponent extends Component {
   private rootFacade: RootComponentFacade | null;
-  private communicationHandler: ContainerCommunicationHandler<TEndpoint> | null;
+  private communicationHandler: ContainerCommunicationHandler | null;
   private contentDisposePromise: Promise<void> | null;
   private contentDisposePromiseResolver: (() => void) | null;
 
@@ -32,12 +32,12 @@ export abstract class ChildComponent<TEndpoint> extends Component {
    * All derived classes need to implement this to retunr the correct handler implementation.
    * @param methods
    */
-  protected abstract getCommunicationHandlerCore(methods: ContainerCommunicationHandlerMethods): ContainerCommunicationHandler<TEndpoint>;
+  protected abstract getCommunicationHandlerCore(methods: ContainerCommunicationHandlerMethods): ContainerCommunicationHandler;
 
   /**
    * Get the comunication handler.
    */
-  protected getCommunicationHandler(): ContainerCommunicationHandler<TEndpoint> {
+  protected getCommunicationHandler(): ContainerCommunicationHandler {
     const methods = new ContainerCommunicationHandlerMethods();
     methods.mounted = () => this.callHandler(ComponentEventType.Mounted);
     methods.beforeUpdate = () => this.callHandler(ComponentEventType.BeforeUpdate);
@@ -76,7 +76,7 @@ export abstract class ChildComponent<TEndpoint> extends Component {
     this.setContentDisposePromise();
 
     // This should trigger the child component dispose.
-    (<ContainerCommunicationHandler<TEndpoint>>this.communicationHandler).requestContentDispose();
+    (<ContainerCommunicationHandler>this.communicationHandler).requestContentDispose();
   }
 
   /**
@@ -133,7 +133,7 @@ export abstract class ChildComponent<TEndpoint> extends Component {
     this.startDisposingContent();
     await (<Promise<void>>this.contentDisposePromise);
 
-    (<ContainerCommunicationHandler<TEndpoint>>this.communicationHandler).dispose();
+    (<ContainerCommunicationHandler>this.communicationHandler).dispose();
     this.communicationHandler = null;
     this.contentDisposePromiseResolver = null;
     this.contentDisposePromise = null;

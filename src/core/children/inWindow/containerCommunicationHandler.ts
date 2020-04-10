@@ -1,18 +1,13 @@
-import { ContainerCommunicationHandlerMethods, CommunicationsEvent, ContainerCommunicationHandler, HTMLElementCommunicationsManager } from '../communications/index';
+import { ContainerCommunicationHandlerMethods, CommunicationsEvent, ContainerCommunicationHandler, HTMLElementCommunicationsManager, CommunicationsManager } from '../communications/index';
 
 /**
  * @inheritdoc
  */
-export class InWindowContainerCommunicationHandler extends ContainerCommunicationHandler<HTMLElement> {
-  constructor(el: HTMLElement, wrapperMethods: ContainerCommunicationHandlerMethods) {
-    super(
-      new HTMLElementCommunicationsManager(
-        el,
-        CommunicationsEvent.CONTENT_EVENT_TYPE,
-        el,
-        CommunicationsEvent.CONTAINER_EVENT_TYPE
-      ),
-      wrapperMethods
-    );
+export class InWindowContainerCommunicationHandler extends ContainerCommunicationHandler {
+  /**
+ * @inheritdoc
+ */
+  constructor(communicationsManager: CommunicationsManager, wrapperMethods: ContainerCommunicationHandlerMethods) {
+    super(communicationsManager, wrapperMethods);
   }
 }

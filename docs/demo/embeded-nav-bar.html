@@ -54,10 +54,16 @@
 
       var communicationHandler = null;
       if (window.parent !== window) {
-        communicationHandler = new ufe.CrossWindowContentCommunicationHandler(
+        var manager = new ufe.CrossWindowCommunicationsManager(
           window, //inboundEndpoint: Window
+          ufe.CommunicationsEvent.CONTAINER_EVENT_TYPE,
           window.parent, //outboundEndpoint: Window
-          ufe.getUrlOrigin(document, window.location.href), //origin: string,
+          ufe.CommunicationsEvent.CONTENT_EVENT_TYPE,
+          ufe.getUrlOrigin(document, window.location.href)
+        );
+        manager.initialize();
+        communicationHandler = new ufe.CrossWindowContentCommunicationHandler(
+          manager,
           function() {
             dispose();
           } //disposeCommandCallback: () => void
@@ -87,7 +93,7 @@
           communicationHandler.dispose();
         }
         communicationHandler = null;
-        console.log('MainNavBarComponent -> finished');
+        console.log('MainNavBarC Iframe -> finished');
       }
 
       function submitHandler(e) {

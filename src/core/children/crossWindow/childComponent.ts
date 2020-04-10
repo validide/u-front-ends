@@ -1,6 +1,6 @@
 import { RootComponentFacade } from '../../rootComponentFacade';
 import { ChildComponent } from '../childComponent';
-import { ContainerCommunicationHandlerMethods, ContainerCommunicationHandler } from '../communications/index';
+import { ContainerCommunicationHandlerMethods, ContainerCommunicationHandler, CrossWindowCommunicationsManager, CommunicationsEvent } from '../communications/index';
 import { CrossWindowChildComponentOptions } from './childComponentOptions';
 import { CrossWindowContainerCommunicationHandler } from './containerCommunicationHandler';
 import { generateUniqueId } from '../../../dom/document/generateIds';
@@ -9,7 +9,7 @@ import { getUrlOrigin } from '../../../dom/document/getUrlOrigin';
 /**
  * Cross Window Child Component.
  */
-export class CrossWindowChildComponent extends ChildComponent<Window> {
+export class CrossWindowChildComponent extends ChildComponent {
   private embededId: string;
   private embededLoadPromise: Promise<void> | null;
   private embededLoadResolver: (() => void) | null;
@@ -108,13 +108,19 @@ export class CrossWindowChildComponent extends ChildComponent<Window> {
    *
    * @param methods @inheritdoc
    */
-  protected getCommunicationHandlerCore(methods: ContainerCommunicationHandlerMethods): ContainerCommunicationHandler<Window> {
+  protected getCommunicationHandlerCore(methods: ContainerCommunicationHandlerMethods): ContainerCommunicationHandler {
     const document = this.getDocument();
-    return new CrossWindowContainerCommunicationHandler(
+    const manager = new CrossWindowCommunicationsManager(
       <Window>(document).defaultView,
+      CommunicationsEvent.CONTENT_EVENT_TYPE,
       this.outboundEndpointAccesor(),
+      CommunicationsEvent.CONTAINER_EVENT_TYPE,
+      getUrlOrigin(document, this.getOptions().url)
+    );
+    manager.initialize();
+    return new CrossWindowContainerCommunicationHandler(
+      manager,
       this.embededId,
-      getUrlOrigin(document, this.getOptions().url),
       methods
     );
   }

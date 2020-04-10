@@ -467,7 +467,6 @@
         constructor(communicationsManager, handlerMethods) {
             this.communicationsManager = communicationsManager;
             this.handlerMethods = handlerMethods;
-            this.communicationsManager.initialize();
             this.communicationsManager.setEventReceivedCallback((e) => {
                 this.handleEvent(e);
             });
@@ -532,7 +531,6 @@
         constructor(communicationsManager, disposeCommandCallback) {
             this.communicationsManager = communicationsManager;
             this.disposeCommandCallback = disposeCommandCallback;
-            this.communicationsManager.initialize();
             this.communicationsManager.setEventReceivedCallback((e) => {
                 this.handleEvent(e);
             });
@@ -634,35 +632,13 @@
         }
     }
 
-    /**
-     * Comunications manager base class.
-     */
     class CommunicationsManager {
         /**
-         * Constructor
-         * @param inboundEndpoint The endpoint for receiving messages.
-         * @param inboundEventType The types of messages to receive.
-         * @param outboundEndpoint The endpoint to sent mesages.
-         * @param outboundEventType The messages to send.
+         * Constructor.
          */
-        constructor(inboundEndpoint, inboundEventType, outboundEndpoint, outboundEventType) {
-            this.inboundEndpoint = inboundEndpoint;
-            this.inboundEventType = inboundEventType;
-            this.outboundEndpoint = outboundEndpoint;
-            this.outboundEventType = outboundEventType;
-            this.onEventReceived = null;
-            this.eventHandler = (e) => this.handleEvent(e);
+        constructor() {
             this.initialized = false;
             this.disposed = false;
-        }
-        /**
-         * Handle the received events.
-         * @param e The recevied event.
-         */
-        handleEvent(e) {
-            const evt = this.readEvent(e);
-            if (evt && this.onEventReceived)
-                this.onEventReceived(evt);
         }
         /**
          * Initialize the manager.
@@ -673,22 +649,6 @@
          */
         disposeCore() { }
         /**
-         * Send a message.
-         * @param event The message.
-         */
-        send(event) {
-            if (this.outboundEndpoint) {
-                this.sendEvent(this.outboundEndpoint, event);
-            }
-        }
-        /**
-         * The the callback to handle any incomming messages.
-         * @param callback The callback.
-         */
-        setEventReceivedCallback(callback) {
-            this.onEventReceived = callback;
-        }
-        /**
          * Initialize the manager.
          */
         initialize() {
@@ -696,9 +656,6 @@
                 return;
             this.initialized = true;
             this.initializeCore();
-            if (this.inboundEndpoint && this.eventHandler) {
-                this.startReceiving(this.inboundEndpoint, this.eventHandler);
-            }
         }
         /**
          * Dispose of the manager.
@@ -707,20 +664,82 @@
             if (this.disposed)
                 return;
             this.disposed = true;
-            this.initialized = true;
+            this.disposeCore();
+        }
+    }
+    /**
+     * Comunications manager base class.
+     */
+    class CommunicationsManagerOf extends CommunicationsManager {
+        /**
+         * Constructor
+         * @param inboundEndpoint The endpoint for receiving messages.
+         * @param inboundEventType The types of messages to receive.
+         * @param outboundEndpoint The endpoint to sent mesages.
+         * @param outboundEventType The messages to send.
+         */
+        constructor(inboundEndpoint, inboundEventType, outboundEndpoint, outboundEventType) {
+            super();
+            this.inboundEndpoint = inboundEndpoint;
+            this.inboundEventType = inboundEventType;
+            this.outboundEndpoint = outboundEndpoint;
+            this.outboundEventType = outboundEventType;
+            this.onEventReceived = null;
+            this.eventHandler = (e) => { this.handleEvent(e); };
+        }
+        /**
+         * Handle the received events.
+         * @param e The recevied event.
+         */
+        handleEvent(e) {
+            if (!this.onEventReceived)
+                return;
+            const evt = this.readEvent(e);
+            if (evt) {
+                this.onEventReceived(evt);
+            }
+        }
+        /**
+         * @inheritdoc
+         */
+        initializeCore() {
+            if (this.inboundEndpoint && this.eventHandler) {
+                this.startReceiving(this.inboundEndpoint, this.eventHandler);
+            }
+            super.initializeCore();
+        }
+        /**
+         * @inheritdoc
+         */
+        disposeCore() {
             if (this.inboundEndpoint && this.eventHandler) {
                 this.stopReceiving(this.inboundEndpoint, this.eventHandler);
             }
             this.eventHandler = null;
             this.onEventReceived = null;
             this.inboundEndpoint = null;
+            super.disposeCore();
+        }
+        /**
+         * @inheritdoc
+         */
+        send(event) {
+            if (this.outboundEndpoint) {
+                this.sendEvent(this.outboundEndpoint, event);
+            }
+        }
+        /**
+         * @inheritdoc
+         */
+        setEventReceivedCallback(callback) {
+            this.onEventReceived = callback;
         }
     }
 
     /**
      * @inheritdoc
      */
-    class CrossWindowCommunicationsManager extends CommunicationsManager {
+    class CrossWindowCommunicationsManager extends CommunicationsManagerOf {
         /**
          * Constructor
          * @param inboundEndpoint The endpoint for receiving messages.
@@ -785,7 +804,7 @@
     /**
      * @inheritdoc
      */
-    class HTMLElementCommunicationsManager extends CommunicationsManager {
+    class HTMLElementCommunicationsManager extends CommunicationsManagerOf {
         /**
          * @inheritdoc
          */
@@ -799,7 +818,9 @@
             const customEvent = e;
             if (!customEvent || customEvent.type !== this.inboundEventType)
                 return null;
-            return customEvent.detail;
+            return customEvent.detail instanceof CommunicationsEvent
+                ? customEvent.detail
+                : null;
         }
         /**
          * @inheritdoc
@@ -966,8 +987,11 @@
      * @inheritdoc
      */
     class InWindowContainerCommunicationHandler extends ContainerCommunicationHandler {
-        constructor(el, wrapperMethods) {
-            super(new HTMLElementCommunicationsManager(el, CommunicationsEvent.CONTENT_EVENT_TYPE, el, CommunicationsEvent.CONTAINER_EVENT_TYPE), wrapperMethods);
+        /**
+       * @inheritdoc
+       */
+        constructor(communicationsManager, wrapperMethods) {
+            super(communicationsManager, wrapperMethods);
         }
     }
 
@@ -997,7 +1021,10 @@
          * @inheritdoc
          */
         getCommunicationHandlerCore(methods) {
-            return new InWindowContainerCommunicationHandler(this.rootElement, methods);
+            const endpoint = this.rootElement;
+            const manager = new HTMLElementCommunicationsManager(endpoint, CommunicationsEvent.CONTENT_EVENT_TYPE, endpoint, CommunicationsEvent.CONTAINER_EVENT_TYPE);
+            manager.initialize();
+            return new InWindowContainerCommunicationHandler(manager, methods);
         }
         /**
          * Get the InWindowChildComponentOptions
@@ -1029,14 +1056,12 @@
     class CrossWindowContainerCommunicationHandler extends ContainerCommunicationHandler {
         /**
          * Constructor.
-         * @param inboundEndpoint The inbound comunication endpoint.
-         * @param outboundEndpoint The outbound communication endpoint.
+         * @param communicationsManager A communications manager.
          * @param embedId The Id of the embeded element.
-         * @param origin The origin to communicate with.
          * @param containerMethods The methods to communicate with the container.
          */
-        constructor(inboundEndpoint, outboundEndpoint, embedId, origin, containerMethods) {
-            super(new CrossWindowCommunicationsManager(inboundEndpoint, CommunicationsEvent.CONTENT_EVENT_TYPE, outboundEndpoint, CommunicationsEvent.CONTAINER_EVENT_TYPE, origin), containerMethods);
+        constructor(communicationsManager, embedId, containerMethods) {
+            super(communicationsManager, containerMethods);
             this.embedId = embedId;
         }
         /**
@@ -1158,7 +1183,9 @@
          */
         getCommunicationHandlerCore(methods) {
             const document = this.getDocument();
-            return new CrossWindowContainerCommunicationHandler((document).defaultView, this.outboundEndpointAccesor(), this.embededId, getUrlOrigin(document, this.getOptions().url), methods);
+            const manager = new CrossWindowCommunicationsManager((document).defaultView, CommunicationsEvent.CONTENT_EVENT_TYPE, this.outboundEndpointAccesor(), CommunicationsEvent.CONTAINER_EVENT_TYPE, getUrlOrigin(document, this.getOptions().url));
+            manager.initialize();
+            return new CrossWindowContainerCommunicationHandler(manager, this.embededId, methods);
         }
         /**
          * Handle the loading of the embeded element.
@@ -1259,13 +1286,11 @@
     class CrossWindowContentCommunicationHandler extends ContentCommunicationHandler {
         /**
          * Constructor.
-         * @param inboundEndpoint The inbound communication endpoint.
-         * @param outboundEndpoint The outbund communication endpoint.
-         * @param origin The origin to communicate with.
+         * @param communicationsManager A communications manager.
          * @param disposeCommandCallback The command to dispose the content.
          */
-        constructor(inboundEndpoint, outboundEndpoint, origin, disposeCommandCallback) {
-            super(new CrossWindowCommunicationsManager(inboundEndpoint, CommunicationsEvent.CONTAINER_EVENT_TYPE, outboundEndpoint, CommunicationsEvent.CONTENT_EVENT_TYPE, origin), disposeCommandCallback);
+        constructor(communicationsManager, disposeCommandCallback) {
+            super(communicationsManager, disposeCommandCallback);
             this.iframeId = '';
             this.messageQueue = [];
         }
@@ -1381,8 +1406,8 @@
          * @param el The element to use for sending and receiving messages.
          * @param disposeCommandCallback The callback for disposing the content.
          */
-        constructor(el, disposeCommandCallback) {
-            super(new HTMLElementCommunicationsManager(el, CommunicationsEvent.CONTAINER_EVENT_TYPE, el, CommunicationsEvent.CONTENT_EVENT_TYPE), disposeCommandCallback);
+        constructor(communicationsManager, disposeCommandCallback) {
+            super(communicationsManager, disposeCommandCallback);
         }
     }
 
@@ -1515,6 +1540,7 @@
     exports.ChildComponentOptions = ChildComponentOptions;
     exports.CommunicationsEvent = CommunicationsEvent;
     exports.CommunicationsManager = CommunicationsManager;
+    exports.CommunicationsManagerOf = CommunicationsManagerOf;
     exports.Component = Component;
     exports.ComponentEvent = ComponentEvent;
     exports.ComponentEventHandlers = ComponentEventHandlers;

@@ -4,8 +4,8 @@ import { CommunicationsEventKind, CommunicationsEvent } from './event';
 /**
  * Handle the communications on the component content side.
  */
-export abstract class ContentCommunicationHandler<TEndpoint> {
-  private communicationsManager: CommunicationsManager<TEndpoint> | null;
+export abstract class ContentCommunicationHandler {
+  private communicationsManager: CommunicationsManager | null;
   private disposeCommandCallback: (() => void) | null;
   private disposed: boolean;
 
@@ -15,12 +15,11 @@ export abstract class ContentCommunicationHandler<TEndpoint> {
    * @param disposeCommandCallback The callback to dispose the content.
    */
   constructor(
-    communicationsManager: CommunicationsManager<TEndpoint>,
+    communicationsManager: CommunicationsManager,
     disposeCommandCallback: () => void
   ) {
     this.communicationsManager = communicationsManager;
     this.disposeCommandCallback = disposeCommandCallback;
-    this.communicationsManager.initialize();
     this.communicationsManager.setEventReceivedCallback((e: CommunicationsEvent) => {
       this.handleEvent(e);
     });

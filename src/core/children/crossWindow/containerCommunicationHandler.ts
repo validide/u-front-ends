@@ -5,34 +5,21 @@ import { CrossWindowCommunicationsManager } from '../communications/crossWindowM
 /**
  * @inheritdoc
  */
-export class CrossWindowContainerCommunicationHandler extends ContainerCommunicationHandler<Window> {
+export class CrossWindowContainerCommunicationHandler extends ContainerCommunicationHandler {
   private embedId: string;
 
   /**
    * Constructor.
-   * @param inboundEndpoint The inbound comunication endpoint.
-   * @param outboundEndpoint The outbound communication endpoint.
+   * @param communicationsManager A communications manager.
    * @param embedId The Id of the embeded element.
-   * @param origin The origin to communicate with.
    * @param containerMethods The methods to communicate with the container.
    */
   constructor(
-    inboundEndpoint: Window,
-    outboundEndpoint: Window,
+    communicationsManager: CrossWindowCommunicationsManager,
     embedId: string,
-    origin: string,
     containerMethods: ContainerCommunicationHandlerMethods
   ) {
-    super(
-      new CrossWindowCommunicationsManager(
-        inboundEndpoint,
-        CommunicationsEvent.CONTENT_EVENT_TYPE,
-        outboundEndpoint,
-        CommunicationsEvent.CONTAINER_EVENT_TYPE,
-        origin
-      ),
-      containerMethods
-    );
+    super(communicationsManager, containerMethods);
     this.embedId = embedId;
   }
 

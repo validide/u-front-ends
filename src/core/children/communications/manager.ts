@@ -1,17 +1,72 @@
 import { CommunicationsEvent } from './event';
 
+export abstract class CommunicationsManager {
+  private initialized: boolean;
+  private disposed: boolean;
+
+  /**
+   * Constructor.
+   */
+  constructor() {
+    this.initialized = false;
+    this.disposed = false;
+  }
+
+  /**
+   * Initialize the manager.
+   */
+  protected initializeCore(): void { }
+
+  /**
+   * Clean any resources before the manager is disposed.
+   */
+  protected disposeCore(): void { }
+
+  /**
+   * Send a message.
+   * @param event The message.
+   */
+  public abstract send(event: CommunicationsEvent): void;
+
+  /**
+   * The the callback to handle any incomming messages.
+   * @param callback The callback.
+   */
+  public abstract setEventReceivedCallback(callback: (event: CommunicationsEvent) => void): void;
+
+  /**
+   * Initialize the manager.
+   */
+  public initialize(): void {
+    if (this.initialized)
+      return;
+
+    this.initialized = true;
+    this.initializeCore();
+  }
+
+  /**
+   * Dispose of the manager.
+   */
+  public dispose(): void {
+    if (this.disposed)
+      return;
+
+    this.disposed = true;
+    this.disposeCore();
+  }
+}
+
 /**
  * Comunications manager base class.
  */
-export abstract class CommunicationsManager<TEndpoint> {
+export abstract class CommunicationsManagerOf<TEndpoint> extends CommunicationsManager {
   private inboundEndpoint: TEndpoint | null;
   protected inboundEventType: string;
   private outboundEndpoint: TEndpoint | null;
   protected outboundEventType: string;
   private eventHandler: ((e: Event) => void) | null;
-  private onEventReceived: ((event:CommunicationsEvent) => void) | null;
-  private initialized: boolean;
-  private disposed: boolean;
+  private onEventReceived: ((event: CommunicationsEvent) => void) | null;
 
   /**
    * Constructor
@@ -26,14 +81,13 @@ export abstract class CommunicationsManager<TEndpoint> {
     outboundEndpoint: TEndpoint,
     outboundEventType: string
   ) {
+    super();
     this.inboundEndpoint = inboundEndpoint;
     this.inboundEventType = inboundEventType;
     this.outboundEndpoint = outboundEndpoint;
     this.outboundEventType = outboundEventType;
     this.onEventReceived = null;
-    this.eventHandler = (e:Event) => this.handleEvent(e);
-    this.initialized = false;
-    this.disposed = false;
+    this.eventHandler = (e: Event) => { this.handleEvent(e); }
   }
 
   /**
@@ -41,20 +95,37 @@ export abstract class CommunicationsManager<TEndpoint> {
    * @param e The recevied event.
    */
   private handleEvent(e: Event): void {
+    if (!this.onEventReceived)
+      return;
+
     const evt = this.readEvent(e);
-    if (evt && this.onEventReceived)
+    if (evt) {
       this.onEventReceived(evt);
+    }
   }
 
   /**
-   * Initialize the manager.
+   * @inheritdoc
    */
-  protected initializeCore(): void {}
+  protected initializeCore(): void {
+    if (this.inboundEndpoint && this.eventHandler) {
+      this.startReceiving(this.inboundEndpoint, this.eventHandler);
+    }
+    super.initializeCore()
+  }
 
   /**
-   * Clean any resources before the manager is disposed.
+   * @inheritdoc
    */
-  protected disposeCore(): void {}
+  protected disposeCore(): void {
+    if (this.inboundEndpoint && this.eventHandler) {
+      this.stopReceiving(this.inboundEndpoint, this.eventHandler);
+    }
+    this.eventHandler = null;
+    this.onEventReceived = null;
+    this.inboundEndpoint = null;
+    super.disposeCore();
+  }
 
   /**
    * Start to receive messages
@@ -83,51 +154,18 @@ export abstract class CommunicationsManager<TEndpoint> {
   protected abstract sendEvent(outboundEndpoint: TEndpoint, event: CommunicationsEvent): void;
 
   /**
-   * Send a message.
-   * @param event The message.
+   * @inheritdoc
    */
-  public send(event: CommunicationsEvent): void{
+  public send(event: CommunicationsEvent): void {
     if (this.outboundEndpoint) {
       this.sendEvent(this.outboundEndpoint, event);
     }
   }
 
   /**
-   * The the callback to handle any incomming messages.
-   * @param callback The callback.
+   * @inheritdoc
    */
-  public setEventReceivedCallback(callback: (event:CommunicationsEvent) => void) {
+  public setEventReceivedCallback(callback: (event: CommunicationsEvent) => void) {
     this.onEventReceived = callback;
-  }
-
-  /**
-   * Initialize the manager.
-   */
-  public initialize(): void {
-    if (this.initialized)
-      return;
-
-    this.initialized = true;
-    this.initializeCore();
-    if (this.inboundEndpoint && this.eventHandler) {
-      this.startReceiving(this.inboundEndpoint, this.eventHandler);
-    }
-  }
-
-  /**
-   * Dispose of the manager.
-   */
-  public dispose(): void {
-    if (this.disposed)
-      return;
-
-    this.disposed = true;
-    this.initialized = true;
-    if (this.inboundEndpoint && this.eventHandler) {
-      this.stopReceiving(this.inboundEndpoint, this.eventHandler);
-    }
-    this.eventHandler = null;
-    this.onEventReceived = null;
-    this.inboundEndpoint = null;
   }
 }

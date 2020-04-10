@@ -1,11 +1,11 @@
 import { CommunicationsEvent } from '../communications/event';
-import { CommunicationsManager } from '../communications/manager';
+import { CommunicationsManager, CommunicationsManagerOf } from '../communications/manager';
 import { createCustomEvent } from '../../../dom/document/createCustomEvent';
 
 /**
  * @inheritdoc
  */
-export class HTMLElementCommunicationsManager extends CommunicationsManager<HTMLElement> {
+export class HTMLElementCommunicationsManager extends CommunicationsManagerOf<HTMLElement> {
 
   /**
    * @inheritdoc
@@ -27,7 +27,9 @@ export class HTMLElementCommunicationsManager extends CommunicationsManager<HTML
     if (!customEvent || customEvent.type !== this.inboundEventType)
       return null;
 
-    return customEvent.detail;
+    return customEvent.detail instanceof CommunicationsEvent
+      ? customEvent.detail
+      : null;
   }
 
   /**

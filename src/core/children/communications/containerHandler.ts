@@ -31,8 +31,8 @@ export class ContainerCommunicationHandlerMethods {
 /**
  * Handle the communications on the child component side.
  */
-export abstract class ContainerCommunicationHandler<TEndpoint> {
-  private communicationsManager: CommunicationsManager<TEndpoint> | null;
+export abstract class ContainerCommunicationHandler {
+  private communicationsManager: CommunicationsManager | null;
   private handlerMethods: ContainerCommunicationHandlerMethods | null;
   private disposed: boolean;
 
@@ -42,12 +42,11 @@ export abstract class ContainerCommunicationHandler<TEndpoint> {
    * @param handlerMethods A collection of handler methods.
    */
   constructor(
-    communicationsManager: CommunicationsManager<TEndpoint>,
+    communicationsManager: CommunicationsManager,
     handlerMethods: ContainerCommunicationHandlerMethods
   ) {
     this.communicationsManager = communicationsManager;
     this.handlerMethods = handlerMethods;
-    this.communicationsManager.initialize();
     this.communicationsManager.setEventReceivedCallback((e: CommunicationsEvent) => {
       this.handleEvent(e);
     });

@@ -1,11 +1,11 @@
 import { CommunicationsEvent } from '../communications/event';
-import { CommunicationsManager } from '../communications/manager';
+import { CommunicationsManagerOf } from '../communications/manager';
 import { CrossWindowCommunicationDataContract } from './crossWindowDataContract';
 
 /**
  * @inheritdoc
  */
-export class CrossWindowCommunicationsManager extends CommunicationsManager<Window> {
+export class CrossWindowCommunicationsManager extends CommunicationsManagerOf<Window> {
   private origin: string;
 
   /**

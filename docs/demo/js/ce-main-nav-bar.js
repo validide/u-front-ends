@@ -90,7 +90,15 @@
       super.initCore();
 
       this.el = this.firstElementChild;
-      this.communicationHandler = new ufe.InWindowContentCommunicationHandler(this, () => this.dispose());
+      var manager = new ufe.HTMLElementCommunicationsManager(
+        this,
+        ufe.CommunicationsEvent.CONTAINER_EVENT_TYPE,
+        this,
+        ufe.CommunicationsEvent.CONTENT_EVENT_TYPE
+      );
+      manager.initialize();
+
+      this.communicationHandler = new ufe.InWindowContentCommunicationHandler(manager, () => this.dispose());
       this.submitHandler = (e) => {
         e.preventDefault();
         var action = e.currentTarget.getAttribute('data-demo-action');
