@@ -1,15 +1,15 @@
 import { RootComponentFacade } from '../../rootComponentFacade';
 import { ChildComponent } from '../childComponent';
-import { ContainerCommunicationHandler, ContainerCommunicationHandlerMethods } from '../communications/index';
-import { CrossWindowChildComponentOptions } from './crossWindowChildComponentOptions';
-import { CrossWindowContainerCommunicationHandler } from './crossWindowContainerCommunicationHandler';
+import { ContainerCommunicationHandlerMethods, ContainerCommunicationHandler } from '../communications/index';
+import { CrossWindowChildComponentOptions } from './childComponentOptions';
+import { CrossWindowContainerCommunicationHandler } from './containerCommunicationHandler';
 import { generateUniqueId } from '../../../dom/document/generateIds';
 import { getUrlOrigin } from '../../../dom/document/getUrlOrigin';
 
 /**
  * Cross Window Child Component.
  */
-export class CrossWindowChildComponent extends ChildComponent {
+export class CrossWindowChildComponent extends ChildComponent<Window> {
   private embededId: string;
   private embededLoadPromise: Promise<void> | null;
   private embededLoadResolver: (() => void) | null;
@@ -108,7 +108,7 @@ export class CrossWindowChildComponent extends ChildComponent {
    *
    * @param methods @inheritdoc
    */
-  protected getCommunicationHandlerCore(methods: ContainerCommunicationHandlerMethods): ContainerCommunicationHandler {
+  protected getCommunicationHandlerCore(methods: ContainerCommunicationHandlerMethods): ContainerCommunicationHandler<Window> {
     const document = this.getDocument();
     return new CrossWindowContainerCommunicationHandler(
       <Window>(document).defaultView,

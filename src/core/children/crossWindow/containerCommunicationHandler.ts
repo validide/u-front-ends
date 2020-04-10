@@ -1,11 +1,11 @@
-import { ContainerCommunicationHandlerMethods, CommunicationEvent, ContainerCommunicationHandler, CommunicationEventKind } from '../communications/index';
-import { CrossWindowCommunicationManager } from './crossWindowCommunicationManager';
+import { ContainerCommunicationHandlerMethods, CommunicationsEvent, ContainerCommunicationHandler, CommunicationsEventKind } from '../communications/index';
 import { getHashCode } from '../../../utilities/getHashCode';
+import { CrossWindowCommunicationsManager } from '../communications/crossWindowManager';
 
 /**
  * @inheritdoc
  */
-export class CrossWindowContainerCommunicationHandler extends ContainerCommunicationHandler {
+export class CrossWindowContainerCommunicationHandler extends ContainerCommunicationHandler<Window> {
   private embedId: string;
 
   /**
@@ -24,13 +24,12 @@ export class CrossWindowContainerCommunicationHandler extends ContainerCommunica
     containerMethods: ContainerCommunicationHandlerMethods
   ) {
     super(
-      'message',
-      inboundEndpoint,
-      new CrossWindowCommunicationManager(
+      new CrossWindowCommunicationsManager(
+        inboundEndpoint,
+        CommunicationsEvent.CONTENT_EVENT_TYPE,
         outboundEndpoint,
-        origin,
-        CommunicationEvent.CONTENT_EVENT_TYPE,
-        CommunicationEvent.CONTAINER_EVENT_TYPE
+        CommunicationsEvent.CONTAINER_EVENT_TYPE,
+        origin
       ),
       containerMethods
     );
@@ -40,11 +39,11 @@ export class CrossWindowContainerCommunicationHandler extends ContainerCommunica
   /**
    * @inheritdoc
    */
-  protected handleEventCore(e: CommunicationEvent): void {
+  protected handleEventCore(e: CommunicationsEvent): void {
     if (!this.embedId)
       return;
 
-    if (!e.contentId && e.kind === CommunicationEventKind.Mounted) {
+    if (!e.contentId && e.kind === CommunicationsEventKind.Mounted) {
       this.attemptHandShake(e);
       return;
     }
@@ -58,9 +57,9 @@ export class CrossWindowContainerCommunicationHandler extends ContainerCommunica
   /**
    * Attempt a andshake with the content.
    */
-  private attemptHandShake(e: CommunicationEvent): void{
+  private attemptHandShake(e: CommunicationsEvent): void{
     const hash = getHashCode(this.embedId).toString(10);
-    const response = new CommunicationEvent(CommunicationEventKind.Mounted);
+    const response = new CommunicationsEvent(CommunicationsEventKind.Mounted);
 
     // We got a message back so if the data matches the hash we sent send the id
     if (e.data && e.data === hash) {
@@ -68,6 +67,6 @@ export class CrossWindowContainerCommunicationHandler extends ContainerCommunica
     } else {
       response.data = hash;
     }
-    this.dispatchEvent(response);
+    this.communicationsManager?.send(response);
   }
 }

@@ -1,8 +1,8 @@
-import { getUuidV4 } from "../../../utilities/random";
+import { getUuidV4 } from '../../../utilities/random';
 /**
  * Kind of events used to comunicate between content and container component.
  */
-export enum CommunicationEventKind {
+export enum CommunicationsEventKind {
   Mounted = 'mounted',
   BeforeUpdate = 'beforeUpdate',
   Updated = 'updated',
@@ -13,7 +13,7 @@ export enum CommunicationEventKind {
 /**
  * Event used to comunicate between content and container component.
  */
-export class CommunicationEvent {
+export class CommunicationsEvent {
   /**
    * The type of event dispatched by the child component.
    */
@@ -26,7 +26,7 @@ export class CommunicationEvent {
   /**
    * The kind of event.
    */
-  public kind: CommunicationEventKind;
+  public kind: CommunicationsEventKind;
   /**
    * Unique idnetifyer.
    */
@@ -48,7 +48,7 @@ export class CommunicationEvent {
    * Constructor.
    * @param kind The kind of event.
    */
-  constructor(kind: CommunicationEventKind) {
+  constructor(kind: CommunicationsEventKind) {
     this.kind = kind;
     this.uuid = getUuidV4()
     this.timestamp = new Date().getTime();

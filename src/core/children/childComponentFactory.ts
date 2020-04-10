@@ -1,9 +1,9 @@
 import { RootComponentFacade } from '../rootComponentFacade';
-import { ChildComponent } from './childComponent';
 import { ChildComponentOptions } from './childComponentOptions';
 import { ChildComponentType } from './childComponentType';
-import { InWindowChildComponent } from './inWindow/inWindowChildComponent';
+import { InWindowChildComponent } from './inWindow/childComponent';
 import { CrossWindowChildComponent, CrossWindowChildComponentOptions } from './crossWindow/index';
+import { Component } from '../component';
 
 /**
  * Factory to create child components.
@@ -15,7 +15,7 @@ export class ChildComponentFactory {
    * @param options The child component options.
    * @param rootFacade The facade for the root component.
    */
-  public createComponent(window: Window, options: ChildComponentOptions, rootFacade: RootComponentFacade): ChildComponent {
+  public createComponent(window: Window, options: ChildComponentOptions, rootFacade: RootComponentFacade): Component {
     switch (options.type) {
       case ChildComponentType.InWindow:
         return new InWindowChildComponent(window, options, rootFacade);

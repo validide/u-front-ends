@@ -395,17 +395,17 @@
         }
     }
 
-    (function (CommunicationEventKind) {
-        CommunicationEventKind["Mounted"] = "mounted";
-        CommunicationEventKind["BeforeUpdate"] = "beforeUpdate";
-        CommunicationEventKind["Updated"] = "updated";
-        CommunicationEventKind["BeforeDispose"] = "beforeDispose";
-        CommunicationEventKind["Disposed"] = "disposed";
-    })(exports.CommunicationEventKind || (exports.CommunicationEventKind = {}));
+    (function (CommunicationsEventKind) {
+        CommunicationsEventKind["Mounted"] = "mounted";
+        CommunicationsEventKind["BeforeUpdate"] = "beforeUpdate";
+        CommunicationsEventKind["Updated"] = "updated";
+        CommunicationsEventKind["BeforeDispose"] = "beforeDispose";
+        CommunicationsEventKind["Disposed"] = "disposed";
+    })(exports.CommunicationsEventKind || (exports.CommunicationsEventKind = {}));
     /**
      * Event used to comunicate between content and container component.
      */
-    class CommunicationEvent {
+    class CommunicationsEvent {
         /**
          * Constructor.
          * @param kind The kind of event.
@@ -420,86 +420,13 @@
     /**
      * The type of event dispatched by the child component.
      */
-    CommunicationEvent.CONTENT_EVENT_TYPE = 'content_event.communication.children.validide_micro_front_ends';
+    CommunicationsEvent.CONTENT_EVENT_TYPE = 'content_event.communication.children.validide_micro_front_ends';
     /**
      * The type of event dispatched by the content.
      */
-    CommunicationEvent.CONTAINER_EVENT_TYPE = 'container_event.communication.children.validide_micro_front_ends';
+    CommunicationsEvent.CONTAINER_EVENT_TYPE = 'container_event.communication.children.validide_micro_front_ends';
 
-    /**
-     * Communication handler.
-     */
-    class CommunicationHandler {
-        /**
-         * Constructor.
-         * @param messageType The type of message to listen for.
-         * @param inboundEndpoint The inbound "endpoint"(element) to listen to.
-         * @param manager The communications manager.
-         */
-        constructor(messageType, inboundEndpoint, manager) {
-            this.messageType = messageType;
-            this.inboundEndpoint = inboundEndpoint;
-            this.manager = manager;
-            this.handlerAction = this.handleEvent.bind(this);
-            this.disposed = false;
-            this.attachCommandHandler();
-        }
-        /**
-         * Handle a communication event.
-         * @param e The event.
-         */
-        handleEvent(e) {
-            if (!this.manager)
-                return;
-            const evt = this.manager.readEvent(e);
-            if (!evt)
-                return;
-            this.handleEventCore(evt);
-        }
-        /**
-         * Attach the command handler to the endpoint.
-         */
-        attachCommandHandler() {
-            if (!this.inboundEndpoint || !this.handlerAction)
-                return;
-            this.inboundEndpoint.addEventListener(this.messageType, this.handlerAction);
-        }
-        /**
-         * Detach the command handler from the endpoint.
-         */
-        detachCommandHandler() {
-            if (!this.inboundEndpoint || !this.handlerAction)
-                return;
-            this.inboundEndpoint.removeEventListener(this.messageType, this.handlerAction);
-        }
-        /**
-         * Dispatch a communication event.
-         * @param information The event information.
-         */
-        dispatchEvent(information) {
-            if (!this.manager)
-                return;
-            this.manager.dispatchEvent(information);
-        }
-        /**
-         * Dispose the handler.
-         */
-        dispose() {
-            if (this.disposed)
-                return;
-            this.disposed = true;
-            if (this.handlerAction) {
-                this.detachCommandHandler();
-            }
-            this.handlerAction = null;
-            if (this.manager) {
-                this.manager.dispose();
-            }
-            this.manager = null;
-            this.disposeCore();
-        }
-    }
-
+    var _a, _b, _c, _d, _e;
     /**
      * The communication handler methods.
      */
@@ -508,103 +435,110 @@
             /**
              * Call the container to signal that the content finished mounting.
              */
-            this.callMounterHandler = noop;
+            this[_a] = noop;
             /**
              * Call the container to signal an update is about to happen.
              */
-            this.callBeforeUpdateHandler = noop;
+            this[_b] = noop;
             /**
              * Call the container to signal an update finished.
              */
-            this.callUpdatedHandler = noop;
+            this[_c] = noop;
             /**
              * Call the container to signal dispose started.
              */
-            this.contentBeginDisposed = noop;
+            this[_d] = noop;
             /**
              * Call the container to signal the component has disposed(almost).
              */
-            this.contentDisposed = noop;
+            this[_e] = noop;
         }
     }
+    _a = exports.CommunicationsEventKind.Mounted, _b = exports.CommunicationsEventKind.BeforeUpdate, _c = exports.CommunicationsEventKind.Updated, _d = exports.CommunicationsEventKind.BeforeDispose, _e = exports.CommunicationsEventKind.Disposed;
     /**
-     * Communication handler for the container(child component).
+     * Handle the communications on the child component side.
      */
-    class ContainerCommunicationHandler extends CommunicationHandler {
+    class ContainerCommunicationHandler {
         /**
-         * Constructor.
-         * @param messageType The message to handle.
-         * @param inboundEndpoint The inbound "endpoint" to listen to.
-         * @param manager The manager to handle outgoing communication.
-         * @param containerMethods The container methods.
+         * Constructor
+         * @param communicationsManager A communications manager.
+         * @param handlerMethods A collection of handler methods.
          */
-        constructor(messageType, inboundEndpoint, manager, containerMethods) {
-            super(messageType, inboundEndpoint, manager);
-            this.containerMethods = containerMethods;
+        constructor(communicationsManager, handlerMethods) {
+            this.communicationsManager = communicationsManager;
+            this.handlerMethods = handlerMethods;
+            this.communicationsManager.initialize();
+            this.communicationsManager.setEventReceivedCallback((e) => {
+                this.handleEvent(e);
+            });
+            this.disposed = false;
         }
         /**
-         * @inheritdoc
+         * Core functionality for handling the incomming events.
+         * @param e The event.
          */
         handleEventCore(e) {
-            if (!this.containerMethods)
+            if (!this.handlerMethods)
                 return;
-            switch (e.kind) {
-                case exports.CommunicationEventKind.Mounted:
-                    this.containerMethods.callMounterHandler();
-                    break;
-                case exports.CommunicationEventKind.BeforeUpdate:
-                    this.containerMethods.callBeforeUpdateHandler();
-                    break;
-                case exports.CommunicationEventKind.Updated:
-                    this.containerMethods.callUpdatedHandler();
-                    break;
-                case exports.CommunicationEventKind.BeforeDispose:
-                    this.containerMethods.contentBeginDisposed();
-                    break;
-                case exports.CommunicationEventKind.Disposed:
-                    this.containerMethods.contentDisposed();
-                    break;
-                default:
-                    throw new Error(`The "${e.kind}" event is not configured.`);
-            }
+            const method = this.handlerMethods[e.kind];
+            if (!method)
+                return;
+            method();
         }
         /**
-         * @inheritdoc
+         * Handle the incomming communications event.
+         * @param e The event
          */
-        disposeCore() {
-            this.containerMethods = null;
+        handleEvent(e) {
+            this.handleEventCore(e);
+        }
+        /**
+         * Method invoked to dispose of the handler.
+         */
+        dispose() {
+            var _f;
+            if (this.disposed)
+                return;
+            this.disposed = true;
+            (_f = this.communicationsManager) === null || _f === void 0 ? void 0 : _f.dispose();
+            this.communicationsManager = null;
+            this.handlerMethods = null;
         }
         /**
          * Reuest that the content begins disposing.
          */
         requestContentDispose() {
-            this.dispatchEvent(new CommunicationEvent(exports.CommunicationEventKind.BeforeDispose));
+            var _f;
+            (_f = this.communicationsManager) === null || _f === void 0 ? void 0 : _f.send(new CommunicationsEvent(exports.CommunicationsEventKind.BeforeDispose));
         }
     }
 
     /**
-     *Communication handler for the content(the component beeing integrated).
-     * The integrated component should create an instance of this to comunicate with the container.
+     * Handle the communications on the component content side.
      */
-    class ContentCommunicationHandler extends CommunicationHandler {
+    class ContentCommunicationHandler {
         /**
-         * Constructor.
-         * @param messageType The message to handle.
-         * @param inboundEndpoint The inbound "endpoint" to listen to.
-         * @param manager The manager to handle outgoing communication.
-         * @param disposeCommandCallback The command to dispose the content.
+         * Constructor
+         * @param communicationsManager A comunications manager
+         * @param disposeCommandCallback The callback to dispose the content.
          */
-        constructor(messageType, inboundEndpoint, manager, disposeCommandCallback) {
-            super(messageType, inboundEndpoint, manager);
+        constructor(communicationsManager, disposeCommandCallback) {
+            this.communicationsManager = communicationsManager;
             this.disposeCommandCallback = disposeCommandCallback;
+            this.communicationsManager.initialize();
+            this.communicationsManager.setEventReceivedCallback((e) => {
+                this.handleEvent(e);
+            });
+            this.disposed = false;
         }
         /**
-         * @inheritdoc
+         * Core functionality for handling the incomming events.
+         * @param e The event.
          */
         handleEventCore(e) {
             switch (e.kind) {
-                case exports.CommunicationEventKind.BeforeDispose:
-                case exports.CommunicationEventKind.Disposed:
+                case exports.CommunicationsEventKind.BeforeDispose:
+                case exports.CommunicationsEventKind.Disposed:
                     if (this.disposeCommandCallback) {
                         this.disposeCommandCallback();
                     }
@@ -614,40 +548,269 @@
             }
         }
         /**
+         * Handle the incomming communications event.
+         * @param e The event
+         */
+        handleEvent(e) {
+            this.handleEventCore(e);
+        }
+        /**
+         * Core dispose function.
+         * Any component derived should override this to add clean-up after itself.
+         */
+        disposeCore() { }
+        /**
          * Dispatch event to signal mounting finished.
          */
         dispatchMounted() {
-            this.dispatchEvent(new CommunicationEvent(exports.CommunicationEventKind.Mounted));
+            var _a;
+            (_a = this.communicationsManager) === null || _a === void 0 ? void 0 : _a.send(new CommunicationsEvent(exports.CommunicationsEventKind.Mounted));
         }
         /**
          * Dispatch event to signal update is about to start.
          */
         dispatchBeforeUpdate() {
-            this.dispatchEvent(new CommunicationEvent(exports.CommunicationEventKind.BeforeUpdate));
+            var _a;
+            (_a = this.communicationsManager) === null || _a === void 0 ? void 0 : _a.send(new CommunicationsEvent(exports.CommunicationsEventKind.BeforeUpdate));
         }
         /**
          * Dispatch event to signal update finished.
          */
         dispatchUpdated() {
-            this.dispatchEvent(new CommunicationEvent(exports.CommunicationEventKind.Updated));
+            var _a;
+            (_a = this.communicationsManager) === null || _a === void 0 ? void 0 : _a.send(new CommunicationsEvent(exports.CommunicationsEventKind.Updated));
         }
         /**
          * Dispatch event to disposing started.
          */
         dispatchBeforeDispose() {
-            this.dispatchEvent(new CommunicationEvent(exports.CommunicationEventKind.BeforeDispose));
+            var _a;
+            (_a = this.communicationsManager) === null || _a === void 0 ? void 0 : _a.send(new CommunicationsEvent(exports.CommunicationsEventKind.BeforeDispose));
         }
         /**
          * Dispatch event to mount finished.
          */
         dispatchDisposed() {
-            this.dispatchEvent(new CommunicationEvent(exports.CommunicationEventKind.Disposed));
+            var _a;
+            (_a = this.communicationsManager) === null || _a === void 0 ? void 0 : _a.send(new CommunicationsEvent(exports.CommunicationsEventKind.Disposed));
+        }
+        /**
+         * Method invoked to dispose of the handler.
+         */
+        dispose() {
+            var _a;
+            if (this.disposed)
+                return;
+            this.disposed = true;
+            this.disposeCore();
+            (_a = this.communicationsManager) === null || _a === void 0 ? void 0 : _a.dispose();
+            this.communicationsManager = null;
+            this.disposeCommandCallback = null;
+        }
+    }
+
+    /**
+     * The data sent between the windows directly on the Message Event.
+     */
+    class CrossWindowCommunicationDataContract {
+        /**
+         * Constructor.
+         * @param type Data type.
+         * @param detail Data detail.
+         */
+        constructor(type, detail) {
+            this.type = type;
+            this.detail = detail;
+        }
+    }
+
+    /**
+     * Comunications manager base class.
+     */
+    class CommunicationsManager {
+        /**
+         * Constructor
+         * @param inboundEndpoint The endpoint for receiving messages.
+         * @param inboundEventType The types of messages to receive.
+         * @param outboundEndpoint The endpoint to sent mesages.
+         * @param outboundEventType The messages to send.
+         */
+        constructor(inboundEndpoint, inboundEventType, outboundEndpoint, outboundEventType) {
+            this.inboundEndpoint = inboundEndpoint;
+            this.inboundEventType = inboundEventType;
+            this.outboundEndpoint = outboundEndpoint;
+            this.outboundEventType = outboundEventType;
+            this.onEventReceived = null;
+            this.eventHandler = (e) => this.handleEvent(e);
+            this.initialized = false;
+            this.disposed = false;
+        }
+        /**
+         * Handle the received events.
+         * @param e The recevied event.
+         */
+        handleEvent(e) {
+            const evt = this.readEvent(e);
+            if (evt && this.onEventReceived)
+                this.onEventReceived(evt);
+        }
+        /**
+         * Initialize the manager.
+         */
+        initializeCore() { }
+        /**
+         * Clean any resources before the manager is disposed.
+         */
+        disposeCore() { }
+        /**
+         * Send a message.
+         * @param event The message.
+         */
+        send(event) {
+            if (this.outboundEndpoint) {
+                this.sendEvent(this.outboundEndpoint, event);
+            }
+        }
+        /**
+         * The the callback to handle any incomming messages.
+         * @param callback The callback.
+         */
+        setEventReceivedCallback(callback) {
+            this.onEventReceived = callback;
+        }
+        /**
+         * Initialize the manager.
+         */
+        initialize() {
+            if (this.initialized)
+                return;
+            this.initialized = true;
+            this.initializeCore();
+            if (this.inboundEndpoint && this.eventHandler) {
+                this.startReceiving(this.inboundEndpoint, this.eventHandler);
+            }
+        }
+        /**
+         * Dispose of the manager.
+         */
+        dispose() {
+            if (this.disposed)
+                return;
+            this.disposed = true;
+            this.initialized = true;
+            if (this.inboundEndpoint && this.eventHandler) {
+                this.stopReceiving(this.inboundEndpoint, this.eventHandler);
+            }
+            this.eventHandler = null;
+            this.onEventReceived = null;
+            this.inboundEndpoint = null;
+        }
+    }
+
+    /**
+     * @inheritdoc
+     */
+    class CrossWindowCommunicationsManager extends CommunicationsManager {
+        /**
+         * Constructor
+         * @param inboundEndpoint The endpoint for receiving messages.
+         * @param inboundEventType The types of messages to receive.
+         * @param outboundEndpoint The endpoint to sent mesages.
+         * @param outboundEventType The messages to send.
+         * @param origin The origin to comunicate with.
+         */
+        constructor(inboundEndpoint, inboundEventType, outboundEndpoint, outboundEventType, origin) {
+            super(inboundEndpoint, inboundEventType, outboundEndpoint, outboundEventType);
+            this.origin = origin;
         }
         /**
          * @inheritdoc
          */
-        disposeCore() {
-            this.disposeCommandCallback = null;
+        readEvent(e) {
+            const messageEvent = e;
+            if (!messageEvent || messageEvent.origin !== this.origin)
+                return null;
+            const data = messageEvent.data;
+            if (!data || data.type !== this.inboundEventType)
+                return null;
+            return data.detail;
+        }
+        /**
+         * @inheritdoc
+         */
+        startReceiving(inboundEndpoint, handler) {
+            inboundEndpoint.addEventListener('message', handler);
+        }
+        /**
+         * @inheritdoc
+         */
+        stopReceiving(inboundEndpoint, handler) {
+            inboundEndpoint.removeEventListener('message', handler);
+        }
+        /**
+         * @inheritdoc
+         */
+        sendEvent(outboundEndpoint, event) {
+            const data = new CrossWindowCommunicationDataContract(this.outboundEventType, event);
+            outboundEndpoint.postMessage(data, this.origin);
+        }
+    }
+
+    function customEventPolyfill(document, typeArg, eventInitDict) {
+        const params = eventInitDict || { bubbles: false, cancelable: false, detail: null };
+        var evt = document.createEvent('CustomEvent');
+        evt.initCustomEvent(typeArg, params.bubbles || false, params.cancelable || false, params.detail);
+        return evt;
+    }
+    function createCustomEvent(document, typeArg, eventInitDict) {
+        const win = document === null || document === void 0 ? void 0 : document.defaultView;
+        if (!win)
+            throw new Error('Document does not have a defualt view.');
+        if (typeof win.CustomEvent !== 'function') {
+            return new customEventPolyfill(document, typeArg, eventInitDict);
+        }
+        return new win.CustomEvent(typeArg, eventInitDict);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    class HTMLElementCommunicationsManager extends CommunicationsManager {
+        /**
+         * @inheritdoc
+         */
+        constructor(inboundEndpoint, inboundEventType, outboundEndpoint, outboundEventType) {
+            super(inboundEndpoint, inboundEventType, outboundEndpoint, outboundEventType);
+        }
+        /**
+         * @inheritdoc
+         */
+        readEvent(e) {
+            const customEvent = e;
+            if (!customEvent || customEvent.type !== this.inboundEventType)
+                return null;
+            return customEvent.detail;
+        }
+        /**
+         * @inheritdoc
+         */
+        startReceiving(inboundEndpoint, handler) {
+            inboundEndpoint.addEventListener(this.inboundEventType, handler);
+        }
+        /**
+         * @inheritdoc
+         */
+        stopReceiving(inboundEndpoint, handler) {
+            inboundEndpoint.removeEventListener(this.inboundEventType, handler);
+        }
+        /**
+         * @inheritdoc
+         */
+        sendEvent(outboundEndpoint, event) {
+            if (!outboundEndpoint.ownerDocument)
+                return;
+            const evt = createCustomEvent(outboundEndpoint.ownerDocument, this.outboundEventType, { detail: event });
+            outboundEndpoint.dispatchEvent(evt);
         }
     }
 
@@ -682,11 +845,11 @@
          */
         getCommunicationHandler() {
             const methods = new ContainerCommunicationHandlerMethods();
-            methods.callMounterHandler = () => this.callHandler(exports.ComponentEventType.Mounted);
-            methods.callBeforeUpdateHandler = () => this.callHandler(exports.ComponentEventType.BeforeUpdate);
-            methods.callUpdatedHandler = () => this.callHandler(exports.ComponentEventType.Updated);
-            methods.contentBeginDisposed = () => this.contentBeginDisposed();
-            methods.contentDisposed = () => this.contentDisposed();
+            methods.mounted = () => this.callHandler(exports.ComponentEventType.Mounted);
+            methods.beforeUpdate = () => this.callHandler(exports.ComponentEventType.BeforeUpdate);
+            methods.updated = () => this.callHandler(exports.ComponentEventType.Updated);
+            methods.beforeDispose = () => this.contentBeginDisposed();
+            methods.disposed = () => this.contentDisposed();
             return this.getCommunicationHandlerCore(methods);
         }
         /**
@@ -719,8 +882,6 @@
          * Set the promise that is used fof the disposing of the component.
          */
         setContentDisposePromise() {
-            if (this.contentDisposePromise !== null)
-                return;
             this.contentDisposePromise = Promise
                 .race([
                 new Promise((resolver, rejecter) => {
@@ -729,7 +890,7 @@
                 new Promise((resolveTimeout, rejectTimeout) => {
                     this
                         .getWindow()
-                        .setTimeout(() => rejectTimeout(`Child dispose timeout.`), this.getOptions().contentDisposeTimeout);
+                        .setTimeout(() => rejectTimeout(new Error(`Child dispose timeout.`)), this.getOptions().contentDisposeTimeout);
                 })
             ])
                 .catch((err) => {
@@ -768,10 +929,8 @@
             return __awaiter$1(this, void 0, void 0, function* () {
                 this.startDisposingContent();
                 yield this.contentDisposePromise;
-                if (this.communicationHandler) {
-                    this.communicationHandler.dispose();
-                    this.communicationHandler = null;
-                }
+                this.communicationHandler.dispose();
+                this.communicationHandler = null;
                 this.contentDisposePromiseResolver = null;
                 this.contentDisposePromise = null;
                 yield _super.disposeCore.call(this);
@@ -793,68 +952,12 @@
         ChildComponentType["CrossWindow"] = "crossWindow";
     })(exports.ChildComponentType || (exports.ChildComponentType = {}));
 
-    function customEventPolyfill(document, typeArg, eventInitDict) {
-        const params = eventInitDict || { bubbles: false, cancelable: false, detail: null };
-        var evt = document.createEvent('CustomEvent');
-        evt.initCustomEvent(typeArg, params.bubbles || false, params.cancelable || false, params.detail);
-        return evt;
-    }
-    function createCustomEvent(document, typeArg, eventInitDict) {
-        const win = document === null || document === void 0 ? void 0 : document.defaultView;
-        if (!win)
-            throw new Error('Document does not have a defualt view.');
-        if (typeof win.CustomEvent !== 'function') {
-            return new customEventPolyfill(document, typeArg, eventInitDict);
-        }
-        return new win.CustomEvent(typeArg, eventInitDict);
-    }
-
-    /**
-     * In Window Child Comunication Manager.
-     */
-    class InWindowCommunicationManager {
-        /**
-         * Constructor
-         * @param outboundEndpoint The outbound communication endpoint.
-         * @param inboundEventType The inbound event type.
-         * @param outboundEventType The outbound event type.
-         */
-        constructor(el, inboundEventType, outboundEventType) {
-            this.outboundEndpoint = el;
-            this.inboundEventType = inboundEventType;
-            this.outboundEventType = outboundEventType;
-        }
-        /**
-         * @inheritdoc
-         */
-        readEvent(e) {
-            if (!e || e.type !== this.inboundEventType)
-                return null;
-            return e.detail;
-        }
-        /**
-         * @inheritdoc
-         */
-        dispatchEvent(detail) {
-            if (!this.outboundEndpoint || !this.outboundEndpoint.ownerDocument)
-                return;
-            const evt = createCustomEvent(this.outboundEndpoint.ownerDocument, this.outboundEventType, { detail: detail });
-            this.outboundEndpoint.dispatchEvent(evt);
-        }
-        /**
-         * @inheritdoc
-         */
-        dispose() {
-            this.outboundEndpoint = null;
-        }
-    }
-
     /**
      * @inheritdoc
      */
     class InWindowContainerCommunicationHandler extends ContainerCommunicationHandler {
         constructor(el, wrapperMethods) {
-            super(CommunicationEvent.CONTENT_EVENT_TYPE, el, new InWindowCommunicationManager(el, CommunicationEvent.CONTENT_EVENT_TYPE, CommunicationEvent.CONTAINER_EVENT_TYPE), wrapperMethods);
+            super(new HTMLElementCommunicationsManager(el, CommunicationsEvent.CONTENT_EVENT_TYPE, el, CommunicationsEvent.CONTAINER_EVENT_TYPE), wrapperMethods);
         }
     }
 
@@ -911,57 +1014,6 @@
     }
 
     /**
-     * Cross Window Communication Manager.
-     */
-    class CrossWindowCommunicationManager {
-        /**
-         * Constructor.
-         * @param outboundEndpoint Outbound endpoint.
-         * @param origin The origin the manager should comunicate with.
-         * @param inboundEventType The inbound event type.
-         * @param outboundEventType The outbound event type.
-         */
-        constructor(outboundEndpoint, origin, inboundEventType, outboundEventType) {
-            this.outboundEndpoint = outboundEndpoint;
-            this.origin = origin;
-            this.inboundEventType = inboundEventType;
-            this.outboundEventType = outboundEventType;
-        }
-        /**
-         * @inheritdoc
-         */
-        readEvent(e) {
-            if (!e)
-                return null;
-            const messageEvent = e;
-            if (!messageEvent || messageEvent.origin !== this.origin)
-                return null;
-            const data = messageEvent.data;
-            if (!data || data.type !== this.inboundEventType)
-                return null;
-            return data.detail;
-        }
-        /**
-         * @inheritdoc
-         */
-        dispatchEvent(detail) {
-            if (!this.outboundEndpoint)
-                return;
-            const event = {
-                type: this.outboundEventType,
-                detail: detail
-            };
-            this.outboundEndpoint.postMessage(event, this.origin);
-        }
-        /**
-         * @inheritdoc
-         */
-        dispose() {
-            this.outboundEndpoint = null;
-        }
-    }
-
-    /**
      * @inheritdoc
      */
     class CrossWindowContainerCommunicationHandler extends ContainerCommunicationHandler {
@@ -974,7 +1026,7 @@
          * @param containerMethods The methods to communicate with the container.
          */
         constructor(inboundEndpoint, outboundEndpoint, embedId, origin, containerMethods) {
-            super('message', inboundEndpoint, new CrossWindowCommunicationManager(outboundEndpoint, origin, CommunicationEvent.CONTENT_EVENT_TYPE, CommunicationEvent.CONTAINER_EVENT_TYPE), containerMethods);
+            super(new CrossWindowCommunicationsManager(inboundEndpoint, CommunicationsEvent.CONTENT_EVENT_TYPE, outboundEndpoint, CommunicationsEvent.CONTAINER_EVENT_TYPE, origin), containerMethods);
             this.embedId = embedId;
         }
         /**
@@ -983,7 +1035,7 @@
         handleEventCore(e) {
             if (!this.embedId)
                 return;
-            if (!e.contentId && e.kind === exports.CommunicationEventKind.Mounted) {
+            if (!e.contentId && e.kind === exports.CommunicationsEventKind.Mounted) {
                 this.attemptHandShake(e);
                 return;
             }
@@ -995,8 +1047,9 @@
          * Attempt a andshake with the content.
          */
         attemptHandShake(e) {
+            var _a;
             const hash = getHashCode(this.embedId).toString(10);
-            const response = new CommunicationEvent(exports.CommunicationEventKind.Mounted);
+            const response = new CommunicationsEvent(exports.CommunicationsEventKind.Mounted);
             // We got a message back so if the data matches the hash we sent send the id
             if (e.data && e.data === hash) {
                 response.contentId = this.embedId;
@@ -1004,7 +1057,7 @@
             else {
                 response.data = hash;
             }
-            this.dispatchEvent(response);
+            (_a = this.communicationsManager) === null || _a === void 0 ? void 0 : _a.send(response);
         }
     }
 
@@ -1181,6 +1234,9 @@
      * Cross Window Child Component Options.
      */
     class CrossWindowChildComponentOptions extends ChildComponentOptions {
+        /**
+         * Constructor.
+         */
         constructor() {
             super();
             this.url = 'about:blank';
@@ -1200,7 +1256,7 @@
          * @param disposeCommandCallback The command to dispose the content.
          */
         constructor(inboundEndpoint, outboundEndpoint, origin, disposeCommandCallback) {
-            super('message', inboundEndpoint, new CrossWindowCommunicationManager(outboundEndpoint, origin, CommunicationEvent.CONTAINER_EVENT_TYPE, CommunicationEvent.CONTENT_EVENT_TYPE), disposeCommandCallback);
+            super(new CrossWindowCommunicationsManager(inboundEndpoint, CommunicationsEvent.CONTAINER_EVENT_TYPE, outboundEndpoint, CommunicationsEvent.CONTENT_EVENT_TYPE, origin), disposeCommandCallback);
             this.iframeId = '';
             this.messageQueue = [];
         }
@@ -1224,22 +1280,20 @@
         /**
          * @inheritdoc
          */
-        dispatchEvent(information) {
-            const message = information;
-            if (message) {
-                if (this.iframeId) {
-                    message.contentId = this.iframeId;
-                }
-                else {
-                    if (message.kind !== exports.CommunicationEventKind.Mounted) {
-                        // In case we do not have an iframeId push all events to queue,
-                        // only Mounted are allowed to establish handshake.
-                        this.messageQueue.push(message);
-                        return;
-                    }
+        send(message) {
+            var _a;
+            if (this.iframeId) {
+                message.contentId = this.iframeId;
+            }
+            else {
+                if (message.kind !== exports.CommunicationsEventKind.Mounted) {
+                    // In case we do not have an iframeId push all events to queue,
+                    // only Mounted are allowed to establish handshake.
+                    this.messageQueue.push(message);
+                    return;
                 }
             }
-            super.dispatchEvent(information);
+            (_a = this.communicationsManager) === null || _a === void 0 ? void 0 : _a.send(message);
         }
         /**
          * Attempt a handshake with the container.
@@ -1250,28 +1304,29 @@
                 // Phase 2 of the handshake - we got the id.
                 this.iframeId = e.contentId;
                 // Send it again to notify parent.
-                const response = new CommunicationEvent(exports.CommunicationEventKind.Mounted);
+                const response = new CommunicationsEvent(exports.CommunicationsEventKind.Mounted);
                 response.contentId = this.iframeId;
-                this.dispatchEvent(response);
+                this.send(response);
                 // Send the previously queued messages.
                 this.flushMessages();
             }
             else {
                 // Phase 1 of the handshake - we got the hash so send it back.
-                const response = new CommunicationEvent(exports.CommunicationEventKind.Mounted);
+                const response = new CommunicationsEvent(exports.CommunicationsEventKind.Mounted);
                 response.contentId = this.iframeId;
                 response.data = e.data;
-                this.dispatchEvent(response);
+                this.send(response);
             }
         }
         /**
          * Flush all the messages that were enqueues before the handhake.
          */
         flushMessages() {
+            var _a;
             for (let index = 0; index < this.messageQueue.length; index++) {
                 const msg = this.messageQueue[index];
                 msg.contentId = this.iframeId;
-                this.dispatchEvent(msg);
+                (_a = this.communicationsManager) === null || _a === void 0 ? void 0 : _a.send(msg);
             }
         }
     }
@@ -1314,8 +1369,13 @@
      * @inheritdoc
      */
     class InWindowContentCommunicationHandler extends ContentCommunicationHandler {
+        /**
+         * Constructor.
+         * @param el The element to use for sending and receiving messages.
+         * @param disposeCommandCallback The callback for disposing the content.
+         */
         constructor(el, disposeCommandCallback) {
-            super(CommunicationEvent.CONTAINER_EVENT_TYPE, el, new InWindowCommunicationManager(el, CommunicationEvent.CONTAINER_EVENT_TYPE, CommunicationEvent.CONTENT_EVENT_TYPE), disposeCommandCallback);
+            super(new HTMLElementCommunicationsManager(el, CommunicationsEvent.CONTAINER_EVENT_TYPE, el, CommunicationsEvent.CONTENT_EVENT_TYPE), disposeCommandCallback);
         }
     }
 
@@ -1384,12 +1444,11 @@
          * @param childId The child identifyer.
          */
         disposeChild(childId) {
-            const child = this.getChild(childId);
-            if (!child)
-                return Promise.resolve();
-            return child
-                .dispose()
-                .then(() => {
+            return __awaiter$3(this, void 0, void 0, function* () {
+                const child = this.getChild(childId);
+                if (!child)
+                    return Promise.resolve();
+                yield child.dispose();
                 this.children[childId] = null;
             });
         }
@@ -1447,8 +1506,8 @@
     exports.ChildComponent = ChildComponent;
     exports.ChildComponentFactory = ChildComponentFactory;
     exports.ChildComponentOptions = ChildComponentOptions;
-    exports.CommunicationEvent = CommunicationEvent;
-    exports.CommunicationHandler = CommunicationHandler;
+    exports.CommunicationsEvent = CommunicationsEvent;
+    exports.CommunicationsManager = CommunicationsManager;
     exports.Component = Component;
     exports.ComponentEvent = ComponentEvent;
     exports.ComponentEventHandlers = ComponentEventHandlers;
@@ -1458,12 +1517,13 @@
     exports.ContentCommunicationHandler = ContentCommunicationHandler;
     exports.CrossWindowChildComponent = CrossWindowChildComponent;
     exports.CrossWindowChildComponentOptions = CrossWindowChildComponentOptions;
-    exports.CrossWindowCommunicationManager = CrossWindowCommunicationManager;
+    exports.CrossWindowCommunicationDataContract = CrossWindowCommunicationDataContract;
+    exports.CrossWindowCommunicationsManager = CrossWindowCommunicationsManager;
     exports.CrossWindowContainerCommunicationHandler = CrossWindowContainerCommunicationHandler;
     exports.CrossWindowContentCommunicationHandler = CrossWindowContentCommunicationHandler;
+    exports.HTMLElementCommunicationsManager = HTMLElementCommunicationsManager;
     exports.InWindowChildComponent = InWindowChildComponent;
     exports.InWindowChildComponentOptions = InWindowChildComponentOptions;
-    exports.InWindowCommunicationManager = InWindowCommunicationManager;
     exports.InWindowContainerCommunicationHandler = InWindowContainerCommunicationHandler;
     exports.InWindowContentCommunicationHandler = InWindowContentCommunicationHandler;
     exports.ResourceConfiguration = ResourceConfiguration;

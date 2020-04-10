@@ -1,13 +1,13 @@
 import { ChildComponent } from '../childComponent';
 import { RootComponentFacade } from '../../rootComponentFacade';
 import { ContainerCommunicationHandlerMethods, ContainerCommunicationHandler } from '../communications/index';
-import { InWindowContainerCommunicationHandler } from './inWindowContainerCommunicationHandler';
-import { InWindowChildComponentOptions } from './inWindowChildComponentOptions';
+import { InWindowChildComponentOptions } from './childComponentOptions';
+import { InWindowContainerCommunicationHandler } from './containerCommunicationHandler';
 
 /**
  * In Window Child Component.
  */
-export class InWindowChildComponent extends ChildComponent {
+export class InWindowChildComponent extends ChildComponent<HTMLElement> {
   /**
    * Constructor.
    * @param window The window reference.
@@ -21,7 +21,7 @@ export class InWindowChildComponent extends ChildComponent {
   /**
    * @inheritdoc
    */
-  protected getCommunicationHandlerCore(methods: ContainerCommunicationHandlerMethods): ContainerCommunicationHandler {
+  protected getCommunicationHandlerCore(methods: ContainerCommunicationHandlerMethods): ContainerCommunicationHandler<HTMLElement> {
     return new InWindowContainerCommunicationHandler(<HTMLElement>this.rootElement, methods);
   }
 

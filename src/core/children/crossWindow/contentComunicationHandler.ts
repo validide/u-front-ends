@@ -1,12 +1,12 @@
-import { ContentCommunicationHandler, CommunicationEvent, CommunicationEventKind } from '../communications/index';
-import { CrossWindowCommunicationManager } from './crossWindowCommunicationManager';
+import { CommunicationsEvent, CommunicationsEventKind, ContentCommunicationHandler } from '../communications/index';
+import { CrossWindowCommunicationsManager } from '../communications/crossWindowManager';
 
 /**
  * @inheritdoc
  */
-export class CrossWindowContentCommunicationHandler extends ContentCommunicationHandler {
+export class CrossWindowContentCommunicationHandler extends ContentCommunicationHandler<Window> {
   private iframeId: string;
-  private messageQueue: Array<CommunicationEvent>;
+  private messageQueue: Array<CommunicationsEvent>;
 
   /**
    * Constructor.
@@ -22,13 +22,13 @@ export class CrossWindowContentCommunicationHandler extends ContentCommunication
     disposeCommandCallback: () => void
   ) {
     super(
-      'message',
-      inboundEndpoint,
-      new CrossWindowCommunicationManager(
+      new CrossWindowCommunicationsManager(
+        inboundEndpoint,
+        CommunicationsEvent.CONTAINER_EVENT_TYPE,
         outboundEndpoint,
-        origin,
-        CommunicationEvent.CONTAINER_EVENT_TYPE,
-        CommunicationEvent.CONTENT_EVENT_TYPE),
+        CommunicationsEvent.CONTENT_EVENT_TYPE,
+        origin
+        ),
       disposeCommandCallback
     );
 
@@ -47,7 +47,7 @@ export class CrossWindowContentCommunicationHandler extends ContentCommunication
   /**
    * @inheritdoc
    */
-  protected handleEventCore(e: CommunicationEvent): void {
+  protected handleEventCore(e: CommunicationsEvent): void {
     if (!this.iframeId) {
       this.attemptHandShake(e);
       return;
@@ -59,46 +59,43 @@ export class CrossWindowContentCommunicationHandler extends ContentCommunication
   /**
    * @inheritdoc
    */
-  protected dispatchEvent<T>(information: T): void {
-    const message = (<unknown>information) as CommunicationEvent;
-    if (message) {
-      if (this.iframeId) {
-        message.contentId = this.iframeId;
-      } else {
-        if (message.kind !== CommunicationEventKind.Mounted) {
-          // In case we do not have an iframeId push all events to queue,
-          // only Mounted are allowed to establish handshake.
-          this.messageQueue.push(message);
-          return;
-        }
+  protected send(message: CommunicationsEvent): void {
+    if (this.iframeId) {
+      message.contentId = this.iframeId;
+    } else {
+      if (message.kind !== CommunicationsEventKind.Mounted) {
+        // In case we do not have an iframeId push all events to queue,
+        // only Mounted are allowed to establish handshake.
+        this.messageQueue.push(message);
+        return;
       }
     }
-    super.dispatchEvent(information);
+    this.communicationsManager?.send(message);
   }
 
   /**
    * Attempt a handshake with the container.
    * @param e The communication event.
    */
-  private attemptHandShake(e: CommunicationEvent): void {
+  private attemptHandShake(e: CommunicationsEvent): void {
     if (e.contentId) {
       // Phase 2 of the handshake - we got the id.
       this.iframeId = e.contentId;
 
       // Send it again to notify parent.
-      const response = new CommunicationEvent(exports.CommunicationEventKind.Mounted);
+      const response = new CommunicationsEvent(exports.CommunicationsEventKind.Mounted);
       response.contentId = this.iframeId;
-      this.dispatchEvent(response);
+      this.send(response);
 
       // Send the previously queued messages.
       this.flushMessages();
     }
     else {
       // Phase 1 of the handshake - we got the hash so send it back.
-      const response = new CommunicationEvent(exports.CommunicationEventKind.Mounted);
+      const response = new CommunicationsEvent(exports.CommunicationsEventKind.Mounted);
       response.contentId = this.iframeId;
       response.data = e.data;
-      this.dispatchEvent(response);
+      this.send(response);
     }
   }
 
@@ -109,7 +106,7 @@ export class CrossWindowContentCommunicationHandler extends ContentCommunication
     for (let index = 0; index < this.messageQueue.length; index++) {
       const msg = this.messageQueue[index];
       msg.contentId = this.iframeId;
-      this.dispatchEvent(msg);
+      this.communicationsManager?.send(msg);
     }
   }
 }

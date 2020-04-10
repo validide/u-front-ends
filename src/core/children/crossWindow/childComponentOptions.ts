@@ -9,6 +9,9 @@ export class CrossWindowChildComponentOptions extends ChildComponentOptions {
   createEmbedElement?: (el: HTMLElement) => HTMLElement;
   embededAttributes?: { [key: string]: string; };
 
+  /**
+   * Constructor.
+   */
   constructor() {
     super();
     this.type = ChildComponentType.CrossWindow;

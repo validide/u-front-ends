@@ -7,9 +7,9 @@ import { ContainerCommunicationHandler, ContainerCommunicationHandlerMethods } f
 /**
  * Child component base class.
  */
-export abstract class ChildComponent extends Component {
+export abstract class ChildComponent<TEndpoint> extends Component {
   private rootFacade: RootComponentFacade | null;
-  private communicationHandler: ContainerCommunicationHandler | null;
+  private communicationHandler: ContainerCommunicationHandler<TEndpoint> | null;
   private contentDisposePromise: Promise<void> | null;
   private contentDisposePromiseResolver: (() => void) | null;
 
@@ -32,18 +32,18 @@ export abstract class ChildComponent extends Component {
    * All derived classes need to implement this to retunr the correct handler implementation.
    * @param methods
    */
-  protected abstract getCommunicationHandlerCore(methods: ContainerCommunicationHandlerMethods): ContainerCommunicationHandler;
+  protected abstract getCommunicationHandlerCore(methods: ContainerCommunicationHandlerMethods): ContainerCommunicationHandler<TEndpoint>;
 
   /**
    * Get the comunication handler.
    */
-  protected getCommunicationHandler(): ContainerCommunicationHandler {
+  protected getCommunicationHandler(): ContainerCommunicationHandler<TEndpoint> {
     const methods = new ContainerCommunicationHandlerMethods();
-    methods.callMounterHandler = () => this.callHandler(ComponentEventType.Mounted);
-    methods.callBeforeUpdateHandler = () => this.callHandler(ComponentEventType.BeforeUpdate);
-    methods.callUpdatedHandler = () => this.callHandler(ComponentEventType.Updated);
-    methods.contentBeginDisposed = () => this.contentBeginDisposed();
-    methods.contentDisposed = () => this.contentDisposed();
+    methods.mounted = () => this.callHandler(ComponentEventType.Mounted);
+    methods.beforeUpdate = () => this.callHandler(ComponentEventType.BeforeUpdate);
+    methods.updated = () => this.callHandler(ComponentEventType.Updated);
+    methods.beforeDispose = () => this.contentBeginDisposed();
+    methods.disposed = () => this.contentDisposed();
     return this.getCommunicationHandlerCore(methods);
   }
 
@@ -76,7 +76,7 @@ export abstract class ChildComponent extends Component {
     this.setContentDisposePromise();
 
     // This should trigger the child component dispose.
-    (<ContainerCommunicationHandler>this.communicationHandler).requestContentDispose();
+    (<ContainerCommunicationHandler<TEndpoint>>this.communicationHandler).requestContentDispose();
   }
 
   /**
@@ -133,7 +133,7 @@ export abstract class ChildComponent extends Component {
     this.startDisposingContent();
     await (<Promise<void>>this.contentDisposePromise);
 
-    (<ContainerCommunicationHandler>this.communicationHandler).dispose();
+    (<ContainerCommunicationHandler<TEndpoint>>this.communicationHandler).dispose();
     this.communicationHandler = null;
     this.contentDisposePromiseResolver = null;
     this.contentDisposePromise = null;

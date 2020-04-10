@@ -2,14 +2,14 @@ import { RootComponentOptions } from './rootComponentOptions';
 import { RootComponentFacade } from './rootComponentFacade';
 import { Component } from './component';
 import { ComponentEventType } from './componentEvent';
-import { ChildComponent, ChildComponentOptions } from './children/index';
+import { ChildComponentOptions } from './children/index';
 
 /**
  * The root component to host the rest of the components.
  * There is not limitation right no but ideally there should only be one of these on a page.
  */
 export class RootComponent extends Component {
-  private children: { [id: string]: ChildComponent | null };
+  private children: { [id: string]: Component | null };
   constructor(window: Window, options: RootComponentOptions) {
     super(window, options);
     this.children = {};
@@ -20,7 +20,7 @@ export class RootComponent extends Component {
    * The dispose method is async but we do not want to wait for that.
    * @param child The child that was disposed.
    */
-  private scheduleDisposeChild(child: ChildComponent): void {
+  private scheduleDisposeChild(child: Component): void {
     // Schedule this later
     this.getWindow().setTimeout(() => {
       this.disposeChildByRef(child);
@@ -31,7 +31,7 @@ export class RootComponent extends Component {
    * Dispose a child using it's reference.
    * @param child
    */
-  private disposeChildByRef(child: ChildComponent): Promise<void> {
+  private disposeChildByRef(child: Component): Promise<void> {
     return this.disposeChild(child.id);
   }
 
@@ -84,7 +84,7 @@ export class RootComponent extends Component {
    * Get the child with the given identifier.
    * @param id The child identifier.
    */
-  public getChild(id: string|null): ChildComponent | null {
+  public getChild(id: string|null): Component | null {
     return id ? (this.children[id] || null) : null;
   }
 
