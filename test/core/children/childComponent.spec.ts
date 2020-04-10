@@ -85,8 +85,8 @@ export function test_ChildComponent() {
       await mock.initialize();
       await mock.mount();
 
-      mock.comunicationMethods.contentBeginDisposed();
-      mock.comunicationMethods.contentBeginDisposed();
+      mock.comunicationMethods.beforeDispose();
+      mock.comunicationMethods.beforeDispose();
       expect(disposedRootCalls).to.eq(1);
     })
 
@@ -105,7 +105,7 @@ export function test_ChildComponent() {
 
         //await getDelayPromise(3);
 
-        mock.comunicationMethods.contentDisposed(); //Signal the dispose
+        mock.comunicationMethods.disposed(); //Signal the dispose
         await all;
       } catch (error) {
         // We are doing a bad thing so bad things will come to us.
@@ -123,7 +123,7 @@ export function test_ChildComponent() {
       await mock.initialize();
       await mock.mount();
 
-      mock.comunicationMethods.contentDisposed(); //Signal the dispose
+      mock.comunicationMethods.disposed(); //Signal the dispose
 
       expect(disposedRootCalls).to.eq(1);
     })
@@ -141,12 +141,12 @@ export function test_ChildComponent() {
       await mock.initialize();
       const mount = mock.mount();
 
-      mock.comunicationMethods.callMounterHandler();
+      mock.comunicationMethods.mounted();
 
       await mount;
 
-      mock.comunicationMethods.callBeforeUpdateHandler()
-      mock.comunicationMethods.callUpdatedHandler();
+      mock.comunicationMethods.beforeUpdate()
+      mock.comunicationMethods.updated();
 
       expect(mounted).to.be.true;
       expect(beforeUpdate).to.be.true;
