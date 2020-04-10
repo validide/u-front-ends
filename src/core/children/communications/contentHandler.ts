@@ -5,7 +5,7 @@ import { CommunicationsEventKind, CommunicationsEvent } from './event';
  * Handle the communications on the component content side.
  */
 export abstract class ContentCommunicationHandler<TEndpoint> {
-  protected communicationsManager: CommunicationsManager<TEndpoint> | null;
+  private communicationsManager: CommunicationsManager<TEndpoint> | null;
   private disposeCommandCallback: (() => void) | null;
   private disposed: boolean;
 
@@ -58,40 +58,47 @@ export abstract class ContentCommunicationHandler<TEndpoint> {
    */
   protected disposeCore(): void { }
 
+  /**
+   * Send a message.
+   * @param event The message.
+   */
+  public send(event: CommunicationsEvent): void{
+    this.communicationsManager?.send(event);
+  }
 
   /**
    * Dispatch event to signal mounting finished.
    */
   public dispatchMounted(): void {
-    this.communicationsManager?.send(new CommunicationsEvent(CommunicationsEventKind.Mounted));
+    this.send(new CommunicationsEvent(CommunicationsEventKind.Mounted));
   }
 
   /**
    * Dispatch event to signal update is about to start.
    */
   public dispatchBeforeUpdate(): void {
-    this.communicationsManager?.send(new CommunicationsEvent(CommunicationsEventKind.BeforeUpdate));
+    this.send(new CommunicationsEvent(CommunicationsEventKind.BeforeUpdate));
   }
 
   /**
    * Dispatch event to signal update finished.
    */
   public dispatchUpdated(): void {
-    this.communicationsManager?.send(new CommunicationsEvent(CommunicationsEventKind.Updated));
+    this.send(new CommunicationsEvent(CommunicationsEventKind.Updated));
   }
 
   /**
    * Dispatch event to disposing started.
    */
   public dispatchBeforeDispose(): void {
-    this.communicationsManager?.send(new CommunicationsEvent(CommunicationsEventKind.BeforeDispose));
+    this.send(new CommunicationsEvent(CommunicationsEventKind.BeforeDispose));
   }
 
   /**
    * Dispatch event to mount finished.
    */
   public dispatchDisposed(): void {
-    this.communicationsManager?.send(new CommunicationsEvent(CommunicationsEventKind.Disposed));
+    this.send(new CommunicationsEvent(CommunicationsEventKind.Disposed));
   }
 
   /**

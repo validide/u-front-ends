@@ -505,11 +505,18 @@
             this.handlerMethods = null;
         }
         /**
+         * Send a message.
+         * @param event The message.
+         */
+        send(event) {
+            var _f;
+            (_f = this.communicationsManager) === null || _f === void 0 ? void 0 : _f.send(event);
+        }
+        /**
          * Reuest that the content begins disposing.
          */
         requestContentDispose() {
-            var _f;
-            (_f = this.communicationsManager) === null || _f === void 0 ? void 0 : _f.send(new CommunicationsEvent(exports.CommunicationsEventKind.BeforeDispose));
+            this.send(new CommunicationsEvent(exports.CommunicationsEventKind.BeforeDispose));
         }
     }
 
@@ -560,39 +567,42 @@
          */
         disposeCore() { }
         /**
+         * Send a message.
+         * @param event The message.
+         */
+        send(event) {
+            var _a;
+            (_a = this.communicationsManager) === null || _a === void 0 ? void 0 : _a.send(event);
+        }
+        /**
          * Dispatch event to signal mounting finished.
          */
         dispatchMounted() {
-            var _a;
-            (_a = this.communicationsManager) === null || _a === void 0 ? void 0 : _a.send(new CommunicationsEvent(exports.CommunicationsEventKind.Mounted));
+            this.send(new CommunicationsEvent(exports.CommunicationsEventKind.Mounted));
         }
         /**
          * Dispatch event to signal update is about to start.
          */
         dispatchBeforeUpdate() {
-            var _a;
-            (_a = this.communicationsManager) === null || _a === void 0 ? void 0 : _a.send(new CommunicationsEvent(exports.CommunicationsEventKind.BeforeUpdate));
+            this.send(new CommunicationsEvent(exports.CommunicationsEventKind.BeforeUpdate));
         }
         /**
          * Dispatch event to signal update finished.
          */
         dispatchUpdated() {
-            var _a;
-            (_a = this.communicationsManager) === null || _a === void 0 ? void 0 : _a.send(new CommunicationsEvent(exports.CommunicationsEventKind.Updated));
+            this.send(new CommunicationsEvent(exports.CommunicationsEventKind.Updated));
         }
         /**
          * Dispatch event to disposing started.
          */
         dispatchBeforeDispose() {
-            var _a;
-            (_a = this.communicationsManager) === null || _a === void 0 ? void 0 : _a.send(new CommunicationsEvent(exports.CommunicationsEventKind.BeforeDispose));
+            this.send(new CommunicationsEvent(exports.CommunicationsEventKind.BeforeDispose));
         }
         /**
          * Dispatch event to mount finished.
          */
         dispatchDisposed() {
-            var _a;
-            (_a = this.communicationsManager) === null || _a === void 0 ? void 0 : _a.send(new CommunicationsEvent(exports.CommunicationsEventKind.Disposed));
+            this.send(new CommunicationsEvent(exports.CommunicationsEventKind.Disposed));
         }
         /**
          * Method invoked to dispose of the handler.
@@ -1047,7 +1057,6 @@
          * Attempt a andshake with the content.
          */
         attemptHandShake(e) {
-            var _a;
             const hash = getHashCode(this.embedId).toString(10);
             const response = new CommunicationsEvent(exports.CommunicationsEventKind.Mounted);
             // We got a message back so if the data matches the hash we sent send the id
@@ -1057,7 +1066,7 @@
             else {
                 response.data = hash;
             }
-            (_a = this.communicationsManager) === null || _a === void 0 ? void 0 : _a.send(response);
+            this.send(response);
         }
     }
 
@@ -1281,7 +1290,6 @@
          * @inheritdoc
          */
         send(message) {
-            var _a;
             if (this.iframeId) {
                 message.contentId = this.iframeId;
             }
@@ -1293,7 +1301,7 @@
                     return;
                 }
             }
-            (_a = this.communicationsManager) === null || _a === void 0 ? void 0 : _a.send(message);
+            super.send(message);
         }
         /**
          * Attempt a handshake with the container.
@@ -1322,11 +1330,10 @@
          * Flush all the messages that were enqueues before the handhake.
          */
         flushMessages() {
-            var _a;
             for (let index = 0; index < this.messageQueue.length; index++) {
                 const msg = this.messageQueue[index];
                 msg.contentId = this.iframeId;
-                (_a = this.communicationsManager) === null || _a === void 0 ? void 0 : _a.send(msg);
+                this.send(msg);
             }
         }
     }

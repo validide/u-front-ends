@@ -32,7 +32,7 @@ export class ContainerCommunicationHandlerMethods {
  * Handle the communications on the child component side.
  */
 export abstract class ContainerCommunicationHandler<TEndpoint> {
-  protected communicationsManager: CommunicationsManager<TEndpoint> | null;
+  private communicationsManager: CommunicationsManager<TEndpoint> | null;
   private handlerMethods: ContainerCommunicationHandlerMethods | null;
   private disposed: boolean;
 
@@ -91,9 +91,17 @@ export abstract class ContainerCommunicationHandler<TEndpoint> {
   }
 
   /**
+   * Send a message.
+   * @param event The message.
+   */
+  public send(event: CommunicationsEvent): void{
+    this.communicationsManager?.send(event);
+  }
+
+  /**
    * Reuest that the content begins disposing.
    */
   public requestContentDispose(): void {
-    this.communicationsManager?.send(new CommunicationsEvent(CommunicationsEventKind.BeforeDispose));
+    this.send(new CommunicationsEvent(CommunicationsEventKind.BeforeDispose));
   }
 }

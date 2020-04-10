@@ -59,7 +59,7 @@ export class CrossWindowContentCommunicationHandler extends ContentCommunication
   /**
    * @inheritdoc
    */
-  protected send(message: CommunicationsEvent): void {
+  public send(message: CommunicationsEvent): void {
     if (this.iframeId) {
       message.contentId = this.iframeId;
     } else {
@@ -70,7 +70,7 @@ export class CrossWindowContentCommunicationHandler extends ContentCommunication
         return;
       }
     }
-    this.communicationsManager?.send(message);
+    super.send(message);
   }
 
   /**
@@ -106,7 +106,7 @@ export class CrossWindowContentCommunicationHandler extends ContentCommunication
     for (let index = 0; index < this.messageQueue.length; index++) {
       const msg = this.messageQueue[index];
       msg.contentId = this.iframeId;
-      this.communicationsManager?.send(msg);
+      this.send(msg);
     }
   }
 }

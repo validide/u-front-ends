@@ -67,6 +67,6 @@ export class CrossWindowContainerCommunicationHandler extends ContainerCommunica
     } else {
       response.data = hash;
     }
-    this.communicationsManager?.send(response);
+    this.send(response);
   }
 }
