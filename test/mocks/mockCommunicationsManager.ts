@@ -4,9 +4,11 @@ export class MockCommunicationsManager extends CommunicationsManagerOf<HTMLEleme
   public receiving = false;
   public sentEvents: Array<CommunicationsEvent> = [];
   public receivedEvents: Array<CommunicationsEvent> = [];
+  private handler: ((e: Event) => void) | null = null;
 
 
   protected startReceiving(inboundEndpoint: HTMLElement, handler: (e: Event) => void): void {
+    this.handler = handler;
     inboundEndpoint.addEventListener(this.inboundEventType, handler);
     this.receiving = true;
   }
@@ -21,6 +23,10 @@ export class MockCommunicationsManager extends CommunicationsManagerOf<HTMLEleme
   }
   protected sendEvent(outboundEndpoint: HTMLElement, event: CommunicationsEvent): void {
     this.sentEvents.push(event);
+  }
+
+  public callEventReceivedCallback(e: Event): void {
+    return this.handler ? this.handler(e) : void 0;
   }
 
 }

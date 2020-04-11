@@ -43,7 +43,7 @@ export function test_CrossWindowCommunicationsManager() {
         _eventType,
         det
       );
-      _win.addEventListener('message', (e:Event ) => {events.push(e);});
+      _win.addEventListener('message', (e: Event) => { events.push(e); });
 
 
       expect(() => {
@@ -57,15 +57,15 @@ export function test_CrossWindowCommunicationsManager() {
       expect((<MessageEvent>events[0]).data).to.eql(data);
     })
 
-    values_falsies.forEach(f=> {
+    values_falsies.forEach(f => {
       it(`should return null is reading "${f}" as event`, () => {
         expect(_mngr.readEvent(<Event><unknown>f)).to.be.null;
       })
     })
 
-    values_falsies.forEach(f=> {
+    values_falsies.forEach(f => {
       it(`should return null is sending "${f}" as detail`, () => {
-        expect(_mngr.readEvent(createCustomEvent(_win.document, _eventType, { detail: f}))).to.be.null;
+        expect(_mngr.readEvent(createCustomEvent(_win.document, _eventType, { detail: f }))).to.be.null;
       })
     })
 
@@ -126,7 +126,7 @@ export function test_CrossWindowCommunicationsManager() {
       expect(_mngr.readEvent(message_with_wrong_inner_type)).to.be.null;
     })
 
-    values_falsies.forEach(f=>{
+    values_falsies.forEach(f => {
       it(`read an event and return null if the detail is "${f}"`, () => {
         const message_with_wrong_inner_type = _win.document.createEvent('MessageEvent');
         Object.defineProperty(message_with_wrong_inner_type, 'origin', {
@@ -168,7 +168,7 @@ export function test_CrossWindowCommunicationsManager() {
 
     it('attach and detach handler', async () => {
       const events: Array<Event> = [];
-      const handler = (e:Event ) => {events.push(e);};
+      const handler = (e: Event) => { events.push(e); };
       const evt = new CommunicationsEvent(CommunicationsEventKind.BeforeDispose);
       const data = new CrossWindowCommunicationDataContract<CommunicationsEvent>(
         _eventType,
