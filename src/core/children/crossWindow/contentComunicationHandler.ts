@@ -67,7 +67,7 @@ export class CrossWindowContentCommunicationHandler extends ContentCommunication
       this.iframeId = e.contentId;
 
       // Send it again to notify parent.
-      const response = new CommunicationsEvent(exports.CommunicationsEventKind.Mounted);
+      const response = new CommunicationsEvent(CommunicationsEventKind.Mounted);
       response.contentId = this.iframeId;
       this.send(response);
 
@@ -76,7 +76,7 @@ export class CrossWindowContentCommunicationHandler extends ContentCommunication
     }
     else {
       // Phase 1 of the handshake - we got the hash so send it back.
-      const response = new CommunicationsEvent(exports.CommunicationsEventKind.Mounted);
+      const response = new CommunicationsEvent(CommunicationsEventKind.Mounted);
       response.contentId = this.iframeId;
       response.data = e.data;
       this.send(response);

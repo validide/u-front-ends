@@ -4,13 +4,13 @@ import { expect } from 'chai';
 import { CommunicationsEvent, CommunicationsEventKind, getUrlOrigin, CrossWindowCommunicationDataContract } from '../../../../src';
 import { createCustomEvent } from '../../../../src/dom/document/createCustomEvent';
 import { getDelayPromise, values_falsies } from '../../../utils';
-import { MockHCrossWindowCommunicationsManager } from '../../../mocks/mockCrossWindowCommunicationsManager';
+import { MockCrossWindowCommunicationsManager } from '../../../mocks/mockCrossWindowCommunicationsManager';
 
 export function test_CrossWindowCommunicationsManager() {
   describe('CrossWindowCommunicationsManager', () => {
     let _jsDom: JSDOM;
     let _win: Window;
-    let _mngr: MockHCrossWindowCommunicationsManager;
+    let _mngr: MockCrossWindowCommunicationsManager;
     const _eventType = 'some_event_type';
 
     beforeEach(() => {
@@ -21,7 +21,7 @@ export function test_CrossWindowCommunicationsManager() {
       if (!_jsDom.window?.document?.defaultView)
         throw new Error('Setup failure!');
       _win = _jsDom.window.document.defaultView;
-      _mngr = new MockHCrossWindowCommunicationsManager(
+      _mngr = new MockCrossWindowCommunicationsManager(
         _win,
         _eventType,
         _win,

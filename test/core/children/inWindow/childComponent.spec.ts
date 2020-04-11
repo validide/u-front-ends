@@ -5,7 +5,7 @@ import { InWindowChildComponent, ChildComponentOptions, RootComponentFacade, noo
 import { MockInWindowChildComponent} from '../../../mocks/mockInWindowChildComponent'
 
 export function test_InWindowChildComponent() {
-  describe('ChildComponentOptions', () => {
+  describe('InWindowChildComponent', () => {
     let _jsDom: JSDOM;
     let _win: Window;
     let _opt: InWindowChildComponentOptions;
@@ -39,6 +39,7 @@ export function test_InWindowChildComponent() {
 
     it('should have options of InWindowChildComponentOptions type', () => {
       expect(_child.getOptions()).to.be.an.instanceof(InWindowChildComponentOptions);
+      expect(_child.getOptions()).to.be.an.instanceof(ChildComponentOptions);
     })
 
     it('should return a communication hndler that is of type InWindowContainerCommunicationHandler', () => {
