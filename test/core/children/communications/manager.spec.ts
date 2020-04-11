@@ -25,9 +25,9 @@ export function test_CommunicationsManager() {
     });
 
     afterEach(() => {
+      _mngr.dispose();
       _win.close();
       _jsDom.window.close();
-      _mngr.dispose();
     })
 
     it('calling dispose multiple times does not fail', () => {
