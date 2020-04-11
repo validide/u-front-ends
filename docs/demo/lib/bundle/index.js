@@ -1095,6 +1095,15 @@
         }
     }
 
+    var __awaiter$3 = (window && window.__awaiter) || function (thisArg, _arguments, P, generator) {
+        function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+        return new (P || (P = Promise))(function (resolve, reject) {
+            function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+            function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+            function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+            step((generator = generator.apply(thisArg, _arguments || [])).next());
+        });
+    };
     /**
      * Cross Window Child Component.
      */
@@ -1121,19 +1130,15 @@
          * @inheritdoc
          */
         disposeCore() {
-            if (this.embededId) {
-                const embed = this.rootElement.querySelector(`#${this.embededId}`);
-                if (embed) {
-                    if (this.embededLoadHandlerRef) {
-                        embed.removeEventListener('load', this.embededLoadHandlerRef);
-                    }
-                    if (this.embededErrorHandlerRef) {
-                        embed.removeEventListener('error', this.embededErrorHandlerRef);
-                    }
-                    // Do not remove the embede element now as we still need it to comunicate with the content.
-                    // The parent "rootElement" will be removed latter anyhow.
-                    // (<HTMLElement>embed.parentElement).removeChild(embed);
-                }
+            const embed = this.embededId
+                ? this.rootElement.querySelector(`#${this.embededId}`)
+                : null;
+            if (embed) {
+                embed.removeEventListener('load', this.embededLoadHandlerRef);
+                embed.removeEventListener('error', this.embededErrorHandlerRef);
+                // Do not remove the embeded element now as we still need it to comunicate with the content.
+                // The parent "rootElement" will be removed latter anyhow.
+                // (<HTMLElement>embed.parentElement).removeChild(embed);
             }
             this.embededLoadHandlerRef = null;
             this.embededErrorHandlerRef = null;
@@ -1152,29 +1157,28 @@
          * @inheritdoc
          */
         mountCore() {
-            const createEmbedElementFn = this.getOptions().createEmbedElement;
-            let embed = null;
-            if (createEmbedElementFn) {
-                embed = createEmbedElementFn(this.rootElement);
-            }
-            else {
-                embed = this.createEmbedElement();
-            }
-            if (!embed)
-                throw new Error('Failed to create embed element!');
-            const embedId = generateUniqueId(this.getDocument(), 'ufe-cross-');
-            embed.id = embedId;
-            this.embededId = embedId;
-            if (this.embededLoadHandlerRef) {
+            const _super = Object.create(null, {
+                mountCore: { get: () => super.mountCore }
+            });
+            return __awaiter$3(this, void 0, void 0, function* () {
+                const createEmbedElementFn = this.getOptions().createEmbedElement;
+                let embed = null;
+                if (createEmbedElementFn) {
+                    embed = createEmbedElementFn(this.rootElement);
+                }
+                else {
+                    embed = this.createEmbedElement();
+                }
+                if (!embed)
+                    throw new Error('Failed to create embed element!');
+                const embedId = generateUniqueId(this.getDocument(), 'ufe-cross-');
+                embed.id = embedId;
+                this.embededId = embedId;
                 embed.addEventListener('load', this.embededLoadHandlerRef);
-            }
-            if (this.embededErrorHandlerRef) {
                 embed.addEventListener('error', this.embededErrorHandlerRef);
-            }
-            this.rootElement.appendChild(embed);
-            return (this.embededLoadPromise)
-                .then(() => {
-                super.mountCore();
+                this.rootElement.appendChild(embed);
+                yield (this.embededLoadPromise);
+                return yield _super.mountCore.call(this);
             });
         }
         /**
@@ -1192,18 +1196,14 @@
          * @param e The load event.
          */
         embededLoadHandler(e) {
-            if (this.embededLoadResolver) {
-                this.embededLoadResolver();
-            }
+            this.embededLoadResolver();
         }
         /**
          * Handle the errir of the embeded element.
          * @param e The error event.
          */
         embededErrorHandler(e) {
-            if (this.embededErrorRejecter) {
-                this.embededErrorRejecter(e.error);
-            }
+            this.embededErrorRejecter(new Error(`Failed to load embeded element.\nError details:\n${JSON.stringify(e)}`));
         }
         /**
          * Create the embeded element.
@@ -1225,12 +1225,14 @@
          * Access the outbound comunication endpoint.
          */
         outboundEndpointAccesor() {
-            const iframe = this.rootElement.querySelector(`#${this.embededId}`);
-            if (!iframe)
+            const embed = this.embededId
+                ? this.rootElement.querySelector(`#${this.embededId}`)
+                : null;
+            if (!embed)
                 throw new Error(`No iframe with "${this.embededId}" id found.`);
-            if (!iframe.contentWindow)
-                throw new Error(`iframe with "${this.embededId}" id does not have a "contentWindow"(${iframe.contentWindow}).`);
-            return iframe.contentWindow;
+            if (!embed.contentWindow)
+                throw new Error(`The iframe with "${this.embededId}" id does not have a "contentWindow"(${embed.contentWindow}).`);
+            return embed.contentWindow;
         }
     }
 
@@ -1435,7 +1437,7 @@
         }
     }
 
-    var __awaiter$3 = (window && window.__awaiter) || function (thisArg, _arguments, P, generator) {
+    var __awaiter$4 = (window && window.__awaiter) || function (thisArg, _arguments, P, generator) {
         function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
         return new (P || (P = Promise))(function (resolve, reject) {
             function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
@@ -1476,7 +1478,7 @@
          * @param childId The child identifyer.
          */
         disposeChild(childId) {
-            return __awaiter$3(this, void 0, void 0, function* () {
+            return __awaiter$4(this, void 0, void 0, function* () {
                 const child = this.getChild(childId);
                 if (!child)
                     return Promise.resolve();
@@ -1496,7 +1498,7 @@
          * @param options Child component options.
          */
         addChild(options) {
-            return __awaiter$3(this, void 0, void 0, function* () {
+            return __awaiter$4(this, void 0, void 0, function* () {
                 if (!this.isInitialized)
                     throw new Error('Wait for the component to initilize before starting to add children.');
                 if (!this.isMounted)

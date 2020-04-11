@@ -41,20 +41,16 @@ export class CrossWindowChildComponent extends ChildComponent {
    * @inheritdoc
    */
   protected disposeCore(): Promise<void> {
-    if (this.embededId) {
-      const embed = (<HTMLElement>this.rootElement).querySelector<HTMLIFrameElement>(`#${this.embededId}`);
-      if (embed) {
-        if (this.embededLoadHandlerRef) {
-          embed.removeEventListener('load', this.embededLoadHandlerRef);
-        }
+    const embed = this.embededId
+      ? (<HTMLElement>this.rootElement).querySelector<HTMLIFrameElement>(`#${this.embededId}`)
+      : null;
+    if (embed) {
+      embed.removeEventListener('load', <() => void>this.embededLoadHandlerRef);
+      embed.removeEventListener('error', <(e: ErrorEvent) => void>this.embededErrorHandlerRef);
 
-        if (this.embededErrorHandlerRef) {
-          embed.removeEventListener('error', this.embededErrorHandlerRef);
-        }
-        // Do not remove the embede element now as we still need it to comunicate with the content.
-        // The parent "rootElement" will be removed latter anyhow.
-        // (<HTMLElement>embed.parentElement).removeChild(embed);
-      }
+      // Do not remove the embeded element now as we still need it to comunicate with the content.
+      // The parent "rootElement" will be removed latter anyhow.
+      // (<HTMLElement>embed.parentElement).removeChild(embed);
     }
     this.embededLoadHandlerRef = null;
     this.embededErrorHandlerRef = null;
@@ -74,7 +70,7 @@ export class CrossWindowChildComponent extends ChildComponent {
   /**
    * @inheritdoc
    */
-  protected mountCore(): Promise<void> {
+  protected async mountCore(): Promise<void> {
     const createEmbedElementFn = this.getOptions().createEmbedElement;
     let embed: HTMLElement | null = null;
     if (createEmbedElementFn) {
@@ -89,19 +85,14 @@ export class CrossWindowChildComponent extends ChildComponent {
     embed.id = embedId;
     this.embededId = embedId;
 
-    if (this.embededLoadHandlerRef) {
-      embed.addEventListener('load', this.embededLoadHandlerRef);
-    }
-
-    if (this.embededErrorHandlerRef) {
-      embed.addEventListener('error', this.embededErrorHandlerRef);
-    }
+    embed.addEventListener('load', <() => void>this.embededLoadHandlerRef);
+    embed.addEventListener('error', <(e: ErrorEvent) => void>this.embededErrorHandlerRef);
 
     (<HTMLDivElement>this.rootElement).appendChild(embed);
-    return (<Promise<void>>(this.embededLoadPromise))
-      .then(() => {
-        super.mountCore();
-      });
+
+    await (<Promise<void>>(this.embededLoadPromise));
+
+    return await super.mountCore();
   }
 
   /**
@@ -130,9 +121,7 @@ export class CrossWindowChildComponent extends ChildComponent {
    * @param e The load event.
    */
   private embededLoadHandler(e: Event): void {
-    if (this.embededLoadResolver) {
-      this.embededLoadResolver();
-    }
+    (<() => void>this.embededLoadResolver)();
   }
 
   /**
@@ -140,9 +129,7 @@ export class CrossWindowChildComponent extends ChildComponent {
    * @param e The error event.
    */
   private embededErrorHandler(e: ErrorEvent): void {
-    if (this.embededErrorRejecter) {
-      this.embededErrorRejecter(e.error);
-    }
+    (<(e: Error) => void>this.embededErrorRejecter)(new Error(`Failed to load embeded element.\nError details:\n${JSON.stringify(e)}`));
   }
 
   /**
@@ -167,13 +154,16 @@ export class CrossWindowChildComponent extends ChildComponent {
    * Access the outbound comunication endpoint.
    */
   private outboundEndpointAccesor(): Window {
-    const iframe = (<HTMLElement>this.rootElement).querySelector<HTMLIFrameElement>(`#${this.embededId}`);
-    if (!iframe)
+    const embed = this.embededId
+      ? (<HTMLElement>this.rootElement).querySelector<HTMLIFrameElement>(`#${this.embededId}`)
+      : null;
+
+    if (!embed)
       throw new Error(`No iframe with "${this.embededId}" id found.`);
 
-    if (!iframe.contentWindow)
-      throw new Error(`iframe with "${this.embededId}" id does not have a "contentWindow"(${iframe.contentWindow}).`);
+    if (!embed.contentWindow)
+      throw new Error(`The iframe with "${this.embededId}" id does not have a "contentWindow"(${embed.contentWindow}).`);
 
-    return iframe.contentWindow;
+    return embed.contentWindow;
   }
 }

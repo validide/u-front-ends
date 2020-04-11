@@ -1,8 +1,17 @@
 import 'mocha';
-import { JSDOM } from 'jsdom';
+import { JSDOM, ResourceLoader, FetchOptions, VirtualConsole } from 'jsdom';
 import { expect } from 'chai';
-import { CrossWindowChildComponent, ChildComponentOptions, RootComponentFacade, noop, ChildComponent, Component, CrossWindowChildComponentOptions, ContainerCommunicationHandlerMethods, CrossWindowContainerCommunicationHandler } from '../../../../src';
+import { CrossWindowChildComponent, ChildComponentOptions, RootComponentFacade, noop, ChildComponent, Component, CrossWindowChildComponentOptions, ContainerCommunicationHandlerMethods, CrossWindowContainerCommunicationHandler, ComponentEvent } from '../../../../src';
 import { MockCrossWindowChildComponent} from '../../../mocks/mockCrossWindowChildComponent'
+import { values_falsies, getDelayPromise } from '../../../utils';
+
+class CustomResourceLoader extends ResourceLoader {
+  fetch(url: string, options: FetchOptions) {
+    return url.indexOf('error') !== -1
+      ? Promise.reject(new Error('Some network error'))
+      : Promise.resolve(Buffer.from(''));
+  }
+}
 
 export function test_CrossWindowChildComponent() {
   describe('CrossWindowChildComponent', () => {
@@ -13,9 +22,13 @@ export function test_CrossWindowChildComponent() {
     let _child: MockCrossWindowChildComponent;
 
     beforeEach(() => {
+      const virtualConsole = new VirtualConsole();
+      virtualConsole.on('jsdomError', (e) => {});
       _jsDom = new JSDOM(undefined, {
         url: 'http://localhost:8080/',
-        runScripts: 'dangerously'
+        runScripts: 'dangerously',
+        resources: new CustomResourceLoader(),
+        virtualConsole: virtualConsole
       });
       if (!_jsDom.window?.document?.defaultView)
         throw new Error('Setup failure!');
@@ -27,8 +40,12 @@ export function test_CrossWindowChildComponent() {
 
     afterEach(() => {
       _child = <MockCrossWindowChildComponent><unknown>null;
-      _win.close();
-      _jsDom.window.close();
+      try{
+        _win.close();
+        _jsDom.window.close();
+      } catch {
+        // Do nothing
+      }
     })
 
     it('should be a instance of Component/ChildComponent/CrossWindowChildComponent', () => {
@@ -49,24 +66,110 @@ export function test_CrossWindowChildComponent() {
       .to.be.an.instanceof(CrossWindowContainerCommunicationHandler);
     })
 
-    // it('should throw if an injection function is not provided', async () => {
-    //   _opt.inject = undefined;
-    //   try {
-    //     await _child.mountCore();
-    //     expect(false).to.be.true;
-    //   } catch (error) {
-    //     expect((<Error>error).message).to.eq('Inject method not defined!');
-    //   }
-    // })
+    it('should throw if getCommunicationHandlerCore can not find the embeded element', async () => {
+      try {
+        await _child.getCommunicationHandlerCore(new ContainerCommunicationHandlerMethods());
+        expect(false).to.be.true;
+      } catch (error) {
+        expect((<Error>error).message).to.eq(`No iframe with "" id found.`);
+      }
+    })
 
+    values_falsies.forEach(f => {
+      it(`should throw if getCommunicationHandlerCore can not access the contentWindow`, async () => {
+        let embededId: string = '';
+        let originalContentWindow: any = null;
+        let embed: HTMLIFrameElement | null = null;
+        try {
+          await _child.initialize();
+          const mountProm = _child.mount();
+          embed = <HTMLIFrameElement>_child.getRootEl().querySelector('iframe');
+          originalContentWindow = embed.contentWindow;
+          Object.defineProperty(embed, 'contentWindow', {
+            value: f,
+            writable: true
+          });
+          embededId = embed.id;
+          expect(embed.contentWindow).to.eq(f)
+          await _child.getCommunicationHandlerCore(new ContainerCommunicationHandlerMethods());
+          expect(false).to.be.true;
+        } catch (error) {
+          expect((<Error>error).message).to.eq(`The iframe with "${embededId}" id does not have a "contentWindow"(${f}).`);
+        } finally {
+          Object.defineProperty(embed, 'contentWindow', {
+            value: originalContentWindow,
+            writable: true
+          });
 
-    // it('should throw if an injection function is not provided', async () => {
-    //   let root: HTMLElement | null = null;
-    //   _opt.inject = (el: HTMLElement) => { root = el; }
-    //   await _child.initialize();
-    //   await _child.mount();
+        }
+      })
+    })
 
-    //   expect(_child.getRootEl()).to.eq(root);
-    // })
+    it('should render the iframe with the specified attributes', async () => {
+      _opt.url = 'http://localhost:8080/iframe.html';
+      _opt.embededAttributes = {
+        'data-cutom-attribute': 'my-custom-attribute'
+      }
+      await _child.initialize();
+      const mountProm = _child.mount()
+
+      const iframe = <HTMLIFrameElement>_win.document.querySelector<HTMLIFrameElement>('[data-cutom-attribute="my-custom-attribute"]');
+      expect(iframe).not.to.be.null;
+      expect(iframe.src).to.eq(_opt.url);
+    })
+
+    it('should throw an error if it fails to mount', async () => {
+      let error: Error | null = null;
+      _opt.handlers.error = (event: ComponentEvent) => {
+        if (event.error)  {
+          error = event.error;
+        }
+      }
+      _opt.url = 'http://localhost:8080/iframe-error.html';
+      await _child.initialize();
+      await _child.mount();
+      expect(error).not.to.be.null;
+      expect((<Error><unknown>error).message.indexOf('Failed to load embeded element.\nError details:\n')).to.eq(0);
+    })
+
+    it('should be able to dispose even if it threw an error', async () => {
+      let error: Error | null = null;
+      _opt.handlers.error = (event: ComponentEvent) => {
+        if (event.error)  {
+          error = event.error;
+        }
+      }
+      _opt.createEmbedElement = (el: HTMLElement) => { return <HTMLElement><unknown>undefined; };
+      await _child.initialize();
+      await _child.mount();
+      expect(error).not.to.be.null;
+      expect((<Error><unknown>error).message).to.eq('Failed to create embed element!');
+
+      await _child.dispose();
+      expect(_win.document.querySelectorAll('iframe').length).to.eq(0);
+    })
+
+    it('calling disposed multiple times does not trow', async () => {
+      _opt.url = 'http://localhost:8080/iframe-error.html';
+      await _child.initialize();
+      await _child.mount();
+      await _child.dispose();
+
+      expect(_win.document.querySelectorAll('iframe').length).to.eq(0);
+    })
+
+    it('calling disposed multiple times does not trow', async () => {
+      try {
+        _opt.contentDisposeTimeout = 10;
+        await _child.dispose();
+        await _child.dispose();
+        (<any>_child).disposed = false;
+        await _child.dispose();
+      } catch (e) {
+        expect(true).to.be.false; // We should not reach this point.
+      }
+
+      expect(_win.document.querySelectorAll('iframe').length).to.eq(0);
+    })
   });
 }
