@@ -39,7 +39,7 @@ export class CrossWindowCommunicationsManager extends CommunicationsManagerOf<Wi
     if (!data || data.type !== this.inboundEventType)
       return null;
 
-    return data.detail;
+    return data.detail ? data.detail : null;
   }
 
   /**

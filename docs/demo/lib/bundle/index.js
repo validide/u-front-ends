@@ -762,7 +762,7 @@
             const data = messageEvent.data;
             if (!data || data.type !== this.inboundEventType)
                 return null;
-            return data.detail;
+            return data.detail ? data.detail : null;
         }
         /**
          * @inheritdoc

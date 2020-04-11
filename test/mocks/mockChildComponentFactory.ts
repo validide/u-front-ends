@@ -8,7 +8,7 @@ import {
   CommunicationsEvent,
   Component
 } from '../../src';
-import { MockCommunicationsManager } from './CommunicationsManager';
+import { MockCommunicationsManager } from './mockCommunicationsManager';
 
 export class MockChildComponentFactory extends ChildComponentFactory {
   public createComponent(window: Window, options: ChildComponentOptions, rootFacade: RootComponentFacade): Component {

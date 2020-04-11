@@ -1,7 +1,7 @@
 import 'mocha';
 import { JSDOM } from 'jsdom';
 import { expect } from 'chai';
-import { MockCommunicationsManager } from '../../../mocks/CommunicationsManager';
+import { MockCommunicationsManager } from '../../../mocks/mockCommunicationsManager';
 import { CommunicationsEvent, CommunicationsEventKind } from '../../../../src';
 import { createCustomEvent } from '../../../../src/dom/document/createCustomEvent';
 import { getDelayPromise, values_falsies } from '../../../utils';

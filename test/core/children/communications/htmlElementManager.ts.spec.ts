@@ -4,7 +4,7 @@ import { expect } from 'chai';
 import { CommunicationsEvent, CommunicationsEventKind } from '../../../../src';
 import { createCustomEvent } from '../../../../src/dom/document/createCustomEvent';
 import { getDelayPromise, values_falsies } from '../../../utils';
-import { MockHTMLElementCommunicationsManager } from '../../../mocks/HTMLElementCommunicationsManager ';
+import { MockHTMLElementCommunicationsManager } from '../../../mocks/mockHTMLElementCommunicationsManager';
 
 export function test_HTMLElementCommunicationsManager() {
   describe('HTMLElementCommunicationsManager', () => {
