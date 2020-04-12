@@ -3,7 +3,7 @@ import { JSDOM } from 'jsdom';
 import { expect } from 'chai';
 import { MockContentCommunicationHandler } from '../../../mocks/mockContentCommunicationHandler';
 import { MockCommunicationsManager } from '../../../mocks/mockCommunicationsManager';
-import { CommunicationsEvent, CommunicationsEventKind } from '../../../../src';
+import { CommunicationsEvent, CommunicationsEventKind, ContentCommunicationHandlerMethods } from '../../../../src';
 import { createCustomEvent } from '../../../../src/dom/document/createCustomEvent';
 import { values_falsies } from '../../../utils';
 
@@ -13,6 +13,7 @@ export function test_ContentCommunicationHandler() {
     let _win: Window;
     let _mngr: MockCommunicationsManager;
     let _handler: MockContentCommunicationHandler;
+    let _methods: ContentCommunicationHandlerMethods;
     let _disposeCalls = 0;
     const _eventType = 'some_event_type';
 
@@ -26,7 +27,9 @@ export function test_ContentCommunicationHandler() {
       _win = _jsDom.window.document.defaultView;
       _mngr = new MockCommunicationsManager(_win.document.body, _eventType, _win.document.body, _eventType);
       _mngr.initialize();
-      _handler = new MockContentCommunicationHandler(_mngr, () => { _disposeCalls++ });
+      _methods = new ContentCommunicationHandlerMethods();
+      _methods.dispose = () => { _disposeCalls++ };
+      _handler = new MockContentCommunicationHandler(_mngr, _methods);
     });
 
     afterEach(() => {
@@ -66,7 +69,7 @@ export function test_ContentCommunicationHandler() {
 
     values_falsies.forEach(f => {
       it(`should not fail if calling handleEventCore without any methods("${f}")`, () => {
-        const hander = new MockContentCommunicationHandler(_mngr, <()=>void><unknown>f);
+        const hander = new MockContentCommunicationHandler(_mngr, <ContentCommunicationHandlerMethods><unknown>f);
         expect(() => hander.handleEventCore(new CommunicationsEvent(CommunicationsEventKind.BeforeDispose)))
           .not.to.throw()
       })

@@ -52,8 +52,10 @@
         ufe.CommunicationsEvent.CONTENT_EVENT_TYPE
       );
       manager.initialize();
+      var contentMethods = new ufe.ContentCommunicationHandlerMethods();
+      contentMethods.dispose = () => this.dispose();
 
-      this.communicationHandler = new ufe.InWindowContentCommunicationHandler(manager, () => this.dispose());
+      this.communicationHandler = new ufe.InWindowContentCommunicationHandler(manager, contentMethods);
 
       this.submitHandler = (e) => {
         e.preventDefault();

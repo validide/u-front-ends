@@ -1,4 +1,4 @@
-import { CommunicationsEvent, CommunicationsEventKind, ContentCommunicationHandler, CommunicationsManager } from '../communications/index';
+import { CommunicationsEvent, CommunicationsEventKind, ContentCommunicationHandler, CommunicationsManager, ContentCommunicationHandlerMethods } from '../communications/index';
 import { CrossWindowCommunicationsManager } from '../communications/crossWindowManager';
 
 /**
@@ -11,10 +11,10 @@ export class CrossWindowContentCommunicationHandler extends ContentCommunication
   /**
    * Constructor.
    * @param communicationsManager A communications manager.
-   * @param disposeCommandCallback The command to dispose the content.
+   * @param methods The callback to dispose the content.
    */
-  constructor(communicationsManager: CommunicationsManager, disposeCommandCallback: () => void) {
-    super(communicationsManager, disposeCommandCallback);
+  constructor(communicationsManager: CommunicationsManager, methods: ContentCommunicationHandlerMethods) {
+    super(communicationsManager, methods);
 
     this.iframeId = '';
     this.messageQueue = [];

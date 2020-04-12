@@ -520,17 +520,28 @@
     }
 
     /**
+     * Content communications handler methods
+     */
+    class ContentCommunicationHandlerMethods {
+        constructor() {
+            /**
+             * Method to dispose the content.
+             */
+            this.dispose = noop;
+        }
+    }
+    /**
      * Handle the communications on the component content side.
      */
     class ContentCommunicationHandler {
         /**
          * Constructor
          * @param communicationsManager A comunications manager
-         * @param disposeCommandCallback The callback to dispose the content.
+         * @param methods The callback to dispose the content.
          */
-        constructor(communicationsManager, disposeCommandCallback) {
+        constructor(communicationsManager, methods) {
             this.communicationsManager = communicationsManager;
-            this.disposeCommandCallback = disposeCommandCallback;
+            this.methods = methods;
             this.communicationsManager.setEventReceivedCallback((e) => {
                 this.handleEvent(e);
             });
@@ -544,8 +555,8 @@
             switch (e.kind) {
                 case exports.CommunicationsEventKind.BeforeDispose:
                 case exports.CommunicationsEventKind.Disposed:
-                    if (this.disposeCommandCallback) {
-                        this.disposeCommandCallback();
+                    if (this.methods) {
+                        this.methods.dispose();
                     }
                     break;
                 default:
@@ -613,7 +624,7 @@
             this.disposeCore();
             (_a = this.communicationsManager) === null || _a === void 0 ? void 0 : _a.dispose();
             this.communicationsManager = null;
-            this.disposeCommandCallback = null;
+            this.methods = null;
         }
     }
 
@@ -1289,10 +1300,10 @@
         /**
          * Constructor.
          * @param communicationsManager A communications manager.
-         * @param disposeCommandCallback The command to dispose the content.
+         * @param methods The callback to dispose the content.
          */
-        constructor(communicationsManager, disposeCommandCallback) {
-            super(communicationsManager, disposeCommandCallback);
+        constructor(communicationsManager, methods) {
+            super(communicationsManager, methods);
             this.iframeId = '';
             this.messageQueue = [];
         }
@@ -1406,10 +1417,10 @@
         /**
          * Constructor.
          * @param el The element to use for sending and receiving messages.
-         * @param disposeCommandCallback The callback for disposing the content.
+         * @param methods The callback to dispose the content.
          */
-        constructor(communicationsManager, disposeCommandCallback) {
-            super(communicationsManager, disposeCommandCallback);
+        constructor(communicationsManager, methods) {
+            super(communicationsManager, methods);
         }
     }
 
@@ -1550,6 +1561,7 @@
     exports.ContainerCommunicationHandler = ContainerCommunicationHandler;
     exports.ContainerCommunicationHandlerMethods = ContainerCommunicationHandlerMethods;
     exports.ContentCommunicationHandler = ContentCommunicationHandler;
+    exports.ContentCommunicationHandlerMethods = ContentCommunicationHandlerMethods;
     exports.CrossWindowChildComponent = CrossWindowChildComponent;
     exports.CrossWindowChildComponentOptions = CrossWindowChildComponentOptions;
     exports.CrossWindowCommunicationDataContract = CrossWindowCommunicationDataContract;

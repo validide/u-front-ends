@@ -2,7 +2,7 @@ import 'mocha';
 import { JSDOM } from 'jsdom';
 import { expect } from 'chai';
 import { MockCommunicationsManager } from '../../../mocks/mockCommunicationsManager';
-import { InWindowContentCommunicationHandler, noop, ContentCommunicationHandler } from '../../../../src';
+import { InWindowContentCommunicationHandler, noop, ContentCommunicationHandler, ContentCommunicationHandlerMethods } from '../../../../src';
 
 export function test_InWindowContentCommunicationHandler() {
   describe('InWindowContentCommunicationHandler', () => {
@@ -31,7 +31,7 @@ export function test_InWindowContentCommunicationHandler() {
     it('requires a handler and methods as parameters', () => {
       expect(() => new InWindowContentCommunicationHandler(
         _mngr,
-        noop
+        new ContentCommunicationHandlerMethods()
       )).not.to.throw();
     })
 
@@ -39,7 +39,7 @@ export function test_InWindowContentCommunicationHandler() {
     it('should inherit from ContainerCommunicationHandler', () => {
       const handler = new InWindowContentCommunicationHandler(
         _mngr,
-        noop
+        new ContentCommunicationHandlerMethods()
       );
       expect(handler).to.be.an.instanceOf(ContentCommunicationHandler);
     })

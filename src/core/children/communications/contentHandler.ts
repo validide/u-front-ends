@@ -1,25 +1,36 @@
 import { CommunicationsManager } from './manager';
 import { CommunicationsEventKind, CommunicationsEvent } from './event';
+import { noop } from '../../../utilities/noop';
+
+/**
+ * Content communications handler methods
+ */
+export class ContentCommunicationHandlerMethods {
+  /**
+   * Method to dispose the content.
+   */
+  public dispose: () => void = noop;
+}
 
 /**
  * Handle the communications on the component content side.
  */
 export abstract class ContentCommunicationHandler {
   private communicationsManager: CommunicationsManager | null;
-  private disposeCommandCallback: (() => void) | null;
+  private methods: ContentCommunicationHandlerMethods | null;
   private disposed: boolean;
 
   /**
    * Constructor
    * @param communicationsManager A comunications manager
-   * @param disposeCommandCallback The callback to dispose the content.
+   * @param methods The callback to dispose the content.
    */
   constructor(
     communicationsManager: CommunicationsManager,
-    disposeCommandCallback: () => void
+    methods: ContentCommunicationHandlerMethods
   ) {
     this.communicationsManager = communicationsManager;
-    this.disposeCommandCallback = disposeCommandCallback;
+    this.methods = methods;
     this.communicationsManager.setEventReceivedCallback((e: CommunicationsEvent) => {
       this.handleEvent(e);
     });
@@ -34,8 +45,8 @@ export abstract class ContentCommunicationHandler {
     switch (e.kind) {
       case CommunicationsEventKind.BeforeDispose:
       case CommunicationsEventKind.Disposed:
-        if (this.disposeCommandCallback) {
-          this.disposeCommandCallback();
+        if (this.methods) {
+          this.methods.dispose();
         }
         break;
       default:
@@ -111,6 +122,6 @@ export abstract class ContentCommunicationHandler {
     this.disposeCore();
     this.communicationsManager?.dispose();
     this.communicationsManager = null;
-    this.disposeCommandCallback = null;
+    this.methods = null;
   }
 }

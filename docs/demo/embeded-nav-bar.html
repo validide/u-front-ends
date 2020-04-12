@@ -62,11 +62,11 @@
           ufe.getUrlOrigin(document, window.location.href)
         );
         manager.initialize();
+        var contentMethods = new ufe.ContentCommunicationHandlerMethods();
+        contentMethods.dispose = function() { dispose(); };
         communicationHandler = new ufe.CrossWindowContentCommunicationHandler(
           manager,
-          function() {
-            dispose();
-          } //disposeCommandCallback: () => void
+          contentMethods
         );
       }
 

@@ -2,7 +2,7 @@ import 'mocha';
 import { JSDOM } from 'jsdom';
 import { expect } from 'chai';
 import { MockCrossWindowContentCommunicationHandler } from '../../../mocks/mockCrossWindowContentCommunicationHandler';
-import { CrossWindowContentCommunicationHandler, noop, CommunicationsEvent, CommunicationsEventKind } from '../../../../src';
+import { CrossWindowContentCommunicationHandler, noop, CommunicationsEvent, CommunicationsEventKind, ContentCommunicationHandlerMethods } from '../../../../src';
 import { MockCrossWindowCommunicationsManager } from '../../../mocks/mockCrossWindowCommunicationsManager';
 
 export function test_CrossWindowContentCommunicationHandler() {
@@ -11,6 +11,7 @@ export function test_CrossWindowContentCommunicationHandler() {
     let _win: Window;
     let _mngr: MockCrossWindowCommunicationsManager;
     let _handler: MockCrossWindowContentCommunicationHandler;
+    let _methods: ContentCommunicationHandlerMethods;
     let _disposeCall = 0;
     const _eventType = 'some_event_type';
 
@@ -25,7 +26,9 @@ export function test_CrossWindowContentCommunicationHandler() {
       _mngr = new MockCrossWindowCommunicationsManager(_win, _eventType, _win, _eventType, _win.origin);
       _mngr.initialize();
       _disposeCall = 0;
-      _handler = new MockCrossWindowContentCommunicationHandler(_mngr, () => { _disposeCall++; });
+      _methods = new ContentCommunicationHandlerMethods();
+      _methods.dispose = () => { _disposeCall++ };
+      _handler = new MockCrossWindowContentCommunicationHandler(_mngr, _methods);
     });
 
     afterEach(() => {
@@ -36,9 +39,11 @@ export function test_CrossWindowContentCommunicationHandler() {
     })
 
     it('requires a handler and methods as parameters', () => {
+      const methods = new ContentCommunicationHandlerMethods();
+
       expect(() => new CrossWindowContentCommunicationHandler(
         _mngr,
-        noop
+        methods
       )).not.to.throw();
     })
 

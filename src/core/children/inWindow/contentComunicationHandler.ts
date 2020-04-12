@@ -1,4 +1,4 @@
-import { ContentCommunicationHandler, CommunicationsEvent, CommunicationsManager } from '../communications/index';
+import { ContentCommunicationHandler, CommunicationsEvent, CommunicationsManager, ContentCommunicationHandlerMethods } from '../communications/index';
 import { HTMLElementCommunicationsManager } from '../communications/htmlElementManager';
 
 /**
@@ -8,9 +8,9 @@ export class InWindowContentCommunicationHandler extends ContentCommunicationHan
   /**
    * Constructor.
    * @param el The element to use for sending and receiving messages.
-   * @param disposeCommandCallback The callback for disposing the content.
+   * @param methods The callback to dispose the content.
    */
-  constructor(communicationsManager: CommunicationsManager, disposeCommandCallback: () => void) {
-    super(communicationsManager, disposeCommandCallback);
+  constructor(communicationsManager: CommunicationsManager, methods: ContentCommunicationHandlerMethods) {
+    super(communicationsManager, methods);
   }
 }
