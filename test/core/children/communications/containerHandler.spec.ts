@@ -78,5 +78,32 @@ export function test_ContainerCommunicationHandler() {
           .not.to.throw()
       })
     })
+
+    it('should send data', () => {
+      const data = {
+        'foo': 'bar',
+        nested: {
+          'prop_name': 'prop_value'
+        }
+      };
+
+      _handler.sendData(data);
+
+      expect(_mngr.sentEvents.length).to.eq(1);
+      expect(_mngr.sentEvents[0].kind).to.eq(CommunicationsEventKind.Data);
+      expect(_mngr.sentEvents[0].data).to.eq(data);
+    })
+
+    it('should not fail on send data', () => {
+      const data = {
+        'foo': 'bar',
+        nested: {
+          'prop_name': 'prop_value'
+        }
+      };
+
+      _handler.dispose()
+      expect(()=> _handler.sendData(data)).not.to.throw();
+    })
   })
 }

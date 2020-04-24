@@ -1,7 +1,7 @@
 import 'mocha';
 import { JSDOM } from 'jsdom';
 import { expect } from 'chai';
-import { ChildComponentOptions, RootComponentFacade, noop } from '../../../src';
+import { ChildComponentOptions, RootComponentFacade, noop, ContainerCommunicationHandler } from '../../../src';
 import { MockChildComponent, MockContainerCommunicationHandler } from '../../mocks/mockChildComponentFactory';
 
 export function test_ChildComponent() {
@@ -131,10 +131,12 @@ export function test_ChildComponent() {
       let mounted = false;
       let beforeUpdate = false;
       let updated = false;
+      let data: any = null;
       _options.tag= 'ce-dipose-tests';
       _options.handlers.mounted = (evt) => {mounted = true;}
       _options.handlers.beforeUpdate = (evt) => {beforeUpdate = true;}
       _options.handlers.updated = (evt) => {updated = true;}
+      _options.handlers.data = (evt) => {data = evt.data;}
 
       const mock = new MockChildComponent(_win, _options, new RootComponentFacade(noop));
       await mock.initialize();
@@ -144,12 +146,35 @@ export function test_ChildComponent() {
 
       await mount;
 
+      const testData = {'foo': 'bar'};
+      mock.comunicationMethods.data(testData);
       mock.comunicationMethods.beforeUpdate()
       mock.comunicationMethods.updated();
 
       expect(mounted).to.be.true;
       expect(beforeUpdate).to.be.true;
       expect(updated).to.be.true;
+      expect(data).to.eq(testData);
     })
+
+    it(`calls commounication handler on sendData`, async () => {
+      const mock = new MockChildComponent(_win, _options, new RootComponentFacade(noop));
+      await mock.initialize();
+      await mock.mount();
+
+      let called = false;
+      (<ContainerCommunicationHandler>mock.public_containerCommunicationHandler).sendData = () => { called = true; };
+      mock.sendData(null);
+
+      expect(called).to.be.true;
+    })
+
+    it(`should not fail when calling sendData without a handler`, async () => {
+      const mock = new MockChildComponent(_win, _options, new RootComponentFacade(noop));
+
+      expect(() => mock.sendData(null)).not.to.throw();
+      expect(mock.public_containerCommunicationHandler).to.be.null;
+    })
+
   })
 }

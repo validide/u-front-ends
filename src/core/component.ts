@@ -160,7 +160,7 @@ export abstract class Component {
    * Call a specific event handler.
    * @param type The type of handler to call.
    */
-  protected callHandler(type: ComponentEventType): void {
+  protected callHandler(type: ComponentEventType, data?: any): void {
     if (type === ComponentEventType.Error)
       throw new Error(`For calling the "${ComponentEventType.Error}" handler use the "callErrorHandler" method.`);
 
@@ -170,13 +170,15 @@ export abstract class Component {
 
     if (handler) {
       try {
-        handler(new ComponentEvent(
+        const event = new ComponentEvent(
           this.id,
           type,
           this.rootElement,
           this.getParentElement(),
           null
-        ));
+        );
+        event.data = data;
+        handler(event);
       } catch (error) {
         this.callErrorHandler(error);
       }

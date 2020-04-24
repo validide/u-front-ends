@@ -42,6 +42,7 @@ export abstract class ChildComponent extends Component {
     methods.mounted = () => this.callHandler(ComponentEventType.Mounted);
     methods.beforeUpdate = () => this.callHandler(ComponentEventType.BeforeUpdate);
     methods.updated = () => this.callHandler(ComponentEventType.Updated);
+    methods.data = (data: any) => this.callHandler(ComponentEventType.Data, data);
     methods.beforeDispose = () => this.contentBeginDisposed();
     methods.disposed = () => this.contentDisposed();
     return this.getCommunicationHandlerCore(methods);
@@ -138,5 +139,13 @@ export abstract class ChildComponent extends Component {
     this.contentDisposePromiseResolver = null;
     this.contentDisposePromise = null;
     await super.disposeCore();
+  }
+
+  /**
+   * Send data.
+   * @param data The data to send.
+   */
+  public sendData(data: any): void{
+    this.communicationHandler?.sendData(data);
   }
 }

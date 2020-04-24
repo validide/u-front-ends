@@ -7,7 +7,8 @@ export enum CommunicationsEventKind {
   BeforeUpdate = 'beforeUpdate',
   Updated = 'updated',
   BeforeDispose = 'beforeDispose',
-  Disposed = 'disposed'
+  Disposed = 'disposed',
+  Data = 'data'
 }
 
 /**

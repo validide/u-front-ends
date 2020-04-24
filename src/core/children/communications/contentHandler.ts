@@ -10,6 +10,10 @@ export class ContentCommunicationHandlerMethods {
    * Method to dispose the content.
    */
   public dispose: () => void = noop;
+  /**
+   * Method to dispose the content.
+   */
+  public handleDataEvent: (data: any) => void = noop;
 }
 
 /**
@@ -49,6 +53,11 @@ export abstract class ContentCommunicationHandler {
           this.methods.dispose();
         }
         break;
+      case CommunicationsEventKind.Data:
+        if (this.methods) {
+          this.methods.handleDataEvent(e.data);
+        }
+        break;
       default:
         throw new Error(`The "${e.kind}" event is not configured.`);
     }
@@ -74,6 +83,15 @@ export abstract class ContentCommunicationHandler {
    */
   public send(event: CommunicationsEvent): void{
     this.communicationsManager?.send(event);
+  }
+
+  /**
+   * Dispatch event to signal mounting finished.
+   */
+  public sendData(data: any): void {
+    const evt = new CommunicationsEvent(CommunicationsEventKind.Data);
+    evt.data = data;
+    this.send(evt);
   }
 
   /**

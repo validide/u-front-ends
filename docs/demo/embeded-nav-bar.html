@@ -64,6 +64,9 @@
         manager.initialize();
         var contentMethods = new ufe.ContentCommunicationHandlerMethods();
         contentMethods.dispose = function() { dispose(); };
+        contentMethods.handleDataEvent = function(data) {
+          console.log('Iframe recevied data: \n\n' + JSON.stringify(data));
+         };
         communicationHandler = new ufe.CrossWindowContentCommunicationHandler(
           manager,
           contentMethods
@@ -104,6 +107,7 @@
         } else {
           if (communicationHandler) {
             communicationHandler.dispatchBeforeUpdate();
+
             setTimeout(() => {
               communicationHandler.dispatchUpdated();
             }, 1000);
@@ -123,6 +127,7 @@
           // Simulate a delay to consider exts processing
           window.setTimeout(() => {
             communicationHandler.dispatchMounted();
+            communicationHandler.sendData(['Data from content!']);
           }, 1000);
         }
       }

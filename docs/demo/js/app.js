@@ -28,7 +28,10 @@
       case 'error':
         console.error(evt.error);
         break;
-      default:
+      case 'data':
+        console.log('Data from child:\n' + JSON.stringify(evt.data));
+          break;
+        default:
         alert('Unknown event: ' + evt.type);
     }
   }
@@ -43,6 +46,7 @@
   globalHandlers['beforeDestroy'] = mfeEventHadler;
   globalHandlers['destroyed'] = mfeEventHadler;
   globalHandlers['error'] = mfeEventHadler;
+  globalHandlers['data'] = mfeEventHadler;
 
 
   var configuration = new ufe.RootComponentOptions();
@@ -205,6 +209,10 @@
     'removeNavBarIframe': async function (e) {
       if (!navbarIframeId)
         return;
+
+      mfe.getChild(navbarIframeId).sendData({
+        'foo': 'bar'
+      })
 
       await mfe.removeChild(navbarIframeId);
       navbarIframeId = '';

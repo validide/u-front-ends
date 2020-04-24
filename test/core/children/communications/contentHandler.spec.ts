@@ -109,5 +109,52 @@ export function test_ContentCommunicationHandler() {
       expect(_mngr.sentEvents.length).to.eq(1);
       expect((<CommunicationsEvent>_mngr.sentEvents[0]).kind).to.eql(CommunicationsEventKind.Disposed);
     })
+
+    it('should send data', () => {
+      const data = {
+        'foo': 'bar',
+        nested: {
+          'prop_name': 'prop_value'
+        }
+      };
+
+      _handler.sendData(data);
+
+      expect(_mngr.sentEvents.length).to.eq(1);
+      expect(_mngr.sentEvents[0].kind).to.eq(CommunicationsEventKind.Data);
+      expect(_mngr.sentEvents[0].data).to.eq(data);
+    })
+
+    it(`should handle data event`, () => {
+      const data = {
+        'foo': 'bar',
+        nested: {
+          'prop_name': 'prop_value'
+        }
+      };
+      const e = new CommunicationsEvent(CommunicationsEventKind.Data);
+      e.data = data;
+
+      let receivedData: any = null;
+      _methods.handleDataEvent = (data: any) => receivedData = data;
+      _handler.handleEventCore(e);
+
+      expect(receivedData).not.to.be.null;
+      expect(receivedData).to.eq(data);
+    })
+
+    it(`should not fail if data event is not configured`, () => {
+      const data = {
+        'foo': 'bar',
+        nested: {
+          'prop_name': 'prop_value'
+        }
+      };
+      const e = new CommunicationsEvent(CommunicationsEventKind.Data);
+      e.data = data;
+
+      const handler = new MockContentCommunicationHandler(_mngr, <ContentCommunicationHandlerMethods><unknown>null)
+      expect(() => handler.handleEventCore(e)).not.to.throw();
+    })
   })
 }

@@ -26,6 +26,10 @@ export class ContainerCommunicationHandlerMethods {
    * Call the container to signal the component has disposed(almost).
    */
   public [CommunicationsEventKind.Disposed]: () => void = noop;
+  /**
+   * Call the container to signal the component has disposed(almost).
+   */
+  public [CommunicationsEventKind.Data]: (data: any) => void = noop;
 }
 
 /**
@@ -65,7 +69,7 @@ export abstract class ContainerCommunicationHandler {
     if (!method)
       return;
 
-    method();
+    method(e.data);
   }
 
   /**
@@ -94,6 +98,16 @@ export abstract class ContainerCommunicationHandler {
    * @param event The message.
    */
   public send(event: CommunicationsEvent): void{
+    this.communicationsManager?.send(event);
+  }
+
+  /**
+   * Send data.
+   * @param data The data to send.
+   */
+  public sendData(data: any): void{
+    const event = new CommunicationsEvent(CommunicationsEventKind.Data);
+    event.data = data;
     this.communicationsManager?.send(event);
   }
 

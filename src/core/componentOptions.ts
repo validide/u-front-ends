@@ -14,6 +14,7 @@ export class ComponentEventHandlers {
   [ComponentEventType.BeforeDestroy]?: ComponentEventHandler;
   [ComponentEventType.Destroyed]?: ComponentEventHandler;
   [ComponentEventType.Error]?: ComponentEventHandler;
+  [ComponentEventType.Data]?: ComponentEventHandler;
 }
 
 /**

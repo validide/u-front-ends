@@ -10,7 +10,8 @@ export enum ComponentEventType {
   Updated = 'updated',
   BeforeDestroy = 'beforeDestroy',
   Destroyed = 'destroyed',
-  Error = 'error'
+  Error = 'error',
+  Data = 'data'
 }
 
 /**
@@ -28,6 +29,7 @@ export class ComponentEvent {
   public parentEl: HTMLElement;
   public error: Error | null;
   public timestamp: Date;
+  public data: any;
 
   /**
    * COnstructor.

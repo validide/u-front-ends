@@ -136,6 +136,7 @@
         ComponentEventType["BeforeDestroy"] = "beforeDestroy";
         ComponentEventType["Destroyed"] = "destroyed";
         ComponentEventType["Error"] = "error";
+        ComponentEventType["Data"] = "data";
     })(exports.ComponentEventType || (exports.ComponentEventType = {}));
     /**
      * Evnts triggered by the components
@@ -297,7 +298,7 @@
          * Call a specific event handler.
          * @param type The type of handler to call.
          */
-        callHandler(type) {
+        callHandler(type, data) {
             if (type === exports.ComponentEventType.Error)
                 throw new Error(`For calling the "${exports.ComponentEventType.Error}" handler use the "callErrorHandler" method.`);
             const handler = this.options.handlers
@@ -305,7 +306,9 @@
                 : null;
             if (handler) {
                 try {
-                    handler(new ComponentEvent(this.id, type, this.rootElement, this.getParentElement(), null));
+                    const event = new ComponentEvent(this.id, type, this.rootElement, this.getParentElement(), null);
+                    event.data = data;
+                    handler(event);
                 }
                 catch (error) {
                     this.callErrorHandler(error);
@@ -401,6 +404,7 @@
         CommunicationsEventKind["Updated"] = "updated";
         CommunicationsEventKind["BeforeDispose"] = "beforeDispose";
         CommunicationsEventKind["Disposed"] = "disposed";
+        CommunicationsEventKind["Data"] = "data";
     })(exports.CommunicationsEventKind || (exports.CommunicationsEventKind = {}));
     /**
      * Event used to comunicate between content and container component.
@@ -426,7 +430,7 @@
      */
     CommunicationsEvent.CONTAINER_EVENT_TYPE = 'container_event.communication.children.validide_micro_front_ends';
 
-    var _a, _b, _c, _d, _e;
+    var _a, _b, _c, _d, _e, _f;
     /**
      * The communication handler methods.
      */
@@ -452,9 +456,13 @@
              * Call the container to signal the component has disposed(almost).
              */
             this[_e] = noop;
+            /**
+             * Call the container to signal the component has disposed(almost).
+             */
+            this[_f] = noop;
         }
     }
-    _a = exports.CommunicationsEventKind.Mounted, _b = exports.CommunicationsEventKind.BeforeUpdate, _c = exports.CommunicationsEventKind.Updated, _d = exports.CommunicationsEventKind.BeforeDispose, _e = exports.CommunicationsEventKind.Disposed;
+    _a = exports.CommunicationsEventKind.Mounted, _b = exports.CommunicationsEventKind.BeforeUpdate, _c = exports.CommunicationsEventKind.Updated, _d = exports.CommunicationsEventKind.BeforeDispose, _e = exports.CommunicationsEventKind.Disposed, _f = exports.CommunicationsEventKind.Data;
     /**
      * Handle the communications on the child component side.
      */
@@ -482,7 +490,7 @@
             const method = this.handlerMethods[e.kind];
             if (!method)
                 return;
-            method();
+            method(e.data);
         }
         /**
          * Handle the incomming communications event.
@@ -495,11 +503,11 @@
          * Method invoked to dispose of the handler.
          */
         dispose() {
-            var _f;
+            var _g;
             if (this.disposed)
                 return;
             this.disposed = true;
-            (_f = this.communicationsManager) === null || _f === void 0 ? void 0 : _f.dispose();
+            (_g = this.communicationsManager) === null || _g === void 0 ? void 0 : _g.dispose();
             this.communicationsManager = null;
             this.handlerMethods = null;
         }
@@ -508,8 +516,18 @@
          * @param event The message.
          */
         send(event) {
-            var _f;
-            (_f = this.communicationsManager) === null || _f === void 0 ? void 0 : _f.send(event);
+            var _g;
+            (_g = this.communicationsManager) === null || _g === void 0 ? void 0 : _g.send(event);
+        }
+        /**
+         * Send data.
+         * @param data The data to send.
+         */
+        sendData(data) {
+            var _g;
+            const event = new CommunicationsEvent(exports.CommunicationsEventKind.Data);
+            event.data = data;
+            (_g = this.communicationsManager) === null || _g === void 0 ? void 0 : _g.send(event);
         }
         /**
          * Reuest that the content begins disposing.
@@ -528,6 +546,10 @@
              * Method to dispose the content.
              */
             this.dispose = noop;
+            /**
+             * Method to dispose the content.
+             */
+            this.handleDataEvent = noop;
         }
     }
     /**
@@ -559,6 +581,11 @@
                         this.methods.dispose();
                     }
                     break;
+                case exports.CommunicationsEventKind.Data:
+                    if (this.methods) {
+                        this.methods.handleDataEvent(e.data);
+                    }
+                    break;
                 default:
                     throw new Error(`The "${e.kind}" event is not configured.`);
             }
@@ -582,6 +609,14 @@
         send(event) {
             var _a;
             (_a = this.communicationsManager) === null || _a === void 0 ? void 0 : _a.send(event);
+        }
+        /**
+         * Dispatch event to signal mounting finished.
+         */
+        sendData(data) {
+            const evt = new CommunicationsEvent(exports.CommunicationsEventKind.Data);
+            evt.data = data;
+            this.send(evt);
         }
         /**
          * Dispatch event to signal mounting finished.
@@ -890,6 +925,7 @@
             methods.mounted = () => this.callHandler(exports.ComponentEventType.Mounted);
             methods.beforeUpdate = () => this.callHandler(exports.ComponentEventType.BeforeUpdate);
             methods.updated = () => this.callHandler(exports.ComponentEventType.Updated);
+            methods.data = (data) => this.callHandler(exports.ComponentEventType.Data, data);
             methods.beforeDispose = () => this.contentBeginDisposed();
             methods.disposed = () => this.contentDisposed();
             return this.getCommunicationHandlerCore(methods);
@@ -977,6 +1013,14 @@
                 this.contentDisposePromise = null;
                 yield _super.disposeCore.call(this);
             });
+        }
+        /**
+         * Send data.
+         * @param data The data to send.
+         */
+        sendData(data) {
+            var _a;
+            (_a = this.communicationHandler) === null || _a === void 0 ? void 0 : _a.sendData(data);
         }
     }
 
@@ -1252,7 +1296,7 @@
      */
     class ComponentEventHandlers {
     }
-    exports.ComponentEventType.BeforeCreate, exports.ComponentEventType.Created, exports.ComponentEventType.BeforeMount, exports.ComponentEventType.Mounted, exports.ComponentEventType.BeforeUpdate, exports.ComponentEventType.Updated, exports.ComponentEventType.BeforeDestroy, exports.ComponentEventType.Destroyed, exports.ComponentEventType.Error;
+    exports.ComponentEventType.BeforeCreate, exports.ComponentEventType.Created, exports.ComponentEventType.BeforeMount, exports.ComponentEventType.Mounted, exports.ComponentEventType.BeforeUpdate, exports.ComponentEventType.Updated, exports.ComponentEventType.BeforeDestroy, exports.ComponentEventType.Destroyed, exports.ComponentEventType.Error, exports.ComponentEventType.Data;
     /**
      * Compoent configuration options.
      */
