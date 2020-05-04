@@ -9,15 +9,17 @@
      * @returns The has code
      */
     function getHashCode(value) {
-        let hash = 0;
-        let length = value.length;
-        let char;
-        let index = 0;
+        var hash = 0;
+        var length = value.length;
+        var char;
+        var index = 0;
         if (length === 0)
             return hash;
         while (index < length) {
             char = value.charCodeAt(index);
+            // tslint:disable-next-line: no-bitwise
             hash = ((hash << 5) - hash) + char;
+            // tslint:disable-next-line: no-bitwise
             hash |= 0; // Convert to 32bit integer
             index++;
         }
@@ -30,7 +32,9 @@
      */
     function getUuidV4() {
         return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-            var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+            // tslint:disable: one-variable-per-declaration
+            // tslint:disable: no-bitwise
+            var r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
             return v.toString(16);
         });
     }
@@ -43,6 +47,7 @@
     /**
      * A function that does nothing.
      */
+    // tslint:disable-next-line: no-empty
     function noop() { }
 
     /**
@@ -50,11 +55,12 @@
      * @param document The reference to the document object
      * @returns A random generated string
      */
-    function generateUniqueId(document, prefix = '') {
-        const prefixString = (prefix !== null && prefix !== void 0 ? prefix : '');
+    function generateUniqueId(document, prefix) {
+        if (prefix === void 0) { prefix = ''; }
+        var prefixString = (prefix !== null && prefix !== void 0 ? prefix : '');
         while (true) {
             // The 'A-' will ensure this is always a valid JavaScript ID
-            const id = prefixString + 'A-' + getRandomString() + getRandomString();
+            var id = prefixString + 'A-' + getRandomString() + getRandomString();
             if (document.getElementById(id) === null) {
                 return id;
             }
@@ -70,9 +76,9 @@
     function getUrlFullPath(document, url) {
         if (!url)
             return '';
-        const a = document.createElement('a');
+        var a = document.createElement('a');
         a.setAttribute('href', url);
-        return a.protocol + "//" + a.hostname + (a.port && ":" + a.port) + a.pathname;
+        return a.protocol + '//' + a.hostname + (a.port && ':' + a.port) + a.pathname;
     }
 
     /**
@@ -84,9 +90,9 @@
     function getUrlOrigin(document, url) {
         if (!url)
             return '';
-        const a = document.createElement('a');
+        var a = document.createElement('a');
         a.setAttribute('href', url);
-        return a.protocol + "//" + a.hostname + (a.port && ":" + a.port);
+        return a.protocol + '//' + a.hostname + (a.port && ':' + a.port);
     }
 
     /**
@@ -97,11 +103,12 @@
      * @param skipLoading Function to determine if the resource should not be loaded.
      * @param attributes Extra attributes to add on the HTML element before attaching it to the document.
      */
-    function loadResource(document, url, isScript = true, skipLoading, attributes) {
+    function loadResource(document, url, isScript, skipLoading, attributes) {
+        if (isScript === void 0) { isScript = true; }
         if (skipLoading && skipLoading())
             return Promise.resolve();
-        return new Promise((resolve, reject) => {
-            let resource;
+        return new Promise(function (resolve, reject) {
+            var resource;
             if (isScript) {
                 resource = document.createElement('script');
                 resource.src = url;
@@ -111,14 +118,15 @@
                 resource.href = url;
             }
             if (attributes) {
-                const keys = Object.keys(attributes);
-                for (let index = 0; index < keys.length; index++) {
-                    const key = keys[index];
+                var keys = Object.keys(attributes);
+                // tslint:disable-next-line: prefer-for-of
+                for (var index = 0; index < keys.length; index++) {
+                    var key = keys[index];
                     resource.setAttribute(key, attributes[key]);
                 }
             }
-            resource.addEventListener('load', () => resolve());
-            resource.addEventListener('error', () => reject(new Error(`Script load error for url: ${url}.`)));
+            resource.addEventListener('load', function () { return resolve(); });
+            resource.addEventListener('error', function () { return reject(new Error("Script load error for url: " + url + ".")); });
             document.head.appendChild(resource);
         });
     }
@@ -141,7 +149,7 @@
     /**
      * Evnts triggered by the components
      */
-    class ComponentEvent {
+    var ComponentEvent = /** @class */ (function () {
         /**
          * COnstructor.
          * @param id Component unique idnetifyer.
@@ -150,7 +158,7 @@
          * @param parentEl The parent element of the component.
          * @param error The error data in case this is an error event.
          */
-        constructor(id, type, el, parentEl, error) {
+        function ComponentEvent(id, type, el, parentEl, error) {
             this.id = id;
             this.type = type;
             this.el = el;
@@ -158,7 +166,8 @@
             this.error = error;
             this.timestamp = new Date();
         }
-    }
+        return ComponentEvent;
+    }());
 
     var __awaiter = (window && window.__awaiter) || function (thisArg, _arguments, P, generator) {
         function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -169,16 +178,43 @@
             step((generator = generator.apply(thisArg, _arguments || [])).next());
         });
     };
+    var __generator = (window && window.__generator) || function (thisArg, body) {
+        var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
+        return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
+        function verb(n) { return function (v) { return step([n, v]); }; }
+        function step(op) {
+            if (f) throw new TypeError("Generator is already executing.");
+            while (_) try {
+                if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
+                if (y = 0, t) op = [op[0] & 2, t.value];
+                switch (op[0]) {
+                    case 0: case 1: t = op; break;
+                    case 4: _.label++; return { value: op[1], done: false };
+                    case 5: _.label++; y = op[1]; op = [0]; continue;
+                    case 7: op = _.ops.pop(); _.trys.pop(); continue;
+                    default:
+                        if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
+                        if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
+                        if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
+                        if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
+                        if (t[2]) _.ops.pop();
+                        _.trys.pop(); continue;
+                }
+                op = body.call(thisArg, _);
+            } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
+            if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
+        }
+    };
     /**
      * Base class for all components.
      */
-    class Component {
+    var Component = /** @class */ (function () {
         /**
          * Constructor
          * @param window The reference to the window object
          * @param options The component options
          */
-        constructor(window, options) {
+        function Component(window, options) {
             if (!window)
                 throw new Error('Missing "window" argument.');
             if (!options)
@@ -195,21 +231,21 @@
         /**
          * Create the root element hat will "encapsulate" the rest of the elements.
          */
-        createRootElement() {
+        Component.prototype.createRootElement = function () {
             if (this.rootElement)
                 return;
-            const parent = this.getParentElement();
+            var parent = this.getParentElement();
             this.rootElement = this.getDocument().createElement(this.getOptions().tag);
             this.id = generateUniqueId(this.getDocument(), 'ufe-');
             this.rootElement.id = this.id;
             parent.appendChild(this.rootElement);
-        }
+        };
         /**
          * Get the parent element that hosts this component.
          */
-        getParentElement() {
-            let parent = null;
-            const opt = this.getOptions();
+        Component.prototype.getParentElement = function () {
+            var parent = null;
+            var opt = this.getOptions();
             if (opt.parent) {
                 if (typeof opt.parent === 'string') {
                     parent = this.getDocument().querySelector(opt.parent);
@@ -219,69 +255,85 @@
                 }
             }
             if (!parent)
-                throw new Error(`Failed to find parent "${opt.parent}".`);
+                throw new Error("Failed to find parent \"" + opt.parent + "\".");
             return parent;
-        }
+        };
         /**
          * Load the resources required by the compoent.
          */
-        loadResources() {
-            return __awaiter(this, void 0, void 0, function* () {
-                if (this.resourcesLoaded)
-                    return;
-                this.resourcesLoaded = true;
-                const options = this.getOptions();
-                if (options.resources && options.resources.length > 0) {
-                    const document = this.getDocument();
-                    for (let index = 0; index < options.resources.length; index++) {
-                        const resource = options.resources[index];
-                        // DO NOT LOAD ALL AT ONCE AS YOU MIHGT HAVE DEPENDENCIES
-                        // AND A RESOURCE MIGHT LOAD BEFORE IT'S DEPENDENCY
-                        yield loadResource(document, resource.url, resource.isScript, resource.skip, resource.attributes);
+        Component.prototype.loadResources = function () {
+            return __awaiter(this, void 0, void 0, function () {
+                var options, document_1, index, resource;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0:
+                            if (this.resourcesLoaded)
+                                return [2 /*return*/];
+                            this.resourcesLoaded = true;
+                            options = this.getOptions();
+                            if (!(options.resources && options.resources.length > 0)) return [3 /*break*/, 4];
+                            document_1 = this.getDocument();
+                            index = 0;
+                            _a.label = 1;
+                        case 1:
+                            if (!(index < options.resources.length)) return [3 /*break*/, 4];
+                            resource = options.resources[index];
+                            // DO NOT LOAD ALL AT ONCE AS YOU MIHGT HAVE DEPENDENCIES
+                            // AND A RESOURCE MIGHT LOAD BEFORE IT'S DEPENDENCY
+                            return [4 /*yield*/, loadResource(document_1, resource.url, resource.isScript, resource.skip, resource.attributes)];
+                        case 2:
+                            // DO NOT LOAD ALL AT ONCE AS YOU MIHGT HAVE DEPENDENCIES
+                            // AND A RESOURCE MIGHT LOAD BEFORE IT'S DEPENDENCY
+                            _a.sent();
+                            _a.label = 3;
+                        case 3:
+                            index++;
+                            return [3 /*break*/, 1];
+                        case 4: return [2 /*return*/];
                     }
-                }
+                });
             });
-        }
+        };
         /**
          * Get the optons data.
          */
-        getOptions() {
+        Component.prototype.getOptions = function () {
             return this.options;
-        }
+        };
         /**
          * Get the wndow reference.
          */
-        getWindow() { return this.window; }
+        Component.prototype.getWindow = function () { return this.window; };
         /**
          * Get the document refrence.
          */
-        getDocument() { return this.getWindow().document; }
+        Component.prototype.getDocument = function () { return this.getWindow().document; };
         /**
          * Core initialization function.
          * Any component derived should override this to add extra functionality.
          */
-        initializeCore() { return Promise.resolve(); }
+        Component.prototype.initializeCore = function () { return Promise.resolve(); };
         /**
          * Core mount function.
          * Any component derived should override this to add extra functionality.
          */
-        mountCore() {
+        Component.prototype.mountCore = function () {
             // This needs to be handled by each component
             // this.callHandler(ComponentEventType.Mounted);
             return Promise.resolve();
-        }
+        };
         /**
          * Core dispose function.
          * Any component derived should override this to add clean-up after itself.
          */
-        disposeCore() { return Promise.resolve(); }
+        Component.prototype.disposeCore = function () { return Promise.resolve(); };
         /**
          * Call the global error handler.
          * @param e The error object
          */
-        callErrorHandler(e) {
+        Component.prototype.callErrorHandler = function (e) {
             var _a;
-            const handler = (_a = this.options.handlers) === null || _a === void 0 ? void 0 : _a.error;
+            var handler = (_a = this.options.handlers) === null || _a === void 0 ? void 0 : _a.error;
             if (handler) {
                 try {
                     handler(new ComponentEvent(this.id, exports.ComponentEventType.Error, this.rootElement, this.getParentElement(), e));
@@ -293,110 +345,153 @@
             else {
                 this.log(e);
             }
-        }
+        };
         /**
          * Call a specific event handler.
          * @param type The type of handler to call.
          */
-        callHandler(type, data) {
+        Component.prototype.callHandler = function (type, data) {
             if (type === exports.ComponentEventType.Error)
-                throw new Error(`For calling the "${exports.ComponentEventType.Error}" handler use the "callErrorHandler" method.`);
-            const handler = this.options.handlers
+                throw new Error("For calling the \"" + exports.ComponentEventType.Error + "\" handler use the \"callErrorHandler\" method.");
+            var handler = this.options.handlers
                 ? this.options.handlers[type]
                 : null;
             if (handler) {
                 try {
-                    const event = new ComponentEvent(this.id, type, this.rootElement, this.getParentElement(), null);
-                    event.data = data;
-                    handler(event);
+                    var event_1 = new ComponentEvent(this.id, type, this.rootElement, this.getParentElement(), null);
+                    event_1.data = data;
+                    handler(event_1);
                 }
                 catch (error) {
                     this.callErrorHandler(error);
                 }
             }
-        }
+        };
         /**
          * Logging method.
          * @param message The message.
          * @param optionalParams Optional parameters.
          */
-        log(message, ...optionalParams) {
+        Component.prototype.log = function (message) {
+            var optionalParams = [];
+            for (var _i = 1; _i < arguments.length; _i++) {
+                optionalParams[_i - 1] = arguments[_i];
+            }
             var _a, _b;
-            const logMethod = (_b = (_a = this.window) === null || _a === void 0 ? void 0 : _a.console) === null || _b === void 0 ? void 0 : _b.log;
+            var logMethod = (_b = (_a = this.window) === null || _a === void 0 ? void 0 : _a.console) === null || _b === void 0 ? void 0 : _b.log;
             if (logMethod)
                 logMethod(message, optionalParams);
-        }
+        };
         /**
          * Method invoked to initialize the component.
          * It should create the root element and any base dependencies.
          */
-        initialize() {
-            return __awaiter(this, void 0, void 0, function* () {
-                if (this.isInitialized)
-                    return this;
-                this.callHandler(exports.ComponentEventType.BeforeCreate);
-                this.isInitialized = true;
-                try {
-                    yield this.loadResources();
-                    this.createRootElement();
-                    yield this.initializeCore();
-                }
-                catch (e) {
-                    this.callErrorHandler(e);
-                }
-                this.callHandler(exports.ComponentEventType.Created);
-                return this;
+        Component.prototype.initialize = function () {
+            return __awaiter(this, void 0, void 0, function () {
+                var e_1;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0:
+                            if (this.isInitialized)
+                                return [2 /*return*/, this];
+                            this.callHandler(exports.ComponentEventType.BeforeCreate);
+                            this.isInitialized = true;
+                            _a.label = 1;
+                        case 1:
+                            _a.trys.push([1, 4, , 5]);
+                            return [4 /*yield*/, this.loadResources()];
+                        case 2:
+                            _a.sent();
+                            this.createRootElement();
+                            return [4 /*yield*/, this.initializeCore()];
+                        case 3:
+                            _a.sent();
+                            return [3 /*break*/, 5];
+                        case 4:
+                            e_1 = _a.sent();
+                            this.callErrorHandler(e_1);
+                            return [3 /*break*/, 5];
+                        case 5:
+                            this.callHandler(exports.ComponentEventType.Created);
+                            return [2 /*return*/, this];
+                    }
+                });
             });
-        }
+        };
         /**
          * Method invoked to mount the actual content of the component.
          */
-        mount() {
-            return __awaiter(this, void 0, void 0, function* () {
-                if (!this.isInitialized) {
-                    this.callErrorHandler(new Error(`Call "initialize" before calling "mount".`));
-                    return this;
-                }
-                if (this.isMounted)
-                    return this;
-                this.callHandler(exports.ComponentEventType.BeforeMount);
-                this.isMounted = true;
-                try {
-                    yield this.mountCore();
-                }
-                catch (e) {
-                    this.callErrorHandler(e);
-                }
-                return this;
+        Component.prototype.mount = function () {
+            return __awaiter(this, void 0, void 0, function () {
+                var e_2;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0:
+                            if (!this.isInitialized) {
+                                this.callErrorHandler(new Error('Call "initialize" before calling "mount".'));
+                                return [2 /*return*/, this];
+                            }
+                            if (this.isMounted)
+                                return [2 /*return*/, this];
+                            this.callHandler(exports.ComponentEventType.BeforeMount);
+                            this.isMounted = true;
+                            _a.label = 1;
+                        case 1:
+                            _a.trys.push([1, 3, , 4]);
+                            return [4 /*yield*/, this.mountCore()];
+                        case 2:
+                            _a.sent();
+                            return [3 /*break*/, 4];
+                        case 3:
+                            e_2 = _a.sent();
+                            this.callErrorHandler(e_2);
+                            return [3 /*break*/, 4];
+                        case 4: return [2 /*return*/, this];
+                    }
+                });
             });
-        }
+        };
         /**
          * Method invoked to dispose of the component.
          */
-        dispose() {
+        Component.prototype.dispose = function () {
             var _a, _b;
-            return __awaiter(this, void 0, void 0, function* () {
-                if (this.disposed)
-                    return;
-                this.callHandler(exports.ComponentEventType.BeforeDestroy);
-                this.disposed = true;
-                try {
-                    yield this.disposeCore();
-                }
-                catch (e) {
-                    this.callErrorHandler(e);
-                }
-                this.callHandler(exports.ComponentEventType.Destroyed);
-                this.id = '';
-                this.isInitialized = false;
-                this.isMounted = false;
-                this.resourcesLoaded = false;
-                (_b = (_a = this.rootElement) === null || _a === void 0 ? void 0 : _a.parentElement) === null || _b === void 0 ? void 0 : _b.removeChild(this.rootElement);
-                this.rootElement = null;
-                this.window = null;
+            return __awaiter(this, void 0, void 0, function () {
+                var e_3;
+                return __generator(this, function (_c) {
+                    switch (_c.label) {
+                        case 0:
+                            if (this.disposed)
+                                return [2 /*return*/];
+                            this.callHandler(exports.ComponentEventType.BeforeDestroy);
+                            this.disposed = true;
+                            _c.label = 1;
+                        case 1:
+                            _c.trys.push([1, 3, , 4]);
+                            return [4 /*yield*/, this.disposeCore()];
+                        case 2:
+                            _c.sent();
+                            return [3 /*break*/, 4];
+                        case 3:
+                            e_3 = _c.sent();
+                            this.callErrorHandler(e_3);
+                            return [3 /*break*/, 4];
+                        case 4:
+                            this.callHandler(exports.ComponentEventType.Destroyed);
+                            this.id = '';
+                            this.isInitialized = false;
+                            this.isMounted = false;
+                            this.resourcesLoaded = false;
+                            (_b = (_a = this.rootElement) === null || _a === void 0 ? void 0 : _a.parentElement) === null || _b === void 0 ? void 0 : _b.removeChild(this.rootElement);
+                            this.rootElement = null;
+                            this.window = null;
+                            return [2 /*return*/];
+                    }
+                });
             });
-        }
-    }
+        };
+        return Component;
+    }());
 
     (function (CommunicationsEventKind) {
         CommunicationsEventKind["Mounted"] = "mounted";
@@ -409,33 +504,34 @@
     /**
      * Event used to comunicate between content and container component.
      */
-    class CommunicationsEvent {
+    var CommunicationsEvent = /** @class */ (function () {
         /**
          * Constructor.
          * @param kind The kind of event.
          */
-        constructor(kind) {
+        function CommunicationsEvent(kind) {
             this.kind = kind;
             this.uuid = getUuidV4();
             this.timestamp = new Date().getTime();
             this.contentId = '';
         }
-    }
-    /**
-     * The type of event dispatched by the child component.
-     */
-    CommunicationsEvent.CONTENT_EVENT_TYPE = 'content_event.communication.children.validide_micro_front_ends';
-    /**
-     * The type of event dispatched by the content.
-     */
-    CommunicationsEvent.CONTAINER_EVENT_TYPE = 'container_event.communication.children.validide_micro_front_ends';
+        /**
+         * The type of event dispatched by the child component.
+         */
+        CommunicationsEvent.CONTENT_EVENT_TYPE = 'content_event.communication.children.validide_micro_front_ends';
+        /**
+         * The type of event dispatched by the content.
+         */
+        CommunicationsEvent.CONTAINER_EVENT_TYPE = 'container_event.communication.children.validide_micro_front_ends';
+        return CommunicationsEvent;
+    }());
 
     var _a, _b, _c, _d, _e, _f;
     /**
      * The communication handler methods.
      */
-    class ContainerCommunicationHandlerMethods {
-        constructor() {
+    var ContainerCommunicationHandlerMethods = /** @class */ (function () {
+        function ContainerCommunicationHandlerMethods() {
             /**
              * Call the container to signal that the content finished mounting.
              */
@@ -461,22 +557,24 @@
              */
             this[_f] = noop;
         }
-    }
+        return ContainerCommunicationHandlerMethods;
+    }());
     _a = exports.CommunicationsEventKind.Mounted, _b = exports.CommunicationsEventKind.BeforeUpdate, _c = exports.CommunicationsEventKind.Updated, _d = exports.CommunicationsEventKind.BeforeDispose, _e = exports.CommunicationsEventKind.Disposed, _f = exports.CommunicationsEventKind.Data;
     /**
      * Handle the communications on the child component side.
      */
-    class ContainerCommunicationHandler {
+    var ContainerCommunicationHandler = /** @class */ (function () {
         /**
          * Constructor
          * @param communicationsManager A communications manager.
          * @param handlerMethods A collection of handler methods.
          */
-        constructor(communicationsManager, handlerMethods) {
+        function ContainerCommunicationHandler(communicationsManager, handlerMethods) {
+            var _this = this;
             this.communicationsManager = communicationsManager;
             this.handlerMethods = handlerMethods;
-            this.communicationsManager.setEventReceivedCallback((e) => {
-                this.handleEvent(e);
+            this.communicationsManager.setEventReceivedCallback(function (e) {
+                _this.handleEvent(e);
             });
             this.disposed = false;
         }
@@ -484,25 +582,25 @@
          * Core functionality for handling the incomming events.
          * @param e The event.
          */
-        handleEventCore(e) {
+        ContainerCommunicationHandler.prototype.handleEventCore = function (e) {
             if (!this.handlerMethods)
                 return;
-            const method = this.handlerMethods[e.kind];
+            var method = this.handlerMethods[e.kind];
             if (!method)
                 return;
             method(e.data);
-        }
+        };
         /**
          * Handle the incomming communications event.
          * @param e The event
          */
-        handleEvent(e) {
+        ContainerCommunicationHandler.prototype.handleEvent = function (e) {
             this.handleEventCore(e);
-        }
+        };
         /**
          * Method invoked to dispose of the handler.
          */
-        dispose() {
+        ContainerCommunicationHandler.prototype.dispose = function () {
             var _g;
             if (this.disposed)
                 return;
@@ -510,38 +608,39 @@
             (_g = this.communicationsManager) === null || _g === void 0 ? void 0 : _g.dispose();
             this.communicationsManager = null;
             this.handlerMethods = null;
-        }
+        };
         /**
          * Send a message.
          * @param event The message.
          */
-        send(event) {
+        ContainerCommunicationHandler.prototype.send = function (event) {
             var _g;
             (_g = this.communicationsManager) === null || _g === void 0 ? void 0 : _g.send(event);
-        }
+        };
         /**
          * Send data.
          * @param data The data to send.
          */
-        sendData(data) {
+        ContainerCommunicationHandler.prototype.sendData = function (data) {
             var _g;
-            const event = new CommunicationsEvent(exports.CommunicationsEventKind.Data);
+            var event = new CommunicationsEvent(exports.CommunicationsEventKind.Data);
             event.data = data;
             (_g = this.communicationsManager) === null || _g === void 0 ? void 0 : _g.send(event);
-        }
+        };
         /**
          * Reuest that the content begins disposing.
          */
-        requestContentDispose() {
+        ContainerCommunicationHandler.prototype.requestContentDispose = function () {
             this.send(new CommunicationsEvent(exports.CommunicationsEventKind.BeforeDispose));
-        }
-    }
+        };
+        return ContainerCommunicationHandler;
+    }());
 
     /**
      * Content communications handler methods
      */
-    class ContentCommunicationHandlerMethods {
-        constructor() {
+    var ContentCommunicationHandlerMethods = /** @class */ (function () {
+        function ContentCommunicationHandlerMethods() {
             /**
              * Method to dispose the content.
              */
@@ -551,21 +650,23 @@
              */
             this.handleDataEvent = noop;
         }
-    }
+        return ContentCommunicationHandlerMethods;
+    }());
     /**
      * Handle the communications on the component content side.
      */
-    class ContentCommunicationHandler {
+    var ContentCommunicationHandler = /** @class */ (function () {
         /**
          * Constructor
          * @param communicationsManager A comunications manager
          * @param methods The callback to dispose the content.
          */
-        constructor(communicationsManager, methods) {
+        function ContentCommunicationHandler(communicationsManager, methods) {
+            var _this = this;
             this.communicationsManager = communicationsManager;
             this.methods = methods;
-            this.communicationsManager.setEventReceivedCallback((e) => {
-                this.handleEvent(e);
+            this.communicationsManager.setEventReceivedCallback(function (e) {
+                _this.handleEvent(e);
             });
             this.disposed = false;
         }
@@ -573,7 +674,7 @@
          * Core functionality for handling the incomming events.
          * @param e The event.
          */
-        handleEventCore(e) {
+        ContentCommunicationHandler.prototype.handleEventCore = function (e) {
             switch (e.kind) {
                 case exports.CommunicationsEventKind.BeforeDispose:
                 case exports.CommunicationsEventKind.Disposed:
@@ -587,71 +688,72 @@
                     }
                     break;
                 default:
-                    throw new Error(`The "${e.kind}" event is not configured.`);
+                    throw new Error("The \"" + e.kind + "\" event is not configured.");
             }
-        }
+        };
         /**
          * Handle the incomming communications event.
          * @param e The event
          */
-        handleEvent(e) {
+        ContentCommunicationHandler.prototype.handleEvent = function (e) {
             this.handleEventCore(e);
-        }
+        };
         /**
          * Core dispose function.
          * Any component derived should override this to add clean-up after itself.
          */
-        disposeCore() { }
+        // tslint:disable-next-line: no-empty
+        ContentCommunicationHandler.prototype.disposeCore = function () { };
         /**
          * Send a message.
          * @param event The message.
          */
-        send(event) {
+        ContentCommunicationHandler.prototype.send = function (event) {
             var _a;
             (_a = this.communicationsManager) === null || _a === void 0 ? void 0 : _a.send(event);
-        }
+        };
         /**
          * Dispatch event to signal mounting finished.
          */
-        sendData(data) {
-            const evt = new CommunicationsEvent(exports.CommunicationsEventKind.Data);
+        ContentCommunicationHandler.prototype.sendData = function (data) {
+            var evt = new CommunicationsEvent(exports.CommunicationsEventKind.Data);
             evt.data = data;
             this.send(evt);
-        }
+        };
         /**
          * Dispatch event to signal mounting finished.
          */
-        dispatchMounted() {
+        ContentCommunicationHandler.prototype.dispatchMounted = function () {
             this.send(new CommunicationsEvent(exports.CommunicationsEventKind.Mounted));
-        }
+        };
         /**
          * Dispatch event to signal update is about to start.
          */
-        dispatchBeforeUpdate() {
+        ContentCommunicationHandler.prototype.dispatchBeforeUpdate = function () {
             this.send(new CommunicationsEvent(exports.CommunicationsEventKind.BeforeUpdate));
-        }
+        };
         /**
          * Dispatch event to signal update finished.
          */
-        dispatchUpdated() {
+        ContentCommunicationHandler.prototype.dispatchUpdated = function () {
             this.send(new CommunicationsEvent(exports.CommunicationsEventKind.Updated));
-        }
+        };
         /**
          * Dispatch event to disposing started.
          */
-        dispatchBeforeDispose() {
+        ContentCommunicationHandler.prototype.dispatchBeforeDispose = function () {
             this.send(new CommunicationsEvent(exports.CommunicationsEventKind.BeforeDispose));
-        }
+        };
         /**
          * Dispatch event to mount finished.
          */
-        dispatchDisposed() {
+        ContentCommunicationHandler.prototype.dispatchDisposed = function () {
             this.send(new CommunicationsEvent(exports.CommunicationsEventKind.Disposed));
-        }
+        };
         /**
          * Method invoked to dispose of the handler.
          */
-        dispose() {
+        ContentCommunicationHandler.prototype.dispose = function () {
             var _a;
             if (this.disposed)
                 return;
@@ -660,63 +762,82 @@
             (_a = this.communicationsManager) === null || _a === void 0 ? void 0 : _a.dispose();
             this.communicationsManager = null;
             this.methods = null;
-        }
-    }
+        };
+        return ContentCommunicationHandler;
+    }());
 
     /**
      * The data sent between the windows directly on the Message Event.
      */
-    class CrossWindowCommunicationDataContract {
+    var CrossWindowCommunicationDataContract = /** @class */ (function () {
         /**
          * Constructor.
          * @param type Data type.
          * @param detail Data detail.
          */
-        constructor(type, detail) {
+        function CrossWindowCommunicationDataContract(type, detail) {
             this.type = type;
             this.detail = detail;
         }
-    }
+        return CrossWindowCommunicationDataContract;
+    }());
 
-    class CommunicationsManager {
+    var __extends = (window && window.__extends) || (function () {
+        var extendStatics = function (d, b) {
+            extendStatics = Object.setPrototypeOf ||
+                ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+                function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+            return extendStatics(d, b);
+        };
+        return function (d, b) {
+            extendStatics(d, b);
+            function __() { this.constructor = d; }
+            d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+        };
+    })();
+    var CommunicationsManager = /** @class */ (function () {
         /**
          * Constructor.
          */
-        constructor() {
+        function CommunicationsManager() {
             this.initialized = false;
             this.disposed = false;
         }
         /**
          * Initialize the manager.
          */
-        initializeCore() { }
+        // tslint:disable-next-line: no-empty
+        CommunicationsManager.prototype.initializeCore = function () { };
         /**
          * Clean any resources before the manager is disposed.
          */
-        disposeCore() { }
+        // tslint:disable-next-line: no-empty
+        CommunicationsManager.prototype.disposeCore = function () { };
         /**
          * Initialize the manager.
          */
-        initialize() {
+        CommunicationsManager.prototype.initialize = function () {
             if (this.initialized)
                 return;
             this.initialized = true;
             this.initializeCore();
-        }
+        };
         /**
          * Dispose of the manager.
          */
-        dispose() {
+        CommunicationsManager.prototype.dispose = function () {
             if (this.disposed)
                 return;
             this.disposed = true;
             this.disposeCore();
-        }
-    }
+        };
+        return CommunicationsManager;
+    }());
     /**
      * Comunications manager base class.
      */
-    class CommunicationsManagerOf extends CommunicationsManager {
+    var CommunicationsManagerOf = /** @class */ (function (_super) {
+        __extends(CommunicationsManagerOf, _super);
         /**
          * Constructor
          * @param inboundEndpoint The endpoint for receiving messages.
@@ -724,68 +845,84 @@
          * @param outboundEndpoint The endpoint to sent mesages.
          * @param outboundEventType The messages to send.
          */
-        constructor(inboundEndpoint, inboundEventType, outboundEndpoint, outboundEventType) {
-            super();
-            this.inboundEndpoint = inboundEndpoint;
-            this.inboundEventType = inboundEventType;
-            this.outboundEndpoint = outboundEndpoint;
-            this.outboundEventType = outboundEventType;
-            this.onEventReceived = null;
-            this.eventHandler = (e) => { this.handleEvent(e); };
+        function CommunicationsManagerOf(inboundEndpoint, inboundEventType, outboundEndpoint, outboundEventType) {
+            var _this = _super.call(this) || this;
+            _this.inboundEndpoint = inboundEndpoint;
+            _this.inboundEventType = inboundEventType;
+            _this.outboundEndpoint = outboundEndpoint;
+            _this.outboundEventType = outboundEventType;
+            _this.onEventReceived = null;
+            _this.eventHandler = function (e) { _this.handleEvent(e); };
+            return _this;
         }
         /**
          * Handle the received events.
          * @param e The recevied event.
          */
-        handleEvent(e) {
+        CommunicationsManagerOf.prototype.handleEvent = function (e) {
             if (!this.onEventReceived)
                 return;
-            const evt = this.readEvent(e);
+            var evt = this.readEvent(e);
             if (evt) {
                 this.onEventReceived(evt);
             }
-        }
+        };
         /**
          * @inheritdoc
          */
-        initializeCore() {
+        CommunicationsManagerOf.prototype.initializeCore = function () {
             if (this.inboundEndpoint && this.eventHandler) {
                 this.startReceiving(this.inboundEndpoint, this.eventHandler);
             }
-            super.initializeCore();
-        }
+            _super.prototype.initializeCore.call(this);
+        };
         /**
          * @inheritdoc
          */
-        disposeCore() {
+        CommunicationsManagerOf.prototype.disposeCore = function () {
             if (this.inboundEndpoint && this.eventHandler) {
                 this.stopReceiving(this.inboundEndpoint, this.eventHandler);
             }
             this.eventHandler = null;
             this.onEventReceived = null;
             this.inboundEndpoint = null;
-            super.disposeCore();
-        }
+            _super.prototype.disposeCore.call(this);
+        };
         /**
          * @inheritdoc
          */
-        send(event) {
+        CommunicationsManagerOf.prototype.send = function (event) {
             if (this.outboundEndpoint) {
                 this.sendEvent(this.outboundEndpoint, event);
             }
-        }
+        };
         /**
          * @inheritdoc
          */
-        setEventReceivedCallback(callback) {
+        CommunicationsManagerOf.prototype.setEventReceivedCallback = function (callback) {
             this.onEventReceived = callback;
-        }
-    }
+        };
+        return CommunicationsManagerOf;
+    }(CommunicationsManager));
 
+    var __extends$1 = (window && window.__extends) || (function () {
+        var extendStatics = function (d, b) {
+            extendStatics = Object.setPrototypeOf ||
+                ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+                function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+            return extendStatics(d, b);
+        };
+        return function (d, b) {
+            extendStatics(d, b);
+            function __() { this.constructor = d; }
+            d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+        };
+    })();
     /**
      * @inheritdoc
      */
-    class CrossWindowCommunicationsManager extends CommunicationsManagerOf {
+    var CrossWindowCommunicationsManager = /** @class */ (function (_super) {
+        __extends$1(CrossWindowCommunicationsManager, _super);
         /**
          * Constructor
          * @param inboundEndpoint The endpoint for receiving messages.
@@ -794,51 +931,53 @@
          * @param outboundEventType The messages to send.
          * @param origin The origin to comunicate with.
          */
-        constructor(inboundEndpoint, inboundEventType, outboundEndpoint, outboundEventType, origin) {
-            super(inboundEndpoint, inboundEventType, outboundEndpoint, outboundEventType);
-            this.origin = origin;
+        function CrossWindowCommunicationsManager(inboundEndpoint, inboundEventType, outboundEndpoint, outboundEventType, origin) {
+            var _this = _super.call(this, inboundEndpoint, inboundEventType, outboundEndpoint, outboundEventType) || this;
+            _this.origin = origin;
+            return _this;
         }
         /**
          * @inheritdoc
          */
-        readEvent(e) {
-            const messageEvent = e;
+        CrossWindowCommunicationsManager.prototype.readEvent = function (e) {
+            var messageEvent = e;
             if (!messageEvent || messageEvent.origin !== this.origin)
                 return null;
-            const data = messageEvent.data;
+            var data = messageEvent.data;
             if (!data || data.type !== this.inboundEventType)
                 return null;
             return data.detail ? data.detail : null;
-        }
+        };
         /**
          * @inheritdoc
          */
-        startReceiving(inboundEndpoint, handler) {
+        CrossWindowCommunicationsManager.prototype.startReceiving = function (inboundEndpoint, handler) {
             inboundEndpoint.addEventListener('message', handler);
-        }
+        };
         /**
          * @inheritdoc
          */
-        stopReceiving(inboundEndpoint, handler) {
+        CrossWindowCommunicationsManager.prototype.stopReceiving = function (inboundEndpoint, handler) {
             inboundEndpoint.removeEventListener('message', handler);
-        }
+        };
         /**
          * @inheritdoc
          */
-        sendEvent(outboundEndpoint, event) {
-            const data = new CrossWindowCommunicationDataContract(this.outboundEventType, event);
+        CrossWindowCommunicationsManager.prototype.sendEvent = function (outboundEndpoint, event) {
+            var data = new CrossWindowCommunicationDataContract(this.outboundEventType, event);
             outboundEndpoint.postMessage(data, this.origin);
-        }
-    }
+        };
+        return CrossWindowCommunicationsManager;
+    }(CommunicationsManagerOf));
 
     function customEventPolyfill(document, typeArg, eventInitDict) {
-        const params = eventInitDict || { bubbles: false, cancelable: false, detail: null };
+        var params = eventInitDict || { bubbles: false, cancelable: false, detail: null };
         var evt = document.createEvent('CustomEvent');
         evt.initCustomEvent(typeArg, params.bubbles || false, params.cancelable || false, params.detail);
         return evt;
     }
     function createCustomEvent(document, typeArg, eventInitDict) {
-        const win = document === null || document === void 0 ? void 0 : document.defaultView;
+        var win = document === null || document === void 0 ? void 0 : document.defaultView;
         if (!win)
             throw new Error('Document does not have a defualt view.');
         if (typeof win.CustomEvent !== 'function') {
@@ -847,50 +986,78 @@
         return new win.CustomEvent(typeArg, eventInitDict);
     }
 
+    var __extends$2 = (window && window.__extends) || (function () {
+        var extendStatics = function (d, b) {
+            extendStatics = Object.setPrototypeOf ||
+                ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+                function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+            return extendStatics(d, b);
+        };
+        return function (d, b) {
+            extendStatics(d, b);
+            function __() { this.constructor = d; }
+            d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+        };
+    })();
     /**
      * @inheritdoc
      */
-    class HTMLElementCommunicationsManager extends CommunicationsManagerOf {
+    var HTMLElementCommunicationsManager = /** @class */ (function (_super) {
+        __extends$2(HTMLElementCommunicationsManager, _super);
         /**
          * @inheritdoc
          */
-        constructor(inboundEndpoint, inboundEventType, outboundEndpoint, outboundEventType) {
-            super(inboundEndpoint, inboundEventType, outboundEndpoint, outboundEventType);
+        function HTMLElementCommunicationsManager(inboundEndpoint, inboundEventType, outboundEndpoint, outboundEventType) {
+            return _super.call(this, inboundEndpoint, inboundEventType, outboundEndpoint, outboundEventType) || this;
         }
         /**
          * @inheritdoc
          */
-        readEvent(e) {
-            const customEvent = e;
+        HTMLElementCommunicationsManager.prototype.readEvent = function (e) {
+            var customEvent = e;
             if (!customEvent || customEvent.type !== this.inboundEventType)
                 return null;
             return customEvent.detail instanceof CommunicationsEvent
                 ? customEvent.detail
                 : null;
-        }
+        };
         /**
          * @inheritdoc
          */
-        startReceiving(inboundEndpoint, handler) {
+        HTMLElementCommunicationsManager.prototype.startReceiving = function (inboundEndpoint, handler) {
             inboundEndpoint.addEventListener(this.inboundEventType, handler);
-        }
+        };
         /**
          * @inheritdoc
          */
-        stopReceiving(inboundEndpoint, handler) {
+        HTMLElementCommunicationsManager.prototype.stopReceiving = function (inboundEndpoint, handler) {
             inboundEndpoint.removeEventListener(this.inboundEventType, handler);
-        }
+        };
         /**
          * @inheritdoc
          */
-        sendEvent(outboundEndpoint, event) {
+        HTMLElementCommunicationsManager.prototype.sendEvent = function (outboundEndpoint, event) {
             if (!outboundEndpoint.ownerDocument)
                 return;
-            const evt = createCustomEvent(outboundEndpoint.ownerDocument, this.outboundEventType, { detail: event });
+            var evt = createCustomEvent(outboundEndpoint.ownerDocument, this.outboundEventType, { detail: event });
             outboundEndpoint.dispatchEvent(evt);
-        }
-    }
+        };
+        return HTMLElementCommunicationsManager;
+    }(CommunicationsManagerOf));
 
+    var __extends$3 = (window && window.__extends) || (function () {
+        var extendStatics = function (d, b) {
+            extendStatics = Object.setPrototypeOf ||
+                ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+                function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+            return extendStatics(d, b);
+        };
+        return function (d, b) {
+            extendStatics(d, b);
+            function __() { this.constructor = d; }
+            d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+        };
+    })();
     var __awaiter$1 = (window && window.__awaiter) || function (thisArg, _arguments, P, generator) {
         function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
         return new (P || (P = Promise))(function (resolve, reject) {
@@ -900,85 +1067,116 @@
             step((generator = generator.apply(thisArg, _arguments || [])).next());
         });
     };
+    var __generator$1 = (window && window.__generator) || function (thisArg, body) {
+        var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
+        return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
+        function verb(n) { return function (v) { return step([n, v]); }; }
+        function step(op) {
+            if (f) throw new TypeError("Generator is already executing.");
+            while (_) try {
+                if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
+                if (y = 0, t) op = [op[0] & 2, t.value];
+                switch (op[0]) {
+                    case 0: case 1: t = op; break;
+                    case 4: _.label++; return { value: op[1], done: false };
+                    case 5: _.label++; y = op[1]; op = [0]; continue;
+                    case 7: op = _.ops.pop(); _.trys.pop(); continue;
+                    default:
+                        if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
+                        if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
+                        if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
+                        if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
+                        if (t[2]) _.ops.pop();
+                        _.trys.pop(); continue;
+                }
+                op = body.call(thisArg, _);
+            } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
+            if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
+        }
+    };
     /**
      * Child component base class.
      */
-    class ChildComponent extends Component {
+    var ChildComponent = /** @class */ (function (_super) {
+        __extends$3(ChildComponent, _super);
         /**
          * Constructor.
          * @param window The window reference.
          * @param options The child options.
          * @param rootFacade The facade to the root component.
          */
-        constructor(window, options, rootFacade) {
-            super(window, options);
-            this.rootFacade = rootFacade;
-            this.communicationHandler = null;
-            this.contentDisposePromise = null;
-            this.contentDisposePromiseResolver = null;
+        function ChildComponent(window, options, rootFacade) {
+            var _this = _super.call(this, window, options) || this;
+            _this.rootFacade = rootFacade;
+            _this.communicationHandler = null;
+            _this.contentDisposePromise = null;
+            _this.contentDisposePromiseResolver = null;
+            return _this;
         }
         /**
          * Get the comunication handler.
          */
-        getCommunicationHandler() {
-            const methods = new ContainerCommunicationHandlerMethods();
-            methods.mounted = () => this.callHandler(exports.ComponentEventType.Mounted);
-            methods.beforeUpdate = () => this.callHandler(exports.ComponentEventType.BeforeUpdate);
-            methods.updated = () => this.callHandler(exports.ComponentEventType.Updated);
-            methods.data = (data) => this.callHandler(exports.ComponentEventType.Data, data);
-            methods.beforeDispose = () => this.contentBeginDisposed();
-            methods.disposed = () => this.contentDisposed();
+        ChildComponent.prototype.getCommunicationHandler = function () {
+            var _this = this;
+            var methods = new ContainerCommunicationHandlerMethods();
+            methods.mounted = function () { return _this.callHandler(exports.ComponentEventType.Mounted); };
+            methods.beforeUpdate = function () { return _this.callHandler(exports.ComponentEventType.BeforeUpdate); };
+            methods.updated = function () { return _this.callHandler(exports.ComponentEventType.Updated); };
+            methods.data = function (data) { return _this.callHandler(exports.ComponentEventType.Data, data); };
+            methods.beforeDispose = function () { return _this.contentBeginDisposed(); };
+            methods.disposed = function () { return _this.contentDisposed(); };
             return this.getCommunicationHandlerCore(methods);
-        }
+        };
         /**
          * Get the child component options.
          */
-        getOptions() {
-            return super.getOptions();
-        }
+        ChildComponent.prototype.getOptions = function () {
+            return _super.prototype.getOptions.call(this);
+        };
         /**
          * Handler for the signal that the component started to dispose.
          */
-        contentBeginDisposed() {
+        ChildComponent.prototype.contentBeginDisposed = function () {
             if (this.contentDisposePromise !== null)
                 return; // Dispose has already started.
             this.setContentDisposePromise();
             // Inform parent the content is beeing disposed.
             this.rootFacade.signalDisposed(this);
-        }
+        };
         /**
          * Signal the content that it will be disposed.
          */
-        startDisposingContent() {
+        ChildComponent.prototype.startDisposingContent = function () {
             if (this.contentDisposePromise !== null)
                 return; // Dispose has already started.
             this.setContentDisposePromise();
             // This should trigger the child component dispose.
             this.communicationHandler.requestContentDispose();
-        }
+        };
         /**
          * Set the promise that is used fof the disposing of the component.
          */
-        setContentDisposePromise() {
+        ChildComponent.prototype.setContentDisposePromise = function () {
+            var _this = this;
             this.contentDisposePromise = Promise
                 .race([
-                new Promise((resolver, rejecter) => {
-                    this.contentDisposePromiseResolver = resolver;
+                new Promise(function (resolver, rejecter) {
+                    _this.contentDisposePromiseResolver = resolver;
                 }),
-                new Promise((resolveTimeout, rejectTimeout) => {
-                    this
+                new Promise(function (resolveTimeout, rejectTimeout) {
+                    _this
                         .getWindow()
-                        .setTimeout(() => rejectTimeout(new Error(`Child dispose timeout.`)), this.getOptions().contentDisposeTimeout);
+                        .setTimeout(function () { return rejectTimeout(new Error('Child dispose timeout.')); }, _this.getOptions().contentDisposeTimeout);
                 })
             ])
-                .catch((err) => {
-                this.callErrorHandler(err);
+                .catch(function (err) {
+                _this.callErrorHandler(err);
             });
-        }
+        };
         /**
          * Handler for the signal that the content has finished disposing.
          */
-        contentDisposed() {
+        ChildComponent.prototype.contentDisposed = function () {
             if (this.contentDisposePromiseResolver === null) {
                 // For some reason we got the disposed call without getting the 'beginDispose' call.
                 this.contentDisposePromise = Promise.resolve();
@@ -987,42 +1185,50 @@
             else {
                 this.contentDisposePromiseResolver();
             }
-        }
+        };
         /**
          * @@inheritdoc
          */
-        mountCore() {
+        ChildComponent.prototype.mountCore = function () {
             if (!this.communicationHandler) {
                 this.communicationHandler = this.getCommunicationHandler();
             }
-            return super.mountCore();
-        }
+            return _super.prototype.mountCore.call(this);
+        };
         /**
          * @@inheritdoc
          */
-        disposeCore() {
-            const _super = Object.create(null, {
-                disposeCore: { get: () => super.disposeCore }
+        ChildComponent.prototype.disposeCore = function () {
+            return __awaiter$1(this, void 0, void 0, function () {
+                return __generator$1(this, function (_a) {
+                    switch (_a.label) {
+                        case 0:
+                            this.startDisposingContent();
+                            return [4 /*yield*/, this.contentDisposePromise];
+                        case 1:
+                            _a.sent();
+                            this.communicationHandler.dispose();
+                            this.communicationHandler = null;
+                            this.contentDisposePromiseResolver = null;
+                            this.contentDisposePromise = null;
+                            return [4 /*yield*/, _super.prototype.disposeCore.call(this)];
+                        case 2:
+                            _a.sent();
+                            return [2 /*return*/];
+                    }
+                });
             });
-            return __awaiter$1(this, void 0, void 0, function* () {
-                this.startDisposingContent();
-                yield this.contentDisposePromise;
-                this.communicationHandler.dispose();
-                this.communicationHandler = null;
-                this.contentDisposePromiseResolver = null;
-                this.contentDisposePromise = null;
-                yield _super.disposeCore.call(this);
-            });
-        }
+        };
         /**
          * Send data.
          * @param data The data to send.
          */
-        sendData(data) {
+        ChildComponent.prototype.sendData = function (data) {
             var _a;
             (_a = this.communicationHandler) === null || _a === void 0 ? void 0 : _a.sendData(data);
-        }
-    }
+        };
+        return ChildComponent;
+    }(Component));
 
     /**
      * The type of child component.
@@ -1038,18 +1244,46 @@
         ChildComponentType["CrossWindow"] = "crossWindow";
     })(exports.ChildComponentType || (exports.ChildComponentType = {}));
 
+    var __extends$4 = (window && window.__extends) || (function () {
+        var extendStatics = function (d, b) {
+            extendStatics = Object.setPrototypeOf ||
+                ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+                function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+            return extendStatics(d, b);
+        };
+        return function (d, b) {
+            extendStatics(d, b);
+            function __() { this.constructor = d; }
+            d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+        };
+    })();
     /**
      * @inheritdoc
      */
-    class InWindowContainerCommunicationHandler extends ContainerCommunicationHandler {
+    var InWindowContainerCommunicationHandler = /** @class */ (function (_super) {
+        __extends$4(InWindowContainerCommunicationHandler, _super);
         /**
-       * @inheritdoc
-       */
-        constructor(communicationsManager, wrapperMethods) {
-            super(communicationsManager, wrapperMethods);
+         * @inheritdoc
+         */
+        function InWindowContainerCommunicationHandler(communicationsManager, wrapperMethods) {
+            return _super.call(this, communicationsManager, wrapperMethods) || this;
         }
-    }
+        return InWindowContainerCommunicationHandler;
+    }(ContainerCommunicationHandler));
 
+    var __extends$5 = (window && window.__extends) || (function () {
+        var extendStatics = function (d, b) {
+            extendStatics = Object.setPrototypeOf ||
+                ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+                function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+            return extendStatics(d, b);
+        };
+        return function (d, b) {
+            extendStatics(d, b);
+            function __() { this.constructor = d; }
+            d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+        };
+    })();
     var __awaiter$2 = (window && window.__awaiter) || function (thisArg, _arguments, P, generator) {
         function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
         return new (P || (P = Promise))(function (resolve, reject) {
@@ -1059,70 +1293,120 @@
             step((generator = generator.apply(thisArg, _arguments || [])).next());
         });
     };
+    var __generator$2 = (window && window.__generator) || function (thisArg, body) {
+        var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
+        return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
+        function verb(n) { return function (v) { return step([n, v]); }; }
+        function step(op) {
+            if (f) throw new TypeError("Generator is already executing.");
+            while (_) try {
+                if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
+                if (y = 0, t) op = [op[0] & 2, t.value];
+                switch (op[0]) {
+                    case 0: case 1: t = op; break;
+                    case 4: _.label++; return { value: op[1], done: false };
+                    case 5: _.label++; y = op[1]; op = [0]; continue;
+                    case 7: op = _.ops.pop(); _.trys.pop(); continue;
+                    default:
+                        if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
+                        if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
+                        if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
+                        if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
+                        if (t[2]) _.ops.pop();
+                        _.trys.pop(); continue;
+                }
+                op = body.call(thisArg, _);
+            } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
+            if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
+        }
+    };
     /**
      * In Window Child Component.
      */
-    class InWindowChildComponent extends ChildComponent {
+    var InWindowChildComponent = /** @class */ (function (_super) {
+        __extends$5(InWindowChildComponent, _super);
         /**
          * Constructor.
          * @param window The window reference.
          * @param options The child component options.
          * @param rootFacade The facade to the root component.
          */
-        constructor(window, options, rootFacade) {
-            super(window, options, rootFacade);
+        function InWindowChildComponent(window, options, rootFacade) {
+            return _super.call(this, window, options, rootFacade) || this;
         }
         /**
          * @inheritdoc
          */
-        getCommunicationHandlerCore(methods) {
-            const endpoint = this.rootElement;
-            const manager = new HTMLElementCommunicationsManager(endpoint, CommunicationsEvent.CONTENT_EVENT_TYPE, endpoint, CommunicationsEvent.CONTAINER_EVENT_TYPE);
+        InWindowChildComponent.prototype.getCommunicationHandlerCore = function (methods) {
+            var endpoint = this.rootElement;
+            var manager = new HTMLElementCommunicationsManager(endpoint, CommunicationsEvent.CONTENT_EVENT_TYPE, endpoint, CommunicationsEvent.CONTAINER_EVENT_TYPE);
             manager.initialize();
             return new InWindowContainerCommunicationHandler(manager, methods);
-        }
+        };
         /**
          * Get the InWindowChildComponentOptions
          */
-        getOptions() {
-            return super.getOptions();
-        }
+        InWindowChildComponent.prototype.getOptions = function () {
+            return _super.prototype.getOptions.call(this);
+        };
         /**
          * @inheritdoc
          */
-        mountCore() {
-            const _super = Object.create(null, {
-                mountCore: { get: () => super.mountCore }
+        InWindowChildComponent.prototype.mountCore = function () {
+            return __awaiter$2(this, void 0, void 0, function () {
+                var injectionFunction;
+                return __generator$2(this, function (_a) {
+                    switch (_a.label) {
+                        case 0:
+                            injectionFunction = this.getOptions().inject;
+                            if (!injectionFunction) {
+                                throw new Error('Inject method not defined!');
+                            }
+                            injectionFunction(this.rootElement);
+                            return [4 /*yield*/, _super.prototype.mountCore.call(this)];
+                        case 1:
+                            _a.sent();
+                            return [2 /*return*/];
+                    }
+                });
             });
-            return __awaiter$2(this, void 0, void 0, function* () {
-                const injectionFunction = this.getOptions().inject;
-                if (!injectionFunction) {
-                    throw new Error('Inject method not defined!');
-                }
-                injectionFunction(this.rootElement);
-                yield _super.mountCore.call(this);
-            });
-        }
-    }
+        };
+        return InWindowChildComponent;
+    }(ChildComponent));
 
+    var __extends$6 = (window && window.__extends) || (function () {
+        var extendStatics = function (d, b) {
+            extendStatics = Object.setPrototypeOf ||
+                ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+                function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+            return extendStatics(d, b);
+        };
+        return function (d, b) {
+            extendStatics(d, b);
+            function __() { this.constructor = d; }
+            d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+        };
+    })();
     /**
      * @inheritdoc
      */
-    class CrossWindowContainerCommunicationHandler extends ContainerCommunicationHandler {
+    var CrossWindowContainerCommunicationHandler = /** @class */ (function (_super) {
+        __extends$6(CrossWindowContainerCommunicationHandler, _super);
         /**
          * Constructor.
          * @param communicationsManager A communications manager.
          * @param embedId The Id of the embeded element.
          * @param containerMethods The methods to communicate with the container.
          */
-        constructor(communicationsManager, embedId, containerMethods) {
-            super(communicationsManager, containerMethods);
-            this.embedId = embedId;
+        function CrossWindowContainerCommunicationHandler(communicationsManager, embedId, containerMethods) {
+            var _this = _super.call(this, communicationsManager, containerMethods) || this;
+            _this.embedId = embedId;
+            return _this;
         }
         /**
          * @inheritdoc
          */
-        handleEventCore(e) {
+        CrossWindowContainerCommunicationHandler.prototype.handleEventCore = function (e) {
             if (!this.embedId)
                 return;
             if (!e.contentId && e.kind === exports.CommunicationsEventKind.Mounted) {
@@ -1131,14 +1415,14 @@
             }
             if (this.embedId !== e.contentId)
                 return;
-            super.handleEventCore(e);
-        }
+            _super.prototype.handleEventCore.call(this, e);
+        };
         /**
          * Attempt a andshake with the content.
          */
-        attemptHandShake(e) {
-            const hash = getHashCode(this.embedId).toString(10);
-            const response = new CommunicationsEvent(exports.CommunicationsEventKind.Mounted);
+        CrossWindowContainerCommunicationHandler.prototype.attemptHandShake = function (e) {
+            var hash = getHashCode(this.embedId).toString(10);
+            var response = new CommunicationsEvent(exports.CommunicationsEventKind.Mounted);
             // We got a message back so if the data matches the hash we sent send the id
             if (e.data && e.data === hash) {
                 response.contentId = this.embedId;
@@ -1147,9 +1431,23 @@
                 response.data = hash;
             }
             this.send(response);
-        }
-    }
+        };
+        return CrossWindowContainerCommunicationHandler;
+    }(ContainerCommunicationHandler));
 
+    var __extends$7 = (window && window.__extends) || (function () {
+        var extendStatics = function (d, b) {
+            extendStatics = Object.setPrototypeOf ||
+                ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+                function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+            return extendStatics(d, b);
+        };
+        return function (d, b) {
+            extendStatics(d, b);
+            function __() { this.constructor = d; }
+            d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+        };
+    })();
     var __awaiter$3 = (window && window.__awaiter) || function (thisArg, _arguments, P, generator) {
         function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
         return new (P || (P = Promise))(function (resolve, reject) {
@@ -1159,34 +1457,63 @@
             step((generator = generator.apply(thisArg, _arguments || [])).next());
         });
     };
+    var __generator$3 = (window && window.__generator) || function (thisArg, body) {
+        var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
+        return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
+        function verb(n) { return function (v) { return step([n, v]); }; }
+        function step(op) {
+            if (f) throw new TypeError("Generator is already executing.");
+            while (_) try {
+                if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
+                if (y = 0, t) op = [op[0] & 2, t.value];
+                switch (op[0]) {
+                    case 0: case 1: t = op; break;
+                    case 4: _.label++; return { value: op[1], done: false };
+                    case 5: _.label++; y = op[1]; op = [0]; continue;
+                    case 7: op = _.ops.pop(); _.trys.pop(); continue;
+                    default:
+                        if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
+                        if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
+                        if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
+                        if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
+                        if (t[2]) _.ops.pop();
+                        _.trys.pop(); continue;
+                }
+                op = body.call(thisArg, _);
+            } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
+            if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
+        }
+    };
     /**
      * Cross Window Child Component.
      */
-    class CrossWindowChildComponent extends ChildComponent {
+    var CrossWindowChildComponent = /** @class */ (function (_super) {
+        __extends$7(CrossWindowChildComponent, _super);
         /**
          * Constructor.
          * @param window The window refrence.
          * @param options The child options.
          * @param rootFacade he root component facade.
          */
-        constructor(window, options, rootFacade) {
-            super(window, options, rootFacade);
-            this.embededId = '';
-            this.embededLoadResolver = null;
-            this.embededErrorRejecter = null;
-            this.embededLoadPromise = new Promise((resolve, reject) => {
-                this.embededLoadResolver = resolve;
-                this.embededErrorRejecter = reject;
+        function CrossWindowChildComponent(window, options, rootFacade) {
+            var _this = _super.call(this, window, options, rootFacade) || this;
+            _this.embededId = '';
+            _this.embededLoadResolver = null;
+            _this.embededErrorRejecter = null;
+            _this.embededLoadPromise = new Promise(function (resolve, reject) {
+                _this.embededLoadResolver = resolve;
+                _this.embededErrorRejecter = reject;
             });
-            this.embededLoadHandlerRef = this.embededLoadHandler.bind(this);
-            this.embededErrorHandlerRef = this.embededErrorHandler.bind(this);
+            _this.embededLoadHandlerRef = _this.embededLoadHandler.bind(_this);
+            _this.embededErrorHandlerRef = _this.embededErrorHandler.bind(_this);
+            return _this;
         }
         /**
          * @inheritdoc
          */
-        disposeCore() {
-            const embed = this.embededId
-                ? this.rootElement.querySelector(`#${this.embededId}`)
+        CrossWindowChildComponent.prototype.disposeCore = function () {
+            var embed = this.embededId
+                ? this.rootElement.querySelector("#" + this.embededId)
                 : null;
             if (embed) {
                 embed.removeEventListener('load', this.embededLoadHandlerRef);
@@ -1200,178 +1527,237 @@
             this.embededLoadResolver = null;
             this.embededErrorRejecter = null;
             this.embededLoadPromise = null;
-            return super.disposeCore();
-        }
+            return _super.prototype.disposeCore.call(this);
+        };
         /**
          * Get the CrossWindowChildComponentOptions
          */
-        getOptions() {
-            return super.getOptions();
-        }
+        CrossWindowChildComponent.prototype.getOptions = function () {
+            return _super.prototype.getOptions.call(this);
+        };
         /**
          * @inheritdoc
          */
-        mountCore() {
-            const _super = Object.create(null, {
-                mountCore: { get: () => super.mountCore }
+        CrossWindowChildComponent.prototype.mountCore = function () {
+            return __awaiter$3(this, void 0, void 0, function () {
+                var createEmbedElementFn, embed, embedId;
+                return __generator$3(this, function (_a) {
+                    switch (_a.label) {
+                        case 0:
+                            createEmbedElementFn = this.getOptions().createEmbedElement;
+                            embed = null;
+                            if (createEmbedElementFn) {
+                                embed = createEmbedElementFn(this.rootElement);
+                            }
+                            else {
+                                embed = this.createEmbedElement();
+                            }
+                            if (!embed)
+                                throw new Error('Failed to create embed element!');
+                            embedId = generateUniqueId(this.getDocument(), 'ufe-cross-');
+                            embed.id = embedId;
+                            this.embededId = embedId;
+                            embed.addEventListener('load', this.embededLoadHandlerRef);
+                            embed.addEventListener('error', this.embededErrorHandlerRef);
+                            this.rootElement.appendChild(embed);
+                            return [4 /*yield*/, (this.embededLoadPromise)];
+                        case 1:
+                            _a.sent();
+                            return [4 /*yield*/, _super.prototype.mountCore.call(this)];
+                        case 2: return [2 /*return*/, _a.sent()];
+                    }
+                });
             });
-            return __awaiter$3(this, void 0, void 0, function* () {
-                const createEmbedElementFn = this.getOptions().createEmbedElement;
-                let embed = null;
-                if (createEmbedElementFn) {
-                    embed = createEmbedElementFn(this.rootElement);
-                }
-                else {
-                    embed = this.createEmbedElement();
-                }
-                if (!embed)
-                    throw new Error('Failed to create embed element!');
-                const embedId = generateUniqueId(this.getDocument(), 'ufe-cross-');
-                embed.id = embedId;
-                this.embededId = embedId;
-                embed.addEventListener('load', this.embededLoadHandlerRef);
-                embed.addEventListener('error', this.embededErrorHandlerRef);
-                this.rootElement.appendChild(embed);
-                yield (this.embededLoadPromise);
-                return yield _super.mountCore.call(this);
-            });
-        }
+        };
         /**
          *
          * @param methods @inheritdoc
          */
-        getCommunicationHandlerCore(methods) {
-            const document = this.getDocument();
-            const manager = new CrossWindowCommunicationsManager((document).defaultView, CommunicationsEvent.CONTENT_EVENT_TYPE, this.outboundEndpointAccesor(), CommunicationsEvent.CONTAINER_EVENT_TYPE, getUrlOrigin(document, this.getOptions().url));
+        CrossWindowChildComponent.prototype.getCommunicationHandlerCore = function (methods) {
+            var document = this.getDocument();
+            var manager = new CrossWindowCommunicationsManager((document).defaultView, CommunicationsEvent.CONTENT_EVENT_TYPE, this.outboundEndpointAccesor(), CommunicationsEvent.CONTAINER_EVENT_TYPE, getUrlOrigin(document, this.getOptions().url));
             manager.initialize();
             return new CrossWindowContainerCommunicationHandler(manager, this.embededId, methods);
-        }
+        };
         /**
          * Handle the loading of the embeded element.
          * @param e The load event.
          */
-        embededLoadHandler(e) {
+        CrossWindowChildComponent.prototype.embededLoadHandler = function (e) {
             this.embededLoadResolver();
-        }
+        };
         /**
          * Handle the errir of the embeded element.
          * @param e The error event.
          */
-        embededErrorHandler(e) {
-            this.embededErrorRejecter(new Error(`Failed to load embeded element.\nError details:\n${JSON.stringify(e)}`));
-        }
+        CrossWindowChildComponent.prototype.embededErrorHandler = function (e) {
+            this.embededErrorRejecter(new Error("Failed to load embeded element.\nError details:\n" + JSON.stringify(e)));
+        };
         /**
          * Create the embeded element.
          */
-        createEmbedElement() {
-            const embed = this.getDocument().createElement('iframe');
-            const opt = this.getOptions();
+        CrossWindowChildComponent.prototype.createEmbedElement = function () {
+            var embed = this.getDocument().createElement('iframe');
+            var opt = this.getOptions();
             if (opt.embededAttributes) {
-                const keys = Object.keys(opt.embededAttributes);
-                for (let index = 0; index < keys.length; index++) {
-                    const key = keys[index];
+                var keys = Object.keys(opt.embededAttributes);
+                // tslint:disable-next-line: prefer-for-of
+                for (var index = 0; index < keys.length; index++) {
+                    var key = keys[index];
                     embed.setAttribute(key, opt.embededAttributes[key]);
                 }
             }
             embed.setAttribute('src', opt.url);
             return embed;
-        }
+        };
         /**
          * Access the outbound comunication endpoint.
          */
-        outboundEndpointAccesor() {
-            const embed = this.embededId
-                ? this.rootElement.querySelector(`#${this.embededId}`)
+        CrossWindowChildComponent.prototype.outboundEndpointAccesor = function () {
+            var embed = this.embededId
+                ? this.rootElement.querySelector("#" + this.embededId)
                 : null;
             if (!embed)
-                throw new Error(`No iframe with "${this.embededId}" id found.`);
+                throw new Error("No iframe with \"" + this.embededId + "\" id found.");
             if (!embed.contentWindow)
-                throw new Error(`The iframe with "${this.embededId}" id does not have a "contentWindow"(${embed.contentWindow}).`);
+                throw new Error("The iframe with \"" + this.embededId + "\" id does not have a \"contentWindow\"(" + embed.contentWindow + ").");
             return embed.contentWindow;
-        }
-    }
+        };
+        return CrossWindowChildComponent;
+    }(ChildComponent));
 
     /**
      * Configuration object for the event handlers.
      */
-    class ComponentEventHandlers {
-    }
+    var ComponentEventHandlers = /** @class */ (function () {
+        function ComponentEventHandlers() {
+        }
+        return ComponentEventHandlers;
+    }());
     exports.ComponentEventType.BeforeCreate, exports.ComponentEventType.Created, exports.ComponentEventType.BeforeMount, exports.ComponentEventType.Mounted, exports.ComponentEventType.BeforeUpdate, exports.ComponentEventType.Updated, exports.ComponentEventType.BeforeDestroy, exports.ComponentEventType.Destroyed, exports.ComponentEventType.Error, exports.ComponentEventType.Data;
     /**
      * Compoent configuration options.
      */
-    class ComponentOptions {
-        constructor() {
+    var ComponentOptions = /** @class */ (function () {
+        function ComponentOptions() {
             this.parent = 'body';
             this.tag = 'div';
             this.handlers = new ComponentEventHandlers();
             this.resources = [];
         }
-    }
+        return ComponentOptions;
+    }());
 
+    var __extends$8 = (window && window.__extends) || (function () {
+        var extendStatics = function (d, b) {
+            extendStatics = Object.setPrototypeOf ||
+                ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+                function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+            return extendStatics(d, b);
+        };
+        return function (d, b) {
+            extendStatics(d, b);
+            function __() { this.constructor = d; }
+            d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+        };
+    })();
     /**
      * Child component options.
      */
-    class ChildComponentOptions extends ComponentOptions {
-        constructor() {
-            super();
-            this.type = exports.ChildComponentType.InWindow;
+    var ChildComponentOptions = /** @class */ (function (_super) {
+        __extends$8(ChildComponentOptions, _super);
+        function ChildComponentOptions() {
+            var _this = _super.call(this) || this;
+            _this.type = exports.ChildComponentType.InWindow;
             /**
              * The the interval to wait for the component before triggering an error and the 'disposed' event.
              */
-            this.contentDisposeTimeout = 3000;
+            _this.contentDisposeTimeout = 3000;
+            return _this;
         }
-    }
+        return ChildComponentOptions;
+    }(ComponentOptions));
 
+    var __extends$9 = (window && window.__extends) || (function () {
+        var extendStatics = function (d, b) {
+            extendStatics = Object.setPrototypeOf ||
+                ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+                function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+            return extendStatics(d, b);
+        };
+        return function (d, b) {
+            extendStatics(d, b);
+            function __() { this.constructor = d; }
+            d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+        };
+    })();
     /**
      * Cross Window Child Component Options.
      */
-    class CrossWindowChildComponentOptions extends ChildComponentOptions {
+    var CrossWindowChildComponentOptions = /** @class */ (function (_super) {
+        __extends$9(CrossWindowChildComponentOptions, _super);
         /**
          * Constructor.
          */
-        constructor() {
-            super();
-            this.url = 'about:blank';
-            this.type = exports.ChildComponentType.CrossWindow;
+        function CrossWindowChildComponentOptions() {
+            var _this = _super.call(this) || this;
+            _this.url = 'about:blank';
+            _this.type = exports.ChildComponentType.CrossWindow;
+            return _this;
         }
-    }
+        return CrossWindowChildComponentOptions;
+    }(ChildComponentOptions));
 
+    var __extends$a = (window && window.__extends) || (function () {
+        var extendStatics = function (d, b) {
+            extendStatics = Object.setPrototypeOf ||
+                ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+                function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+            return extendStatics(d, b);
+        };
+        return function (d, b) {
+            extendStatics(d, b);
+            function __() { this.constructor = d; }
+            d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+        };
+    })();
     /**
      * @inheritdoc
      */
-    class CrossWindowContentCommunicationHandler extends ContentCommunicationHandler {
+    var CrossWindowContentCommunicationHandler = /** @class */ (function (_super) {
+        __extends$a(CrossWindowContentCommunicationHandler, _super);
         /**
          * Constructor.
          * @param communicationsManager A communications manager.
          * @param methods The callback to dispose the content.
          */
-        constructor(communicationsManager, methods) {
-            super(communicationsManager, methods);
-            this.iframeId = '';
-            this.messageQueue = [];
+        function CrossWindowContentCommunicationHandler(communicationsManager, methods) {
+            var _this = _super.call(this, communicationsManager, methods) || this;
+            _this.iframeId = '';
+            _this.messageQueue = [];
+            return _this;
         }
         /**
          * @inheritdoc
          */
-        disposeCore() {
+        CrossWindowContentCommunicationHandler.prototype.disposeCore = function () {
             this.messageQueue = [];
-            super.disposeCore();
-        }
+            _super.prototype.disposeCore.call(this);
+        };
         /**
          * @inheritdoc
          */
-        handleEventCore(e) {
+        CrossWindowContentCommunicationHandler.prototype.handleEventCore = function (e) {
             if (!this.iframeId) {
                 this.attemptHandShake(e);
                 return;
             }
-            super.handleEventCore(e);
-        }
+            _super.prototype.handleEventCore.call(this, e);
+        };
         /**
          * @inheritdoc
          */
-        send(message) {
+        CrossWindowContentCommunicationHandler.prototype.send = function (message) {
             if (this.iframeId) {
                 message.contentId = this.iframeId;
             }
@@ -1383,18 +1769,18 @@
                     return;
                 }
             }
-            super.send(message);
-        }
+            _super.prototype.send.call(this, message);
+        };
         /**
          * Attempt a handshake with the container.
          * @param e The communication event.
          */
-        attemptHandShake(e) {
+        CrossWindowContentCommunicationHandler.prototype.attemptHandShake = function (e) {
             if (e.contentId) {
                 // Phase 2 of the handshake - we got the id.
                 this.iframeId = e.contentId;
                 // Send it again to notify parent.
-                const response = new CommunicationsEvent(exports.CommunicationsEventKind.Mounted);
+                var response = new CommunicationsEvent(exports.CommunicationsEventKind.Mounted);
                 response.contentId = this.iframeId;
                 this.send(response);
                 // Send the previously queued messages.
@@ -1402,96 +1788,146 @@
             }
             else {
                 // Phase 1 of the handshake - we got the hash so send it back.
-                const response = new CommunicationsEvent(exports.CommunicationsEventKind.Mounted);
+                var response = new CommunicationsEvent(exports.CommunicationsEventKind.Mounted);
                 response.contentId = this.iframeId;
                 response.data = e.data;
                 this.send(response);
             }
-        }
+        };
         /**
          * Flush all the messages that were enqueues before the handhake.
          */
-        flushMessages() {
-            for (let index = 0; index < this.messageQueue.length; index++) {
-                const msg = this.messageQueue[index];
+        CrossWindowContentCommunicationHandler.prototype.flushMessages = function () {
+            // tslint:disable-next-line: prefer-for-of
+            for (var index = 0; index < this.messageQueue.length; index++) {
+                var msg = this.messageQueue[index];
                 msg.contentId = this.iframeId;
                 this.send(msg);
             }
-        }
-    }
+        };
+        return CrossWindowContentCommunicationHandler;
+    }(ContentCommunicationHandler));
 
     /**
      * Factory to create child components.
      */
-    class ChildComponentFactory {
+    var ChildComponentFactory = /** @class */ (function () {
+        function ChildComponentFactory() {
+        }
         /**
          * Create a child component.
          * @param window The window reference.
          * @param options The child component options.
          * @param rootFacade The facade for the root component.
          */
-        createComponent(window, options, rootFacade) {
+        ChildComponentFactory.prototype.createComponent = function (window, options, rootFacade) {
             switch (options.type) {
                 case exports.ChildComponentType.InWindow:
                     return new InWindowChildComponent(window, options, rootFacade);
                 case exports.ChildComponentType.CrossWindow:
                     return new CrossWindowChildComponent(window, options, rootFacade);
                 default:
-                    throw new Error(`The "${options.type}" is not configured.`);
+                    throw new Error("The \"" + options.type + "\" is not configured.");
             }
-        }
-    }
+        };
+        return ChildComponentFactory;
+    }());
 
+    var __extends$b = (window && window.__extends) || (function () {
+        var extendStatics = function (d, b) {
+            extendStatics = Object.setPrototypeOf ||
+                ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+                function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+            return extendStatics(d, b);
+        };
+        return function (d, b) {
+            extendStatics(d, b);
+            function __() { this.constructor = d; }
+            d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+        };
+    })();
     /**
      * In Window Child Component Options.
      */
-    class InWindowChildComponentOptions extends ChildComponentOptions {
+    var InWindowChildComponentOptions = /** @class */ (function (_super) {
+        __extends$b(InWindowChildComponentOptions, _super);
         /**
          * Constructor.
          */
-        constructor() {
-            super();
+        function InWindowChildComponentOptions() {
+            return _super.call(this) || this;
         }
-    }
+        return InWindowChildComponentOptions;
+    }(ChildComponentOptions));
 
+    var __extends$c = (window && window.__extends) || (function () {
+        var extendStatics = function (d, b) {
+            extendStatics = Object.setPrototypeOf ||
+                ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+                function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+            return extendStatics(d, b);
+        };
+        return function (d, b) {
+            extendStatics(d, b);
+            function __() { this.constructor = d; }
+            d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+        };
+    })();
     /**
      * @inheritdoc
      */
-    class InWindowContentCommunicationHandler extends ContentCommunicationHandler {
+    var InWindowContentCommunicationHandler = /** @class */ (function (_super) {
+        __extends$c(InWindowContentCommunicationHandler, _super);
         /**
          * Constructor.
          * @param el The element to use for sending and receiving messages.
          * @param methods The callback to dispose the content.
          */
-        constructor(communicationsManager, methods) {
-            super(communicationsManager, methods);
+        function InWindowContentCommunicationHandler(communicationsManager, methods) {
+            return _super.call(this, communicationsManager, methods) || this;
         }
-    }
+        return InWindowContentCommunicationHandler;
+    }(ContentCommunicationHandler));
 
     /**
      * Configuration for retrieving a resource.
      */
-    class ResourceConfiguration {
-        constructor() {
+    var ResourceConfiguration = /** @class */ (function () {
+        function ResourceConfiguration() {
             this.url = '';
             this.isScript = true;
-            this.skip = () => { return false; };
+            this.skip = function () { return false; };
         }
-    }
+        return ResourceConfiguration;
+    }());
 
     /**
      * Facade to interface with the the root component.
      */
-    class RootComponentFacade {
+    var RootComponentFacade = /** @class */ (function () {
         /**
          * Constructor.
          * @param signalDisposed The function to invoke to signal that the child was disposed.
          */
-        constructor(signalDisposed) {
+        function RootComponentFacade(signalDisposed) {
             this.signalDisposed = signalDisposed;
         }
-    }
+        return RootComponentFacade;
+    }());
 
+    var __extends$d = (window && window.__extends) || (function () {
+        var extendStatics = function (d, b) {
+            extendStatics = Object.setPrototypeOf ||
+                ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+                function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+            return extendStatics(d, b);
+        };
+        return function (d, b) {
+            extendStatics(d, b);
+            function __() { this.constructor = d; }
+            d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+        };
+    })();
     var __awaiter$4 = (window && window.__awaiter) || function (thisArg, _arguments, P, generator) {
         function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
         return new (P || (P = Promise))(function (resolve, reject) {
@@ -1501,96 +1937,162 @@
             step((generator = generator.apply(thisArg, _arguments || [])).next());
         });
     };
+    var __generator$4 = (window && window.__generator) || function (thisArg, body) {
+        var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
+        return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
+        function verb(n) { return function (v) { return step([n, v]); }; }
+        function step(op) {
+            if (f) throw new TypeError("Generator is already executing.");
+            while (_) try {
+                if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
+                if (y = 0, t) op = [op[0] & 2, t.value];
+                switch (op[0]) {
+                    case 0: case 1: t = op; break;
+                    case 4: _.label++; return { value: op[1], done: false };
+                    case 5: _.label++; y = op[1]; op = [0]; continue;
+                    case 7: op = _.ops.pop(); _.trys.pop(); continue;
+                    default:
+                        if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
+                        if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
+                        if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
+                        if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
+                        if (t[2]) _.ops.pop();
+                        _.trys.pop(); continue;
+                }
+                op = body.call(thisArg, _);
+            } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
+            if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
+        }
+    };
     /**
      * The root component to host the rest of the components.
      * There is not limitation right no but ideally there should only be one of these on a page.
      */
-    class RootComponent extends Component {
-        constructor(window, options) {
-            super(window, options);
-            this.children = {};
+    var RootComponent = /** @class */ (function (_super) {
+        __extends$d(RootComponent, _super);
+        function RootComponent(window, options) {
+            var _this = _super.call(this, window, options) || this;
+            _this.children = {};
+            return _this;
         }
         /**
          * Schedule the disposing of the child on exiting the function.
          * The dispose method is async but we do not want to wait for that.
          * @param child The child that was disposed.
          */
-        scheduleDisposeChild(child) {
+        RootComponent.prototype.scheduleDisposeChild = function (child) {
+            var _this = this;
             // Schedule this later
-            this.getWindow().setTimeout(() => {
-                this.disposeChildByRef(child);
+            this.getWindow().setTimeout(function () {
+                _this.disposeChildByRef(child);
             }, 0);
-        }
+        };
         /**
          * Dispose a child using it's reference.
          * @param child
          */
-        disposeChildByRef(child) {
+        RootComponent.prototype.disposeChildByRef = function (child) {
             return this.disposeChild(child.id);
-        }
+        };
         /**
          * Dispose a child by using it's id.
          * @param childId The child identifyer.
          */
-        disposeChild(childId) {
-            return __awaiter$4(this, void 0, void 0, function* () {
-                const child = this.getChild(childId);
-                if (!child)
-                    return Promise.resolve();
-                yield child.dispose();
-                this.children[childId] = null;
+        RootComponent.prototype.disposeChild = function (childId) {
+            return __awaiter$4(this, void 0, void 0, function () {
+                var child;
+                return __generator$4(this, function (_a) {
+                    switch (_a.label) {
+                        case 0:
+                            child = this.getChild(childId);
+                            if (!child)
+                                return [2 /*return*/, Promise.resolve()];
+                            return [4 /*yield*/, child.dispose()];
+                        case 1:
+                            _a.sent();
+                            this.children[childId] = null;
+                            return [2 /*return*/];
+                    }
+                });
             });
-        }
+        };
         /**
          * @@inheritdoc
          */
-        mountCore() {
+        RootComponent.prototype.mountCore = function () {
             this.callHandler(exports.ComponentEventType.Mounted);
-            return super.mountCore();
-        }
+            return _super.prototype.mountCore.call(this);
+        };
         /**
          * Add a child component.
          * @param options Child component options.
          */
-        addChild(options) {
-            return __awaiter$4(this, void 0, void 0, function* () {
-                if (!this.isInitialized)
-                    throw new Error('Wait for the component to initilize before starting to add children.');
-                if (!this.isMounted)
-                    throw new Error('Wait for the component to mount before starting to add children.');
-                const child = this.options.childFactory.createComponent(this.getWindow(), options, new RootComponentFacade(this.scheduleDisposeChild.bind(this)));
-                const id = (yield child.initialize()).id;
-                this.children[id] = child;
-                yield child.mount();
-                return id;
+        RootComponent.prototype.addChild = function (options) {
+            return __awaiter$4(this, void 0, void 0, function () {
+                var child, id;
+                return __generator$4(this, function (_a) {
+                    switch (_a.label) {
+                        case 0:
+                            if (!this.isInitialized)
+                                throw new Error('Wait for the component to initilize before starting to add children.');
+                            if (!this.isMounted)
+                                throw new Error('Wait for the component to mount before starting to add children.');
+                            child = this.options.childFactory.createComponent(this.getWindow(), options, new RootComponentFacade(this.scheduleDisposeChild.bind(this)));
+                            return [4 /*yield*/, child.initialize()];
+                        case 1:
+                            id = (_a.sent()).id;
+                            this.children[id] = child;
+                            return [4 /*yield*/, child.mount()];
+                        case 2:
+                            _a.sent();
+                            return [2 /*return*/, id];
+                    }
+                });
             });
-        }
+        };
         /**
          * Get the child with the given identifier.
          * @param id The child identifier.
          */
-        getChild(id) {
+        RootComponent.prototype.getChild = function (id) {
             return id ? (this.children[id] || null) : null;
-        }
+        };
         /**
          * Remove a child component.
          * @param id The child component identifyer.
          */
-        removeChild(id) {
+        RootComponent.prototype.removeChild = function (id) {
             return this.disposeChild(id);
-        }
-    }
+        };
+        return RootComponent;
+    }(Component));
 
+    var __extends$e = (window && window.__extends) || (function () {
+        var extendStatics = function (d, b) {
+            extendStatics = Object.setPrototypeOf ||
+                ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+                function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+            return extendStatics(d, b);
+        };
+        return function (d, b) {
+            extendStatics(d, b);
+            function __() { this.constructor = d; }
+            d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+        };
+    })();
     /**
      * Options for the root component.
      */
-    class RootComponentOptions extends ComponentOptions {
-        constructor() {
-            super();
-            this.tag = 'script';
-            this.childFactory = new ChildComponentFactory();
+    var RootComponentOptions = /** @class */ (function (_super) {
+        __extends$e(RootComponentOptions, _super);
+        function RootComponentOptions() {
+            var _this = _super.call(this) || this;
+            _this.tag = 'script';
+            _this.childFactory = new ChildComponentFactory();
+            return _this;
         }
-    }
+        return RootComponentOptions;
+    }(ComponentOptions));
 
     exports.ChildComponent = ChildComponent;
     exports.ChildComponentFactory = ChildComponentFactory;

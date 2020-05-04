@@ -25,7 +25,7 @@
   "scripts": {
     "clean": "node ./.build/clean.js",
     "prebuild": "npm run clean",
-    "build": "tsc --module es2015 && rollup --config ./rollup.config.js && node ./.build/minify.js",
+    "build": "tsc --module es2015 --target ES5 && rollup --config ./rollup.config.js && node ./.build/minify.js",
     "test": "npm run lint && nyc mocha",
     "predocs": "npm run test && npm run build",
     "docs": "rollup --config ./rollup.config.js --dir ./docs/demo/lib/bundle/",
