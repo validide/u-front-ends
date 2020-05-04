@@ -8,5 +8,5 @@ export function test_utilities() {
     test_getHashCode();
     test_random();
     test_noop();
-  })
+  });
 }

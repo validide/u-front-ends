@@ -6,6 +6,7 @@ import { test_RootComponent } from './rootComponent.spec';
 import { test_RootComponentFacade } from './rootComponentFacade';
 import { test_RootComponentOptions } from './rootComponentOptions.spec';
 import { test_Children } from './children/index.spec';
+// tslint:disable: no-unused-expression
 
 export function test_core() {
   describe('CORE', () => {
@@ -16,5 +17,5 @@ export function test_core() {
     test_RootComponentFacade();
     test_RootComponentOptions();
     test_Children();
-  })
+  });
 }

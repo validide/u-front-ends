@@ -5,6 +5,7 @@ import { CommunicationsEvent, CommunicationsEventKind } from '../../../../src';
 import { createCustomEvent } from '../../../../src/dom/document/createCustomEvent';
 import { getDelayPromise, values_falsies } from '../../../utils';
 import { MockHTMLElementCommunicationsManager } from '../../../mocks/mockHTMLElementCommunicationsManager';
+// tslint:disable: no-unused-expression
 
 export function test_HTMLElementCommunicationsManager() {
   describe('HTMLElementCommunicationsManager', () => {
@@ -28,11 +29,11 @@ export function test_HTMLElementCommunicationsManager() {
       _win.close();
       _jsDom.window.close();
       _mngr.dispose();
-    })
+    });
 
     it('calling send to an endpoint that is not attached will not fail but will not send', () => {
       const ep = _win.document.createElement('div');
-      const events: Array<Event> = [];
+      const events: Event[] = [];
       ep.addEventListener(_eventType, (e:Event ) => {events.push(e);});
       Object.defineProperty(ep, 'ownerDocument', {
         value: undefined,
@@ -43,11 +44,11 @@ export function test_HTMLElementCommunicationsManager() {
       }).not.to.throw();
 
       expect(events.length).to.eq(0);
-    })
+    });
 
     it('calling send to an endpoint will send', () => {
       const ep = _win.document.createElement('div');
-      const events: Array<Event> = [];
+      const events: Event[] = [];
       const det = new CommunicationsEvent(CommunicationsEventKind.BeforeDispose);
       ep.addEventListener(_eventType, (e:Event ) => {events.push(e);});
 
@@ -58,20 +59,20 @@ export function test_HTMLElementCommunicationsManager() {
 
       expect(events.length).to.eq(1);
       expect(events[0].type).to.eq(_eventType);
-      expect((<CustomEvent>events[0]).detail).to.eq(det);
-    })
+      expect((events[0] as CustomEvent).detail).to.eq(det);
+    });
 
     values_falsies.forEach(f=> {
       it(`should return null is reading "${f}" as event`, () => {
-        expect(_mngr.readEvent(<Event><unknown>f)).to.be.null;
-      })
-    })
+        expect(_mngr.readEvent(f as unknown as Event)).to.be.null;
+      });
+    });
 
     values_falsies.forEach(f=> {
       it(`should return null is sending "${f}" as detail`, () => {
         expect(_mngr.readEvent(createCustomEvent(_win.document, _eventType, { detail: f}))).to.be.null;
-      })
-    })
+      });
+    });
 
     it('read an event and return the correct data', () => {
       const evt = new CommunicationsEvent(CommunicationsEventKind.BeforeDispose);
@@ -79,10 +80,10 @@ export function test_HTMLElementCommunicationsManager() {
       expect(_mngr.readEvent(_win.document.createEvent('MouseEvent'))).to.be.null;
       expect(_mngr.readEvent(createCustomEvent(_win.document, _eventType + '_wrong_type', { detail: evt}))).to.be.null;
       expect(_mngr.readEvent(createCustomEvent(_win.document, _eventType, { detail: evt}))).to.eq(evt);
-    })
+    });
 
     it('attach and detach handler', () => {
-      const events: Array<Event> = [];
+      const events: Event[] = [];
       const handler = (e:Event ) => {events.push(e);};
       const det = new CommunicationsEvent(CommunicationsEventKind.BeforeDispose);
       const ep = _win.document.createElement('div');
@@ -95,16 +96,16 @@ export function test_HTMLElementCommunicationsManager() {
 
       expect(events.length).to.eq(1);
       expect(events[0].type).to.eq(_eventType);
-      expect((<CustomEvent>events[0]).detail).to.eq(det);
+      expect((events[0] as CustomEvent).detail).to.eq(det);
 
       _mngr.stopReceiving(ep, handler);
       ep.dispatchEvent(createCustomEvent(_win.document, _eventType, { detail: det}));
 
       expect(events.length).to.eq(1);
       expect(events[0].type).to.eq(_eventType);
-      expect((<CustomEvent>events[0]).detail).to.eq(det);
+      expect((events[0] as CustomEvent).detail).to.eq(det);
 
-    })
+    });
 
   });
 }

@@ -1,6 +1,7 @@
 import 'mocha';
 import { expect } from 'chai';
 import { CrossWindowChildComponentOptions, ChildComponentType } from '../../../../src';
+// tslint:disable: no-unused-expression
 
 export function test_CrossWindowChildComponentOptions() {
   describe('ChildComponentOptions', () => {
@@ -16,6 +17,6 @@ export function test_CrossWindowChildComponentOptions() {
       expect(conf.url).to.eq('about:blank');
       expect(conf.createEmbedElement).to.be.undefined;
       expect(conf.embededAttributes).to.be.undefined;
-    })
+    });
   });
 }

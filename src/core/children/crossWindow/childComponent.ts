@@ -42,11 +42,11 @@ export class CrossWindowChildComponent extends ChildComponent {
    */
   protected disposeCore(): Promise<void> {
     const embed = this.embededId
-      ? (<HTMLElement>this.rootElement).querySelector<HTMLIFrameElement>(`#${this.embededId}`)
+      ? (this.rootElement as HTMLElement).querySelector<HTMLIFrameElement>(`#${this.embededId}`)
       : null;
     if (embed) {
-      embed.removeEventListener('load', <() => void>this.embededLoadHandlerRef);
-      embed.removeEventListener('error', <(e: ErrorEvent) => void>this.embededErrorHandlerRef);
+      embed.removeEventListener('load', this.embededLoadHandlerRef as () => void);
+      embed.removeEventListener('error', this.embededErrorHandlerRef as (e: ErrorEvent) => void);
 
       // Do not remove the embeded element now as we still need it to comunicate with the content.
       // The parent "rootElement" will be removed latter anyhow.
@@ -64,7 +64,7 @@ export class CrossWindowChildComponent extends ChildComponent {
    * Get the CrossWindowChildComponentOptions
    */
   protected getOptions(): CrossWindowChildComponentOptions {
-    return <CrossWindowChildComponentOptions>super.getOptions();
+    return super.getOptions() as CrossWindowChildComponentOptions;
   }
 
   /**
@@ -74,7 +74,7 @@ export class CrossWindowChildComponent extends ChildComponent {
     const createEmbedElementFn = this.getOptions().createEmbedElement;
     let embed: HTMLElement | null = null;
     if (createEmbedElementFn) {
-      embed = createEmbedElementFn(<HTMLElement>this.rootElement);
+      embed = createEmbedElementFn(this.rootElement as HTMLElement);
     } else {
       embed = this.createEmbedElement();
     }
@@ -85,12 +85,12 @@ export class CrossWindowChildComponent extends ChildComponent {
     embed.id = embedId;
     this.embededId = embedId;
 
-    embed.addEventListener('load', <() => void>this.embededLoadHandlerRef);
-    embed.addEventListener('error', <(e: ErrorEvent) => void>this.embededErrorHandlerRef);
+    embed.addEventListener('load', this.embededLoadHandlerRef as () => void);
+    embed.addEventListener('error', this.embededErrorHandlerRef as (e: ErrorEvent) => void);
 
-    (<HTMLDivElement>this.rootElement).appendChild(embed);
+    (this.rootElement as HTMLDivElement).appendChild(embed);
 
-    await (<Promise<void>>(this.embededLoadPromise));
+    await ((this.embededLoadPromise) as Promise<void>);
 
     return await super.mountCore();
   }
@@ -102,7 +102,7 @@ export class CrossWindowChildComponent extends ChildComponent {
   protected getCommunicationHandlerCore(methods: ContainerCommunicationHandlerMethods): ContainerCommunicationHandler {
     const document = this.getDocument();
     const manager = new CrossWindowCommunicationsManager(
-      <Window>(document).defaultView,
+      (document).defaultView as Window,
       CommunicationsEvent.CONTENT_EVENT_TYPE,
       this.outboundEndpointAccesor(),
       CommunicationsEvent.CONTAINER_EVENT_TYPE,
@@ -121,7 +121,7 @@ export class CrossWindowChildComponent extends ChildComponent {
    * @param e The load event.
    */
   private embededLoadHandler(e: Event): void {
-    (<() => void>this.embededLoadResolver)();
+    (this.embededLoadResolver as () => void)();
   }
 
   /**
@@ -129,7 +129,7 @@ export class CrossWindowChildComponent extends ChildComponent {
    * @param e The error event.
    */
   private embededErrorHandler(e: ErrorEvent): void {
-    (<(e: Error) => void>this.embededErrorRejecter)(new Error(`Failed to load embeded element.\nError details:\n${JSON.stringify(e)}`));
+    (this.embededErrorRejecter as (e: Error) => void)(new Error(`Failed to load embeded element.\nError details:\n${JSON.stringify(e)}`));
   }
 
   /**
@@ -140,9 +140,10 @@ export class CrossWindowChildComponent extends ChildComponent {
     const opt = this.getOptions();
     if (opt.embededAttributes) {
       const keys = Object.keys(opt.embededAttributes);
+      // tslint:disable-next-line: prefer-for-of
       for (let index = 0; index < keys.length; index++) {
         const key = keys[index];
-        embed.setAttribute(key, opt.embededAttributes[key])
+        embed.setAttribute(key, opt.embededAttributes[key]);
       }
     }
 
@@ -155,7 +156,7 @@ export class CrossWindowChildComponent extends ChildComponent {
    */
   private outboundEndpointAccesor(): Window {
     const embed = this.embededId
-      ? (<HTMLElement>this.rootElement).querySelector<HTMLIFrameElement>(`#${this.embededId}`)
+      ? (this.rootElement as HTMLElement).querySelector<HTMLIFrameElement>(`#${this.embededId}`)
       : null;
 
     if (!embed)

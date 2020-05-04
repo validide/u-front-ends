@@ -16,8 +16,8 @@ export function test_random() {
       values.forEach((v, i, arr) => {
         expect(arr.indexOf(v)).to.be.eq(i);
       });
-    })
-  })
+    });
+  });
 
   describe('getUuidV4', () => {
 
@@ -32,6 +32,6 @@ export function test_random() {
       values.forEach((v, i, arr) => {
         expect(arr.indexOf(v)).to.be.eq(i);
       });
-    })
-  })
+    });
+  });
 }

@@ -12,5 +12,5 @@ export function testDocumentModule() {
     test_generateUniqueId();
     test_loadResource();
     test_createCustomEvent();
-  })
+  });
 }

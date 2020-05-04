@@ -1,7 +1,7 @@
 import {HTMLElementCommunicationsManager, CommunicationsEvent} from '../../src';
 
 export class MockHTMLElementCommunicationsManager extends HTMLElementCommunicationsManager {
-  public readEvents:Array<CommunicationsEvent|null> = [];
+  public readEvents:(CommunicationsEvent|null)[] = [];
 
   public readEvent(e: Event): CommunicationsEvent | null {
     const evt = super.readEvent(e);

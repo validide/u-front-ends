@@ -20,9 +20,9 @@ export class ChildComponentFactory {
       case ChildComponentType.InWindow:
         return new InWindowChildComponent(window, options, rootFacade);
       case ChildComponentType.CrossWindow:
-          return new CrossWindowChildComponent(window, <CrossWindowChildComponentOptions>options, rootFacade);
+          return new CrossWindowChildComponent(window, options as CrossWindowChildComponentOptions, rootFacade);
       default:
-        throw new Error(`The "${options.type}" is not configured.`)
+        throw new Error(`The "${options.type}" is not configured.`);
     }
   }
 }

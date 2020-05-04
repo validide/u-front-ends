@@ -2,6 +2,7 @@ import 'mocha';
 import { ComponentEvent, ComponentEventType } from '../../src/index';
 import { expect } from 'chai';
 import { JSDOM } from 'jsdom';
+// tslint:disable: no-unused-expression
 
 export function test_ComponentEvent() {
   describe('ComponentEvent', () => {
@@ -18,7 +19,7 @@ export function test_ComponentEvent() {
     afterEach(() => {
       _win.close();
       _jsDom.window.close();
-    })
+    });
 
     it('should require all values be passed to constructor', () => {
       const el = _win.document.createElement('div');
@@ -35,6 +36,6 @@ export function test_ComponentEvent() {
       expect(value.el).to.eq(el);
       expect(value.parentEl).to.eq(_win.document.body);
       expect(value.error).to.be.null;
-    })
-  })
+    });
+  });
 }

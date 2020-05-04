@@ -2,7 +2,7 @@ import {CrossWindowChildComponent, CrossWindowChildComponentOptions, ContainerCo
 
 export class MockCrossWindowChildComponent extends CrossWindowChildComponent {
   public mountCore(): Promise<void> {
-    return super.mountCore()
+    return super.mountCore();
   }
 
   public getOptions(): CrossWindowChildComponentOptions {
@@ -14,6 +14,6 @@ export class MockCrossWindowChildComponent extends CrossWindowChildComponent {
   }
 
   public getRootEl(): HTMLElement {
-    return <HTMLElement>this.rootElement;
+    return this.rootElement as HTMLElement;
   }
 }

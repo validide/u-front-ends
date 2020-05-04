@@ -15,11 +15,13 @@ export abstract class CommunicationsManager {
   /**
    * Initialize the manager.
    */
+  // tslint:disable-next-line: no-empty
   protected initializeCore(): void { }
 
   /**
    * Clean any resources before the manager is disposed.
    */
+  // tslint:disable-next-line: no-empty
   protected disposeCore(): void { }
 
   /**
@@ -87,7 +89,7 @@ export abstract class CommunicationsManagerOf<TEndpoint> extends CommunicationsM
     this.outboundEndpoint = outboundEndpoint;
     this.outboundEventType = outboundEventType;
     this.onEventReceived = null;
-    this.eventHandler = (e: Event) => { this.handleEvent(e); }
+    this.eventHandler = (e: Event) => { this.handleEvent(e); };
   }
 
   /**
@@ -111,7 +113,7 @@ export abstract class CommunicationsManagerOf<TEndpoint> extends CommunicationsM
     if (this.inboundEndpoint && this.eventHandler) {
       this.startReceiving(this.inboundEndpoint, this.eventHandler);
     }
-    super.initializeCore()
+    super.initializeCore();
   }
 
   /**

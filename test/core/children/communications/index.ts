@@ -11,5 +11,5 @@ export function test_Communications() {
     test_CrossWindowCommunicationsManager();
     test_ContainerCommunicationHandler();
     test_ContentCommunicationHandler();
-  })
+  });
 }

@@ -4,6 +4,7 @@ import { expect } from 'chai';
 import { RootComponent, RootComponentOptions, ChildComponentOptions } from '../../src';
 import { values_falsies, getDelayPromise } from '../utils';
 import { MockChildComponentFactory, MockChildComponent } from '../mocks/mockChildComponentFactory';
+// tslint:disable: no-unused-expression
 
 export function test_RootComponent() {
   describe('RootComponent', () => {
@@ -25,27 +26,27 @@ export function test_RootComponent() {
     afterEach(() => {
       _win.close();
       _jsDom.window.close();
-    })
+    });
 
     describe('Constructor', () => {
 
       values_falsies.forEach((f: any) => {
         it(`passing a falsie as the "window" argument throws - ${f}`, () => {
-          expect(() => new RootComponent(<any>f, _options)).to.throw('Missing "window" argument.');
-        })
+          expect(() => new RootComponent(f as any, _options)).to.throw('Missing "window" argument.');
+        });
       });
 
       values_falsies.forEach((f: any) => {
         it(`passing a falsie as the "options" argument throws - ${f}`, () => {
-          expect(() => new RootComponent(_win, <any>f)).to.throw('Missing "options" argument.');
-        })
+          expect(() => new RootComponent(_win, f as any)).to.throw('Missing "options" argument.');
+        });
       });
 
-      it(`does not throw if valid arguments are provided`, () => {
+      it('does not throw if valid arguments are provided', () => {
         expect(() => new RootComponent(_win, _options)).not.to.throw('Missing "window" argument.');
-      })
+      });
 
-    })
+    });
 
     describe('mount', () => {
       it('should raise the mount event', async () => {
@@ -58,55 +59,55 @@ export function test_RootComponent() {
 
         expect(mounted).to.be.true;
         expect(_win.document.getElementById(root.id)).to.not.be.null;
-        expect((<HTMLElement>_win.document.getElementById(root.id)).tagName).to.eq('SCRIPT');
-      })
-    })
+        expect((_win.document.getElementById(root.id) as HTMLElement).tagName).to.eq('SCRIPT');
+      });
+    });
 
     describe('addChild', () => {
       it('should throw an error if not initialized', async () => {
         const root = new RootComponent(_win, _options);
         try {
-          await root.addChild(_childOptions)
+          await root.addChild(_childOptions);
         } catch (error) {
-          expect((<Error>error).message).to.eq('Wait for the component to initilize before starting to add children.')
+          expect((error as Error).message).to.eq('Wait for the component to initilize before starting to add children.');
         }
-      })
+      });
 
       it('should throw an error if not initialized', async () => {
         const root = new RootComponent(_win, _options);
         try {
           await root.initialize();
-          await root.addChild(_childOptions)
+          await root.addChild(_childOptions);
         } catch (error) {
-          expect((<Error>error).message).to.eq('Wait for the component to mount before starting to add children.');
+          expect((error as Error).message).to.eq('Wait for the component to mount before starting to add children.');
         }
-      })
+      });
 
       it('should add child and return the child id', async () => {
         const root = new RootComponent(_win, _options);
         await root.initialize();
         await root.mount();
-        const id = await root.addChild(_childOptions)
+        const id = await root.addChild(_childOptions);
         expect(_win.document.getElementById(id)).to.not.be.null;
-        expect((<HTMLElement>_win.document.getElementById(id)).tagName).to.eq('DIV');
-      })
-    })
+        expect((_win.document.getElementById(id) as HTMLElement).tagName).to.eq('DIV');
+      });
+    });
 
     describe('get child', () => {
       values_falsies.concat('aaaa').forEach(f => {
         it(`return null if not existing ${f}`, () => {
           const root = new RootComponent(_win, _options);
-          expect(root.getChild(<string><unknown>f)).to.be.null;
-        })
-      })
-    })
+          expect(root.getChild(f as unknown as string)).to.be.null;
+        });
+      });
+    });
 
     describe('remove child', () => {
       it('should not throw if ID does not exist', async () => {
         const root = new RootComponent(_win, _options);
         expect(async () => await root.removeChild('some_id_that_does_not_exit'))
             .not.to.throw();
-      })
+      });
 
       it('should remove child', async () => {
         const root = new RootComponent(_win, _options);
@@ -118,7 +119,7 @@ export function test_RootComponent() {
         await root.removeChild(id);
 
         expect(_win.document.getElementById(id)).to.be.null;
-      })
+      });
 
       it('should handle child dispose request', async () => {
         const root = new RootComponent(_win, _options);
@@ -130,14 +131,14 @@ export function test_RootComponent() {
         const child = root.getChild(id);
         expect(child).to.not.be.null;
 
-        (<MockChildComponent>child).signalDisposeToParent();
+        (child as MockChildComponent).signalDisposeToParent();
         // This is not imediate
         expect(_win.document.getElementById(id)).to.not.be.null;
 
         await getDelayPromise(5);
 
         expect(_win.document.getElementById(id)).to.be.null;
-      })
-    })
-  })
+      });
+    });
+  });
 }

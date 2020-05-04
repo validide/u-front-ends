@@ -51,7 +51,7 @@ export class CommunicationsEvent {
    */
   constructor(kind: CommunicationsEventKind) {
     this.kind = kind;
-    this.uuid = getUuidV4()
+    this.uuid = getUuidV4();
     this.timestamp = new Date().getTime();
     this.contentId = '';
   }

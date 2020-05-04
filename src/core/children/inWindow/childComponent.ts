@@ -22,7 +22,7 @@ export class InWindowChildComponent extends ChildComponent {
    * @inheritdoc
    */
   protected getCommunicationHandlerCore(methods: ContainerCommunicationHandlerMethods): ContainerCommunicationHandler {
-    const endpoint = <HTMLElement>this.rootElement;
+    const endpoint = this.rootElement as HTMLElement;
     const manager = new HTMLElementCommunicationsManager(
       endpoint,
       CommunicationsEvent.CONTENT_EVENT_TYPE,
@@ -37,7 +37,7 @@ export class InWindowChildComponent extends ChildComponent {
    * Get the InWindowChildComponentOptions
    */
   protected getOptions(): InWindowChildComponentOptions {
-    return <InWindowChildComponentOptions>super.getOptions();
+    return super.getOptions() as InWindowChildComponentOptions;
   }
 
   /**
@@ -48,7 +48,7 @@ export class InWindowChildComponent extends ChildComponent {
     if (!injectionFunction) {
       throw new Error('Inject method not defined!');
     }
-    injectionFunction(<HTMLElement>this.rootElement);
+    injectionFunction(this.rootElement as HTMLElement);
     await super.mountCore();
   }
 }

@@ -5,6 +5,7 @@ import { MockCommunicationsManager } from '../../../mocks/mockCommunicationsMana
 import { CommunicationsEvent, CommunicationsEventKind } from '../../../../src';
 import { createCustomEvent } from '../../../../src/dom/document/createCustomEvent';
 import { getDelayPromise, values_falsies } from '../../../utils';
+// tslint:disable: no-unused-expression
 
 export function test_CommunicationsManager() {
   describe('CommunicationsManager', () => {
@@ -28,16 +29,16 @@ export function test_CommunicationsManager() {
       _mngr.dispose();
       _win.close();
       _jsDom.window.close();
-    })
+    });
 
     it('calling dispose multiple times does not fail', () => {
       expect(() => {
         _mngr.dispose();
         _mngr.dispose();
-        (<any>_mngr).disposed = false;
+        (_mngr as any).disposed = false;
         _mngr.dispose();
       }).not.to.throw();
-    })
+    });
 
     it('calling initialize multiple times does not fail', () => {
       expect(() => {
@@ -46,7 +47,7 @@ export function test_CommunicationsManager() {
       }).not.to.throw();
 
       expect(_mngr.receiving).to.be.true;
-    })
+    });
 
     it('calling initialize after dispose not fail but does not receive', () => {
       expect(() => {
@@ -56,26 +57,26 @@ export function test_CommunicationsManager() {
       }).not.to.throw();
 
       expect(_mngr.receiving).to.be.false;
-    })
+    });
 
     it('calling initialize without an inbound enpoint does not fail but does not receive', () => {
-      const mngr = new MockCommunicationsManager(<HTMLElement><unknown>null, _eventType, _win.document.body, _eventType);
+      const mngr = new MockCommunicationsManager(null as unknown as HTMLElement, _eventType, _win.document.body, _eventType);
       expect(() => {
         mngr.initialize();
         mngr.initialize();
       }).not.to.throw();
 
       expect(mngr.receiving).to.be.false;
-    })
+    });
 
     it('calling send without an outbound enpoint does not fail but does not send', () => {
-      const mngr = new MockCommunicationsManager(_win.document.body, _eventType, <HTMLElement><unknown>null, _eventType);
+      const mngr = new MockCommunicationsManager(_win.document.body, _eventType, null as unknown as HTMLElement, _eventType);
       expect(() => {
         mngr.send(new CommunicationsEvent(CommunicationsEventKind.BeforeDispose));
       }).not.to.throw();
 
       expect(mngr.sentEvents.length).to.eq(0);
-    })
+    });
 
     it('calling send will send an event', () => {
       const evt = new CommunicationsEvent(CommunicationsEventKind.BeforeDispose);
@@ -85,10 +86,10 @@ export function test_CommunicationsManager() {
 
       expect(_mngr.sentEvents.length).to.eq(1);
       expect(_mngr.sentEvents[0]).to.eq(evt);
-    })
+    });
 
     it('will handle event if handler is set', async () => {
-      const evts: Array<CommunicationsEvent> = [];
+      const evts: CommunicationsEvent[] = [];
       _mngr.initialize();
       _mngr.setEventReceivedCallback((e: CommunicationsEvent) => { evts.push(e); });
 
@@ -99,7 +100,7 @@ export function test_CommunicationsManager() {
 
       expect(_mngr.receivedEvents.length).to.eq(1);
       expect(evts.length).to.eq(1);
-    })
+    });
 
     it('will not handle event if handler is not set', async () => {
       _mngr.initialize();
@@ -109,11 +110,11 @@ export function test_CommunicationsManager() {
       await getDelayPromise(1); // Wait for JSDOM to send the event
 
       expect(_mngr.receivedEvents.length).to.eq(0);
-    })
+    });
 
     values_falsies.forEach(f => {
       it(`will not handle event if "${f}"`, async () => {
-        const evts: Array<CommunicationsEvent> = [];
+        const evts: CommunicationsEvent[] = [];
         _mngr.initialize();
         _mngr.setEventReceivedCallback((e: CommunicationsEvent) => { evts.push(e); });
 
@@ -124,7 +125,7 @@ export function test_CommunicationsManager() {
         expect(_mngr.receivedEvents.length).to.eq(1);
         expect(_mngr.receivedEvents[0]).to.eq(f === undefined ? null : f);
         expect(evts.length).to.eq(0);
-      })
-    })
+      });
+    });
   });
 }

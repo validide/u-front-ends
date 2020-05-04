@@ -2,7 +2,7 @@ import {InWindowChildComponent, InWindowChildComponentOptions, ContainerCommunic
 
 export class MockInWindowChildComponent extends InWindowChildComponent {
   public mountCore(): Promise<void> {
-    return super.mountCore()
+    return super.mountCore();
   }
 
   public getOptions(): InWindowChildComponentOptions {
@@ -14,6 +14,6 @@ export class MockInWindowChildComponent extends InWindowChildComponent {
   }
 
   public getRootEl(): HTMLElement {
-    return <HTMLElement>this.rootElement;
+    return this.rootElement as HTMLElement;
   }
 }

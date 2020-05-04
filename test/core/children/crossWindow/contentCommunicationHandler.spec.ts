@@ -27,7 +27,7 @@ export function test_CrossWindowContentCommunicationHandler() {
       _mngr.initialize();
       _disposeCall = 0;
       _methods = new ContentCommunicationHandlerMethods();
-      _methods.dispose = () => { _disposeCall++ };
+      _methods.dispose = () => { _disposeCall++; };
       _handler = new MockCrossWindowContentCommunicationHandler(_mngr, _methods);
     });
 
@@ -36,7 +36,7 @@ export function test_CrossWindowContentCommunicationHandler() {
       _mngr.dispose();
       _win.close();
       _jsDom.window.close();
-    })
+    });
 
     it('requires a handler and methods as parameters', () => {
       const methods = new ContentCommunicationHandlerMethods();
@@ -45,7 +45,7 @@ export function test_CrossWindowContentCommunicationHandler() {
         _mngr,
         methods
       )).not.to.throw();
-    })
+    });
 
     it('does not send out events untill it receives the embedId - except for MountedEvents', () => {
       _handler.send(new CommunicationsEvent(CommunicationsEventKind.BeforeUpdate));
@@ -54,7 +54,7 @@ export function test_CrossWindowContentCommunicationHandler() {
 
       _handler.send(new CommunicationsEvent(CommunicationsEventKind.Mounted));
       expect(_mngr.sentEvents.length).to.eq(1);
-    })
+    });
 
     it('sends events with a contentId equal to the embedId it received', async () => {
       _handler.send(new CommunicationsEvent(CommunicationsEventKind.Mounted));
@@ -74,7 +74,7 @@ export function test_CrossWindowContentCommunicationHandler() {
       expect(_mngr.sentEvents[2].contentId).to.eq('test');
       expect(_mngr.sentEvents[2].kind).to.eq(upd.kind);
       expect(_mngr.sentEvents[2].uuid).to.eq(upd.uuid);
-    })
+    });
 
     it('should process dispose commands only after the embedId is received', async () => {
       const disposeCommand = new CommunicationsEvent(CommunicationsEventKind.BeforeDispose);
@@ -90,7 +90,7 @@ export function test_CrossWindowContentCommunicationHandler() {
       await _mngr.simulateReceiveEvent(_mngr.wrapEvent(disposeCommand, _eventType));
       expect(_disposeCall).to.eq(1);
 
-    })
+    });
 
     it('sends the messages it had queued before receiving the embedId', async () => {
       _handler.send(new CommunicationsEvent(CommunicationsEventKind.Mounted));
@@ -120,7 +120,7 @@ export function test_CrossWindowContentCommunicationHandler() {
       expect(_mngr.sentEvents[3].kind).to.eq(CommunicationsEventKind.Updated);
 
       expect(_mngr.sentEvents.length).to.eq(4);
-    })
+    });
 
-  })
+  });
 }

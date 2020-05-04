@@ -24,5 +24,5 @@ export class ComponentOptions {
   public parent: string | HTMLElement = 'body';
   public tag: string = 'div';
   public handlers: ComponentEventHandlers = new ComponentEventHandlers();
-  public resources: Array<ResourceConfiguration> = [];
+  public resources: ResourceConfiguration[] = [];
 }

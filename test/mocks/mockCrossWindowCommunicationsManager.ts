@@ -2,10 +2,10 @@ import {CrossWindowCommunicationsManager, CommunicationsEvent, CrossWindowCommun
 import { getDelayPromise } from '../utils';
 
 export class MockCrossWindowCommunicationsManager extends CrossWindowCommunicationsManager {
-  public readEvents:Array<CommunicationsEvent|null> = [];
+  public readEvents:(CommunicationsEvent|null)[] = [];
   public handler: ((e: Event) => void) | null = null;
   private inboundEndpointRef: Window | null = null;
-  public sentEvents: Array<CommunicationsEvent> = [];
+  public sentEvents: CommunicationsEvent[] = [];
 
   public readEvent(e: Event): CommunicationsEvent | null {
     const evt = super.readEvent(e);
@@ -45,9 +45,9 @@ export class MockCrossWindowCommunicationsManager extends CrossWindowCommunicati
     );
 
 
-    const message = (<Window>this.inboundEndpointRef).document.createEvent('MessageEvent');
+    const message = (this.inboundEndpointRef as Window).document.createEvent('MessageEvent');
     Object.defineProperty(message, 'origin', {
-      value: (<Window>this.inboundEndpointRef).origin,
+      value: (this.inboundEndpointRef as Window).origin,
       writable: false
     });
     Object.defineProperty(message, 'data', {

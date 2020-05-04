@@ -1,5 +1,5 @@
-import { ComponentOptions } from "./componentOptions";
-import { ChildComponentFactory } from "./children/childComponentFactory";
+import { ComponentOptions } from './componentOptions';
+import { ChildComponentFactory } from './children/childComponentFactory';
 
 /**
  * Options for the root component.

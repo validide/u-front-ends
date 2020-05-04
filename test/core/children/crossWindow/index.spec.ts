@@ -9,5 +9,5 @@ export function test_CrossWindowChildren() {
     test_CrossWindowChildComponent();
     test_CrossWindowContentCommunicationHandler();
     test_CrossWindowContainerCommunicationHandler();
-  })
+  });
 }

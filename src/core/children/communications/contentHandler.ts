@@ -75,6 +75,7 @@ export abstract class ContentCommunicationHandler {
    * Core dispose function.
    * Any component derived should override this to add clean-up after itself.
    */
+  // tslint:disable-next-line: no-empty
   protected disposeCore(): void { }
 
   /**

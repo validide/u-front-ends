@@ -2,7 +2,8 @@
 import 'mocha';
 import { expect } from 'chai';
 import { JSDOM, ResourceLoader, FetchOptions, VirtualConsole } from 'jsdom';
-import { loadResource } from '../../../src';
+import { loadResource, noop } from '../../../src';
+// tslint:disable: no-unused-expression
 
 class CustomResourceLoader extends ResourceLoader {
   fetch(url: string, options: FetchOptions) {
@@ -36,13 +37,14 @@ export function test_loadResource() {
     let _win: Window;
 
     beforeEach(() => {
+      const loader = new CustomResourceLoader();
       const virtualConsole = new VirtualConsole();
-      virtualConsole.on('jsdomError', (e) => {});
+      virtualConsole.on('jsdomError', noop);
       _jsDom = new JSDOM(undefined,
         {
           url: 'http://localhost:8080/',
           runScripts: 'dangerously',
-          resources: new CustomResourceLoader(),
+          resources: loader,
           virtualConsole: virtualConsole
         });
       if (!_jsDom.window?.document?.defaultView)
@@ -51,9 +53,9 @@ export function test_loadResource() {
     });
 
     afterEach(() => {
-      _win.close();
+      _win?.close();
       _jsDom.window.close();
-    })
+    });
 
     it('should reject if load fails', async () => {
       const url = 'http://test.com/404.js';
@@ -65,15 +67,15 @@ export function test_loadResource() {
       catch (e) {
         expect(e.message).to.eq(`Script load error for url: ${url}.`);
       }
-    })
+    });
 
     it('should load and run script', async () => {
       const url = 'http://test.com/test.js';
       const prom = loadResource(_win.document, url);
       expect(_win.document.querySelectorAll(`script[src="${url}"]`).length).to.eq(1);
       await prom;
-      expect(_win.document.getElementById(`testId`)).not.to.be.null;
-    })
+      expect(_win.document.getElementById('testId')).not.to.be.null;
+    });
 
     it('should load css', async () => {
       const url = 'http://test.com/test.css';
@@ -83,15 +85,15 @@ export function test_loadResource() {
       expect(_win.document.querySelectorAll(`link[href="${url}"]`).length).to.eq(1);
       await prom;
       expect(_win.document.defaultView?.getComputedStyle(_win.document.body).color || 'null').to.eq('red');
-    })
+    });
 
     it('should skip loading', async () => {
       const url = 'http://test.com/test.js';
       const prom = loadResource(_win.document, url, true, () => true, undefined);
       expect(_win.document.querySelectorAll(`script[src="${url}"]`).length).to.eq(0);
       await prom;
-      expect(_win.document.getElementById(`testId`)).to.be.null;
-    })
+      expect(_win.document.getElementById('testId')).to.be.null;
+    });
 
-  })
+  });
 }

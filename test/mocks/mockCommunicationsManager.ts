@@ -1,9 +1,9 @@
-import { CommunicationsEvent, CommunicationsManagerOf } from "../../src";
+import { CommunicationsEvent, CommunicationsManagerOf } from '../../src';
 
 export class MockCommunicationsManager extends CommunicationsManagerOf<HTMLElement> {
   public receiving = false;
-  public sentEvents: Array<CommunicationsEvent> = [];
-  public receivedEvents: Array<CommunicationsEvent> = [];
+  public sentEvents: CommunicationsEvent[] = [];
+  public receivedEvents: CommunicationsEvent[] = [];
   private handler: ((e: Event) => void) | null = null;
 
 
@@ -17,7 +17,7 @@ export class MockCommunicationsManager extends CommunicationsManagerOf<HTMLEleme
     this.receiving = false;
   }
   protected readEvent(e: Event): CommunicationsEvent | null {
-    const evt = (<CustomEvent>e).detail as CommunicationsEvent;
+    const evt = (e as CustomEvent).detail as CommunicationsEvent;
     this.receivedEvents.push(evt);
     return evt;
   }

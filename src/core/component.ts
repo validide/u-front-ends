@@ -84,6 +84,7 @@ export abstract class Component {
     const options = this.getOptions();
     if (options.resources && options.resources.length > 0) {
       const document = this.getDocument();
+      // tslint:disable-next-line: prefer-for-of
       for (let index = 0; index < options.resources.length; index++) {
         const resource = options.resources[index];
         // DO NOT LOAD ALL AT ONCE AS YOU MIHGT HAVE DEPENDENCIES
@@ -97,13 +98,13 @@ export abstract class Component {
    * Get the optons data.
    */
   protected getOptions(): ComponentOptions {
-    return (<ComponentOptions>this.options);
+    return (this.options as ComponentOptions);
   }
 
   /**
    * Get the wndow reference.
    */
-  protected getWindow(): Window { return <Window>this.window; }
+  protected getWindow(): Window { return this.window as Window; }
 
   /**
    * Get the document refrence.
@@ -204,7 +205,7 @@ export abstract class Component {
     if (this.isInitialized)
       return this;
 
-    this.callHandler(ComponentEventType.BeforeCreate)
+    this.callHandler(ComponentEventType.BeforeCreate);
     this.isInitialized = true;
     try {
       await this.loadResources();
@@ -222,14 +223,14 @@ export abstract class Component {
    */
   public async mount(): Promise<Component> {
     if (!this.isInitialized) {
-      this.callErrorHandler(new Error(`Call "initialize" before calling "mount".`));
+      this.callErrorHandler(new Error('Call "initialize" before calling "mount".'));
       return this;
     }
 
     if (this.isMounted)
       return this;
 
-    this.callHandler(ComponentEventType.BeforeMount)
+    this.callHandler(ComponentEventType.BeforeMount);
     this.isMounted = true;
     try {
       await this.mountCore();

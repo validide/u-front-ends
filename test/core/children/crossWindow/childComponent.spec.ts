@@ -2,8 +2,9 @@ import 'mocha';
 import { JSDOM, ResourceLoader, FetchOptions, VirtualConsole } from 'jsdom';
 import { expect } from 'chai';
 import { CrossWindowChildComponent, ChildComponentOptions, RootComponentFacade, noop, ChildComponent, Component, CrossWindowChildComponentOptions, ContainerCommunicationHandlerMethods, CrossWindowContainerCommunicationHandler, ComponentEvent } from '../../../../src';
-import { MockCrossWindowChildComponent} from '../../../mocks/mockCrossWindowChildComponent'
+import { MockCrossWindowChildComponent} from '../../../mocks/mockCrossWindowChildComponent';
 import { values_falsies, getDelayPromise } from '../../../utils';
+// tslint:disable: no-unused-expression
 
 class CustomResourceLoader extends ResourceLoader {
   fetch(url: string, options: FetchOptions) {
@@ -23,7 +24,7 @@ export function test_CrossWindowChildComponent() {
 
     beforeEach(() => {
       const virtualConsole = new VirtualConsole();
-      virtualConsole.on('jsdomError', (e) => {});
+      virtualConsole.on('jsdomError', noop);
       _jsDom = new JSDOM(undefined, {
         url: 'http://localhost:8080/',
         runScripts: 'dangerously',
@@ -39,62 +40,62 @@ export function test_CrossWindowChildComponent() {
     });
 
     afterEach(() => {
-      _child = <MockCrossWindowChildComponent><unknown>null;
+      _child = (null as unknown as MockCrossWindowChildComponent);
       try{
         _win.close();
         _jsDom.window.close();
       } catch {
         // Do nothing
       }
-    })
+    });
 
     it('should be a instance of Component/ChildComponent/CrossWindowChildComponent', () => {
       expect(_child).to.be.an.instanceof(CrossWindowChildComponent);
       expect(_child).to.be.an.instanceof(ChildComponent);
       expect(_child).to.be.an.instanceof(Component);
-    })
+    });
 
     it('should have options of CrossWindowChildComponentOptions type', () => {
       expect(_child.getOptions()).to.be.an.instanceof(CrossWindowChildComponentOptions);
       expect(_child.getOptions()).to.be.an.instanceof(ChildComponentOptions);
-    })
+    });
 
     it('should return a communication handler that is of type InWindowContainerCommunicationHandler', async () => {
       await _child.initialize();
-      const mountProm = _child.mount()
+      const mountProm = _child.mount();
       expect(_child.getCommunicationHandlerCore(new ContainerCommunicationHandlerMethods()))
       .to.be.an.instanceof(CrossWindowContainerCommunicationHandler);
-    })
+    });
 
     it('should throw if getCommunicationHandlerCore can not find the embeded element', async () => {
       try {
         await _child.getCommunicationHandlerCore(new ContainerCommunicationHandlerMethods());
         expect(false).to.be.true;
       } catch (error) {
-        expect((<Error>error).message).to.eq(`No iframe with "" id found.`);
+        expect((error as Error).message).to.eq('No iframe with "" id found.');
       }
-    })
+    });
 
     values_falsies.forEach(f => {
-      it(`should throw if getCommunicationHandlerCore can not access the contentWindow`, async () => {
+      it('should throw if getCommunicationHandlerCore can not access the contentWindow', async () => {
         let embededId: string = '';
         let originalContentWindow: any = null;
         let embed: HTMLIFrameElement | null = null;
         try {
           await _child.initialize();
           const mountProm = _child.mount();
-          embed = <HTMLIFrameElement>_child.getRootEl().querySelector('iframe');
+          embed = (_child.getRootEl().querySelector('iframe') as HTMLIFrameElement);
           originalContentWindow = embed.contentWindow;
           Object.defineProperty(embed, 'contentWindow', {
             value: f,
             writable: true
           });
           embededId = embed.id;
-          expect(embed.contentWindow).to.eq(f)
+          expect(embed.contentWindow).to.eq(f);
           await _child.getCommunicationHandlerCore(new ContainerCommunicationHandlerMethods());
           expect(false).to.be.true;
         } catch (error) {
-          expect((<Error>error).message).to.eq(`The iframe with "${embededId}" id does not have a "contentWindow"(${f}).`);
+          expect((error as Error).message).to.eq(`The iframe with "${embededId}" id does not have a "contentWindow"(${f}).`);
         } finally {
           Object.defineProperty(embed, 'contentWindow', {
             value: originalContentWindow,
@@ -102,21 +103,21 @@ export function test_CrossWindowChildComponent() {
           });
 
         }
-      })
-    })
+      });
+    });
 
     it('should render the iframe with the specified attributes', async () => {
       _opt.url = 'http://localhost:8080/iframe.html';
       _opt.embededAttributes = {
         'data-cutom-attribute': 'my-custom-attribute'
-      }
+      };
       await _child.initialize();
-      const mountProm = _child.mount()
+      const mountProm = _child.mount();
 
-      const iframe = <HTMLIFrameElement>_win.document.querySelector<HTMLIFrameElement>('[data-cutom-attribute="my-custom-attribute"]');
+      const iframe = _win.document.querySelector<HTMLIFrameElement>('[data-cutom-attribute="my-custom-attribute"]') as HTMLIFrameElement;
       expect(iframe).not.to.be.null;
       expect(iframe.src).to.eq(_opt.url);
-    })
+    });
 
     it('should throw an error if it fails to mount', async () => {
       let error: Error | null = null;
@@ -124,13 +125,13 @@ export function test_CrossWindowChildComponent() {
         if (event.error)  {
           error = event.error;
         }
-      }
+      };
       _opt.url = 'http://localhost:8080/iframe-error.html';
       await _child.initialize();
       await _child.mount();
       expect(error).not.to.be.null;
-      expect((<Error><unknown>error).message.indexOf('Failed to load embeded element.\nError details:\n')).to.eq(0);
-    })
+      expect((error as unknown as Error).message.indexOf('Failed to load embeded element.\nError details:\n')).to.eq(0);
+    });
 
     it('should be able to dispose even if it threw an error', async () => {
       let error: Error | null = null;
@@ -138,16 +139,16 @@ export function test_CrossWindowChildComponent() {
         if (event.error)  {
           error = event.error;
         }
-      }
-      _opt.createEmbedElement = (el: HTMLElement) => { return <HTMLElement><unknown>undefined; };
+      };
+      _opt.createEmbedElement = (el: HTMLElement) => { return undefined as unknown as HTMLElement; };
       await _child.initialize();
       await _child.mount();
       expect(error).not.to.be.null;
-      expect((<Error><unknown>error).message).to.eq('Failed to create embed element!');
+      expect((error as unknown as Error).message).to.eq('Failed to create embed element!');
 
       await _child.dispose();
       expect(_win.document.querySelectorAll('iframe').length).to.eq(0);
-    })
+    });
 
     it('calling disposed multiple times does not trow', async () => {
       _opt.url = 'http://localhost:8080/iframe-error.html';
@@ -156,20 +157,20 @@ export function test_CrossWindowChildComponent() {
       await _child.dispose();
 
       expect(_win.document.querySelectorAll('iframe').length).to.eq(0);
-    })
+    });
 
     it('calling disposed multiple times does not trow', async () => {
       try {
         _opt.contentDisposeTimeout = 10;
         await _child.dispose();
         await _child.dispose();
-        (<any>_child).disposed = false;
+        (_child as any).disposed = false;
         await _child.dispose();
       } catch (e) {
         expect(true).to.be.false; // We should not reach this point.
       }
 
       expect(_win.document.querySelectorAll('iframe').length).to.eq(0);
-    })
+    });
   });
 }

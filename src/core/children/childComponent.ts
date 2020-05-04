@@ -52,7 +52,7 @@ export abstract class ChildComponent extends Component {
    * Get the child component options.
    */
   protected getOptions(): ChildComponentOptions {
-    return <ChildComponentOptions>super.getOptions();
+    return super.getOptions() as ChildComponentOptions;
   }
 
   /**
@@ -64,7 +64,7 @@ export abstract class ChildComponent extends Component {
 
     this.setContentDisposePromise();
     // Inform parent the content is beeing disposed.
-    (<RootComponentFacade>this.rootFacade).signalDisposed(this);
+    (this.rootFacade as RootComponentFacade).signalDisposed(this);
   }
 
   /**
@@ -77,7 +77,7 @@ export abstract class ChildComponent extends Component {
     this.setContentDisposePromise();
 
     // This should trigger the child component dispose.
-    (<ContainerCommunicationHandler>this.communicationHandler).requestContentDispose();
+    (this.communicationHandler as ContainerCommunicationHandler).requestContentDispose();
   }
 
   /**
@@ -93,12 +93,12 @@ export abstract class ChildComponent extends Component {
           this
             .getWindow()
             .setTimeout(
-              () => rejectTimeout(new Error(`Child dispose timeout.`)),
+              () => rejectTimeout(new Error('Child dispose timeout.')),
               this.getOptions().contentDisposeTimeout
             );
         })
       ])
-      .catch((err) => {
+      .catch(err => {
         this.callErrorHandler(err);
       });
   }
@@ -110,7 +110,7 @@ export abstract class ChildComponent extends Component {
     if (this.contentDisposePromiseResolver === null) {
       // For some reason we got the disposed call without getting the 'beginDispose' call.
       this.contentDisposePromise = Promise.resolve();
-      (<RootComponentFacade>this.rootFacade).signalDisposed(this);
+      (this.rootFacade as RootComponentFacade).signalDisposed(this);
     } else {
       this.contentDisposePromiseResolver();
     }
@@ -132,9 +132,9 @@ export abstract class ChildComponent extends Component {
    */
   protected async disposeCore(): Promise<void> {
     this.startDisposingContent();
-    await (<Promise<void>>this.contentDisposePromise);
+    await (this.contentDisposePromise as Promise<void>);
 
-    (<ContainerCommunicationHandler>this.communicationHandler).dispose();
+    (this.communicationHandler as ContainerCommunicationHandler).dispose();
     this.communicationHandler = null;
     this.contentDisposePromiseResolver = null;
     this.contentDisposePromise = null;

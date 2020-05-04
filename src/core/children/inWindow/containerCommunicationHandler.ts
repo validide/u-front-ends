@@ -5,8 +5,8 @@ import { ContainerCommunicationHandlerMethods, CommunicationsEvent, ContainerCom
  */
 export class InWindowContainerCommunicationHandler extends ContainerCommunicationHandler {
   /**
- * @inheritdoc
- */
+   * @inheritdoc
+   */
   constructor(communicationsManager: CommunicationsManager, wrapperMethods: ContainerCommunicationHandlerMethods) {
     super(communicationsManager, wrapperMethods);
   }

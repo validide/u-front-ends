@@ -6,7 +6,7 @@ import { CrossWindowCommunicationsManager } from '../communications/crossWindowM
  */
 export class CrossWindowContentCommunicationHandler extends ContentCommunicationHandler {
   private iframeId: string;
-  private messageQueue: Array<CommunicationsEvent>;
+  private messageQueue: CommunicationsEvent[];
 
   /**
    * Constructor.
@@ -87,6 +87,7 @@ export class CrossWindowContentCommunicationHandler extends ContentCommunication
    * Flush all the messages that were enqueues before the handhake.
    */
   private flushMessages(): void {
+    // tslint:disable-next-line: prefer-for-of
     for (let index = 0; index < this.messageQueue.length; index++) {
       const msg = this.messageQueue[index];
       msg.contentId = this.iframeId;

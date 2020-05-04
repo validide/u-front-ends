@@ -11,7 +11,7 @@ export function loadResource(
   url: string,
   isScript: boolean = true,
   skipLoading?: () => boolean,
-  attributes?: { [key: string]: string; }
+  attributes?: { [key: string]: string }
 ): Promise<void> {
   if (skipLoading && skipLoading())
     return Promise.resolve();
@@ -21,17 +21,18 @@ export function loadResource(
 
     if (isScript) {
       resource = document.createElement('script');
-      (<HTMLScriptElement>resource).src = url;
+      (resource as HTMLScriptElement).src = url;
     } else {
       resource = document.createElement('link');
-      (<HTMLLinkElement>resource).href = url;
+      (resource as HTMLLinkElement).href = url;
     }
 
     if (attributes) {
       const keys = Object.keys(attributes);
+      // tslint:disable-next-line: prefer-for-of
       for (let index = 0; index < keys.length; index++) {
         const key = keys[index];
-        resource.setAttribute(key, attributes[key])
+        resource.setAttribute(key, attributes[key]);
       }
     }
     resource.addEventListener('load', () => resolve());

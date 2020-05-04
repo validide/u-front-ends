@@ -1,6 +1,7 @@
 import 'mocha';
 import { expect } from 'chai';
 import { ChildComponentOptions, ChildComponentType } from '../../../src';
+// tslint:disable: no-unused-expression
 
 export function test_ChildComponentOptions() {
   describe('ChildComponentOptions', () => {
@@ -13,6 +14,6 @@ export function test_ChildComponentOptions() {
       expect(conf.resources.length).to.eq(0);
       expect(conf.tag).to.eq('div');
       expect(conf.parent).to.eq('body');
-    })
+    });
   });
 }

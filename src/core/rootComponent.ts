@@ -46,7 +46,7 @@ export class RootComponent extends Component {
       return Promise.resolve();
 
     await child.dispose();
-    this.children[(<string>childId)] = null;
+    this.children[(childId as string)] = null;
   }
 
   /**
@@ -68,7 +68,7 @@ export class RootComponent extends Component {
     if (!this.isMounted)
       throw new Error('Wait for the component to mount before starting to add children.');
 
-    const child = (<RootComponentOptions>this.options).childFactory.createComponent(
+    const child = (this.options as RootComponentOptions).childFactory.createComponent(
       this.getWindow(),
       options,
       new RootComponentFacade(this.scheduleDisposeChild.bind(this))

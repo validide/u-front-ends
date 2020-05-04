@@ -1,6 +1,7 @@
 import 'mocha';
 import { expect } from 'chai';
 import { RootComponentOptions } from '../../src';
+// tslint:disable: no-unused-expression
 
 export function test_RootComponentOptions() {
   describe('RootComponentOptions', () => {
@@ -12,6 +13,6 @@ export function test_RootComponentOptions() {
       expect(conf.resources.length).to.eq(0);
       expect(conf.tag).to.eq('script');
       expect(conf.parent).to.eq('body');
-    })
+    });
   });
 }

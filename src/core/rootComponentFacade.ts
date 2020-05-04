@@ -1,4 +1,4 @@
-import { Component } from "./index";
+import { Component } from './index';
 
 /**
  * Facade to interface with the the root component.

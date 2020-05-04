@@ -13,5 +13,5 @@ export function test_Children() {
     test_Communications();
     test_CrossWindowChildren();
     test_InWindowChildren();
-  })
+  });
 }

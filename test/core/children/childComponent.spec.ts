@@ -3,6 +3,7 @@ import { JSDOM } from 'jsdom';
 import { expect } from 'chai';
 import { ChildComponentOptions, RootComponentFacade, noop, ContainerCommunicationHandler } from '../../../src';
 import { MockChildComponent, MockContainerCommunicationHandler } from '../../mocks/mockChildComponentFactory';
+// tslint:disable: no-unused-expression
 
 export function test_ChildComponent() {
   describe('ChildComponent', () => {
@@ -21,9 +22,9 @@ export function test_ChildComponent() {
     afterEach(() => {
       _win.close();
       _jsDom.window.close();
-    })
+    });
 
-    it(`does not re-create the communication handler if mountCore is called twice`, async () => {
+    it('does not re-create the communication handler if mountCore is called twice', async () => {
       _options.tag= 'ce-mountCore-test';
       const mock = new MockChildComponent(_win, _options, new RootComponentFacade(noop));
       await mock.initialize();
@@ -37,47 +38,47 @@ export function test_ChildComponent() {
       await mock.mount();
 
       expect(mock.callsTo_getCommunicationHandlerCore).to.eq(1);
-    })
+    });
 
-    it(`timesout when disposing if no signal received from content`, async () => {
-      const errors: Array<Error> = [];
+    it('timesout when disposing if no signal received from content', async () => {
+      const errors: Error[] = [];
       _options.tag= 'ce-dipose-tests';
       _options.contentDisposeTimeout = 10;
-      _options.handlers.error = (evt) => {
+      _options.handlers.error =evt => {
         if(evt.error) {
           errors.push(evt.error);
         }
-      }
+      };
       const mock = new MockChildComponent(_win, _options, new RootComponentFacade(noop));
       await mock.initialize();
       await mock.mount();
 
-      await mock.dispose()
+      await mock.dispose();
 
       expect(errors.length).to.eq(1);
-      expect(errors[0].message).to.eq(`Child dispose timeout.`);
-    })
+      expect(errors[0].message).to.eq('Child dispose timeout.');
+    });
 
-    it(`timesout when disposing if no signal received from content`, async () => {
-      const errors: Array<Error> = [];
+    it('timesout when disposing if no signal received from content', async () => {
+      const errors: Error[] = [];
       _options.tag= 'ce-dipose-tests';
       _options.contentDisposeTimeout = 10;
-      _options.handlers.error = (evt) => {
+      _options.handlers.error =evt => {
         if(evt.error) {
           errors.push(evt.error);
         }
-      }
+      };
       const mock = new MockChildComponent(_win, _options, new RootComponentFacade(noop));
       await mock.initialize();
       await mock.mount();
 
-      await mock.dispose()
+      await mock.dispose();
 
       expect(errors.length).to.eq(1);
-      expect(errors[0].message).to.eq(`Child dispose timeout.`);
-    })
+      expect(errors[0].message).to.eq('Child dispose timeout.');
+    });
 
-    it(`"contentBeginDisposed" calls parent only once`, async () => {
+    it('"contentBeginDisposed" calls parent only once', async () => {
       _options.tag= 'ce-dipose-tests';
       let disposedRootCalls: number = 0;
       const mock = new MockChildComponent(_win, _options, new RootComponentFacade(() => {disposedRootCalls++;}));
@@ -87,9 +88,9 @@ export function test_ChildComponent() {
       mock.comunicationMethods.beforeDispose();
       mock.comunicationMethods.beforeDispose();
       expect(disposedRootCalls).to.eq(1);
-    })
+    });
 
-    it(`multiple dispose calls result in single requestContentDispose`, async () => {
+    it('multiple dispose calls result in single requestContentDispose', async () => {
       _options.tag= 'ce-dipose-tests';
       _options.contentDisposeTimeout = 7;
       const mock = new MockChildComponent(_win, _options, new RootComponentFacade(noop));
@@ -102,19 +103,19 @@ export function test_ChildComponent() {
           mock.disposeCore()
         ]);
 
-        //await getDelayPromise(3);
+        // await getDelayPromise(3);
 
-        mock.comunicationMethods.disposed(); //Signal the dispose
+        mock.comunicationMethods.disposed(); // Signal the dispose
         await all;
       } catch (error) {
         // We are doing a bad thing so bad things will come to us.
       }
 
-      const mockHandler = <MockContainerCommunicationHandler>mock.public_containerCommunicationHandler;
+      const mockHandler = mock.public_containerCommunicationHandler as MockContainerCommunicationHandler;
       expect(mockHandler.calls_requestContentDispose).to.eq(1);
-    })
+    });
 
-    it(`calls root in case the call content disposed is signaled before the begin dispose`, async () => {
+    it('calls root in case the call content disposed is signaled before the begin dispose', async () => {
       _options.tag= 'ce-dipose-tests';
       _options.contentDisposeTimeout = 7;
       let disposedRootCalls: number = 0;
@@ -122,21 +123,21 @@ export function test_ChildComponent() {
       await mock.initialize();
       await mock.mount();
 
-      mock.comunicationMethods.disposed(); //Signal the dispose
+      mock.comunicationMethods.disposed(); // Signal the dispose
 
       expect(disposedRootCalls).to.eq(1);
-    })
+    });
 
-    it(`receives events from content`, async () => {
+    it('receives events from content', async () => {
       let mounted = false;
       let beforeUpdate = false;
       let updated = false;
       let data: any = null;
       _options.tag= 'ce-dipose-tests';
-      _options.handlers.mounted = (evt) => {mounted = true;}
-      _options.handlers.beforeUpdate = (evt) => {beforeUpdate = true;}
-      _options.handlers.updated = (evt) => {updated = true;}
-      _options.handlers.data = (evt) => {data = evt.data;}
+      _options.handlers.mounted =evt => {mounted = true;};
+      _options.handlers.beforeUpdate =evt => {beforeUpdate = true;};
+      _options.handlers.updated =evt => {updated = true;};
+      _options.handlers.data =evt => {data = evt.data;};
 
       const mock = new MockChildComponent(_win, _options, new RootComponentFacade(noop));
       await mock.initialize();
@@ -148,33 +149,33 @@ export function test_ChildComponent() {
 
       const testData = {'foo': 'bar'};
       mock.comunicationMethods.data(testData);
-      mock.comunicationMethods.beforeUpdate()
+      mock.comunicationMethods.beforeUpdate();
       mock.comunicationMethods.updated();
 
       expect(mounted).to.be.true;
       expect(beforeUpdate).to.be.true;
       expect(updated).to.be.true;
       expect(data).to.eq(testData);
-    })
+    });
 
-    it(`calls commounication handler on sendData`, async () => {
+    it('calls commounication handler on sendData', async () => {
       const mock = new MockChildComponent(_win, _options, new RootComponentFacade(noop));
       await mock.initialize();
       await mock.mount();
 
       let called = false;
-      (<ContainerCommunicationHandler>mock.public_containerCommunicationHandler).sendData = () => { called = true; };
+      (mock.public_containerCommunicationHandler as ContainerCommunicationHandler).sendData = () => { called = true; };
       mock.sendData(null);
 
       expect(called).to.be.true;
-    })
+    });
 
-    it(`should not fail when calling sendData without a handler`, async () => {
+    it('should not fail when calling sendData without a handler', async () => {
       const mock = new MockChildComponent(_win, _options, new RootComponentFacade(noop));
 
       expect(() => mock.sendData(null)).not.to.throw();
       expect(mock.public_containerCommunicationHandler).to.be.null;
-    })
+    });
 
-  })
+  });
 }

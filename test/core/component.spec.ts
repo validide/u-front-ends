@@ -4,11 +4,12 @@ import { expect } from 'chai';
 import { Component, ComponentEvent, ComponentEventType, ResourceConfiguration } from '../../src';
 import { values_falsies, getDelayPromise } from '../utils';
 import { ComponentOptions, ComponentEventHandlers } from '../../src/core/componentOptions';
+// tslint:disable: no-unused-expression
 
 class CustomResourceLoader extends ResourceLoader {
   fetch(url: string, options: FetchOptions) {
-    //return Promise.resolve(Buffer.from(`console.log('${url}');`));
-    return Promise.resolve(Buffer.from(``));
+    // return Promise.resolve(Buffer.from(`console.log('${url}');`));
+    return Promise.resolve(Buffer.from(''));
   }
 }
 
@@ -93,13 +94,14 @@ export function test_Component() {
   describe('Component', () => {
     let _jsDom: JSDOM;
     let _win: Window;
-    let _options: ComponentOptions = new ComponentOptions()
+    const _options: ComponentOptions = new ComponentOptions();
 
     beforeEach(() => {
+      const loader = new CustomResourceLoader();
       _jsDom = new JSDOM(undefined, {
         url: 'http://localhost:8080/',
         runScripts: 'dangerously',
-        resources: new CustomResourceLoader()
+        resources: loader
       });
       if (!_jsDom.window?.document?.defaultView)
         throw new Error('Setup failure!');
@@ -107,46 +109,46 @@ export function test_Component() {
     });
 
     afterEach(() => {
-      _win.close();
+      _win?.close();
       _jsDom.window.close();
-    })
+    });
 
     describe('Constructor', () => {
 
       values_falsies.forEach((f: any) => {
         it(`passing a falsie as the "window" argument throws - ${f}`, () => {
-          expect(() => new StubComponent(<any>f, _options)).to.throw('Missing "window" argument.');
-        })
+          expect(() => new StubComponent(f as any, _options)).to.throw('Missing "window" argument.');
+        });
       });
 
       values_falsies.forEach((f: any) => {
         it(`passing a falsie as the "options" argument throws - ${f}`, () => {
-          expect(() => new StubComponent(_win, <any>f)).to.throw('Missing "options" argument.');
-        })
+          expect(() => new StubComponent(_win, f as any)).to.throw('Missing "options" argument.');
+        });
       });
 
-      it(`does not throw if valid arguments are provided`, () => {
+      it('does not throw if valid arguments are provided', () => {
         expect(() => new StubComponent(_win, _options)).not.to.throw('Missing "window" argument.');
-      })
+      });
 
-    })
+    });
 
     describe('Protected', () => {
 
-      it(`can access the "Component" window reference`, () => {
+      it('can access the "Component" window reference', () => {
         const comp = new StubComponent(_win, _options);
         expect(comp.getWindowAccessor()).to.eq(_win);
-      })
+      });
 
-      it(`can access the "Component" document reference`, () => {
+      it('can access the "Component" document reference', () => {
         const comp = new StubComponent(_win, _options);
         expect(comp.getDocumentAccessor()).to.eq(_win.document);
-      })
+      });
 
-      it(`can access the "Component" options reference`, () => {
+      it('can access the "Component" options reference', () => {
         const comp = new StubComponent(_win, _options);
         expect(comp.getOptionsAccessor()).to.eq(_options);
-      })
+      });
 
       it(`callHandler throws when using the ${ComponentEventType.Error}`, () => {
         const comp = new StubComponent(_win, _options);
@@ -154,46 +156,46 @@ export function test_Component() {
         expect(() => comp.callHandler(ComponentEventType.Error))
           .to
           .throw(`For calling the "${ComponentEventType.Error}" handler use the "callErrorHandler" method.`);
-      })
+      });
 
-      it(`callHandler calls correct handler`, async () => {
+      it('callHandler calls correct handler', async () => {
         let called = false;
         const options = new ComponentOptions();
         options.handlers.beforeUpdate = (evt: ComponentEvent) => {
           if (evt.type === ComponentEventType.BeforeUpdate) {
             called = true;
           }
-        }
+        };
 
         const comp = new StubComponent(_win, options);
         comp.callHandler(ComponentEventType.BeforeUpdate);
         expect(called).to.be.true;
-      })
+      });
 
-      it(`callHandler calls error handler if other handler fails`, async () => {
+      it('callHandler calls error handler if other handler fails', async () => {
         let called = false;
         const options = new ComponentOptions();
         options.handlers.beforeUpdate = (evt: ComponentEvent) => {
           throw new Error('Test Error!');
 
-        }
+        };
         options.handlers.error = (evt: ComponentEvent) => {
           if (evt.type === ComponentEventType.Error) {
             called = true;
           }
-        }
+        };
 
         const comp = new StubComponent(_win, options);
         comp.callHandler(ComponentEventType.BeforeUpdate);
         expect(called).to.be.true;
-      })
+      });
 
-    })
+    });
 
     describe('Initialize', () => {
       it('Creates the root element', async () => {
         const opt = new ComponentOptions();
-        opt.handlers = <ComponentEventHandlers><unknown>undefined;
+        opt.handlers = (undefined as unknown as ComponentEventHandlers);
         const resource = new ResourceConfiguration();
         resource.isScript = true;
         resource.url = 'http://localhost:8080/test.js';
@@ -208,7 +210,7 @@ export function test_Component() {
         expect(_win.document.getElementById(comp.id)).to.not.be.null;
         expect(_win.document.getElementById(comp.id)).to.eq(comp.rootElementAccessor());
         expect(_win.document.querySelector('script[src="http://localhost:8080/test.js"]')).to.not.be.null;
-      })
+      });
 
       it('Creates the root element within parent', async () => {
         const parent = _win.document.createElement('my-parent');
@@ -224,7 +226,7 @@ export function test_Component() {
         expect(_win.document.getElementById(comp.id)).to.not.be.null;
         expect(_win.document.getElementById(comp.id)).to.eq(comp.rootElementAccessor());
         expect(parent).to.eq(comp.rootElementAccessor()?.parentElement);
-      })
+      });
 
       it('Creates the root element', async () => {
         const comp = new StubComponent(_win, _options);
@@ -235,7 +237,7 @@ export function test_Component() {
         expect(comp.timesInitializedCalled).to.eq(1);
         expect(_win.document.getElementById(comp.id)).to.not.be.null;
         expect(_win.document.getElementById(comp.id)).to.eq(comp.rootElementAccessor());
-      })
+      });
 
       it('Does not executed twice', async () => {
         const comp = new StubComponent(_win, _options);
@@ -249,7 +251,7 @@ export function test_Component() {
 
         await comp.initialize();
         expect(comp.timesInitializedCalled).to.eq(1);
-      })
+      });
 
       it('Does not create the parent element even if "initialize" is executed twice', async () => {
         const comp = new StubComponent(_win, _options);
@@ -270,45 +272,45 @@ export function test_Component() {
         expect(_win.document.getElementById(comp.id)).to.not.be.null;
         expect(_win.document.getElementById(comp.id)).to.eq(comp.rootElementAccessor());
         expect(_win.document.querySelectorAll('div').length).to.eq(1);
-      })
+      });
 
       values_falsies
         .concat(['some-random-id'])
         .forEach(f => {
           it(`Throws if the parent is missing: ${f}`, async () => {
             const options = new ComponentOptions();
-            let err: Error | null = null
+            let err: Error | null = null;
             let errHandlerCalled = true;
-            options.parent = <string><unknown>f;
+            options.parent = (f as unknown as string);
             options.handlers.error = (e: ComponentEvent) => {
               errHandlerCalled = true;
-            }
-            _win.console.log = (msg: any, ...opt: Array<any>) => {
-              err = <Error>msg;
-            }
+            };
+            _win.console.log = (msg: any, ...opt: any[]) => {
+              err = (msg as Error);
+            };
             const comp = new StubComponent(_win, options);
 
             await comp.initialize();
 
-            expect((<Error><unknown>err).message).to.eq(`Failed to find parent "${f}".`);
-          })
-        })
+            expect((err as unknown as Error).message).to.eq(`Failed to find parent "${f}".`);
+          });
+        });
 
-    })
+    });
 
     describe('Mount', () => {
 
       it('Raises error if called before "initialize"', async () => {
         const options = new ComponentOptions();
-        let err: Error | null = null
+        let err: Error | null = null;
         options.handlers.error = (e: ComponentEvent) => {
           err = e.error;
-        }
+        };
         const comp = new StubComponent(_win, options);
 
         await comp.mount();
-        expect((<Error><unknown>err).message).to.eq('Call "initialize" before calling "mount".');
-      })
+        expect((err as unknown as Error).message).to.eq('Call "initialize" before calling "mount".');
+      });
 
       it('Calling multiple times has no effect', async () => {
         const comp = new StubComponent(_win, _options);
@@ -324,28 +326,28 @@ export function test_Component() {
 
         await comp.mount();
         expect(comp.timesMountedCalled).to.eq(1);
-      })
+      });
 
       it('Calling and failing raises an error', async () => {
         let err: Error | null = null;
         const opt = new ComponentOptions();
         opt.handlers.error = (evt: ComponentEvent) => {
           err = evt.error;
-        }
+        };
 
         const comp = new StubComponent(_win, opt);
         comp.throwError = true;
 
         await comp.initialize();
         await comp.mount();
-        expect(<Error><unknown>err).to.eq(comp.testError);
-      })
+        expect(err as unknown as Error).to.eq(comp.testError);
+      });
 
-    })
+    });
 
     describe('Dipose', () => {
 
-      it(`calling dispose multiple times has same effect as calling once`, async () => {
+      it('calling dispose multiple times has same effect as calling once', async () => {
         const comp = new StubComponent(_win, _options);
         expect(comp.timesDisposedCalled).to.eq(0);
 
@@ -362,9 +364,9 @@ export function test_Component() {
         expect(comp.timesDisposedCalled).to.eq(1);
         await comp.dispose();
         expect(comp.timesDisposedCalled).to.eq(1);
-      })
+      });
 
-      it(`calling dispose without initialize or mount does not throw`, async () => {
+      it('calling dispose without initialize or mount does not throw', async () => {
         const comp = new StubComponent(_win, _options);
         expect(comp.timesDisposedCalled).to.eq(0);
 
@@ -372,43 +374,43 @@ export function test_Component() {
         expect(comp.timesDisposedCalled).to.eq(1);
         await comp.dispose();
         expect(comp.timesDisposedCalled).to.eq(1);
-      })
+      });
 
-      it(`calling dispose does not fail if disposeCore throws`, async () => {
+      it('calling dispose does not fail if disposeCore throws', async () => {
         const options = new ComponentOptions();
         const comp = new StubComponent(_win, options);
         let errorEvent: ComponentEvent | null = null;
         options.handlers = options.handlers || new ComponentEventHandlers();
         options.handlers.error = (evt: ComponentEvent) => {
           errorEvent = evt;
-        }
+        };
         comp.throwError = true;
 
         await comp.dispose();
         expect(comp.timesDisposedCalled).to.eq(1);
         expect(errorEvent).not.to.be.null;
-        expect((<ComponentEvent>(<unknown>errorEvent)).type).to.eq(ComponentEventType.Error);
-        expect((<ComponentEvent>(<unknown>errorEvent)).error).to.eq(comp.testError);
-      })
+        expect(((errorEvent as unknown) as ComponentEvent).type).to.eq(ComponentEventType.Error);
+        expect(((errorEvent as unknown) as ComponentEvent).error).to.eq(comp.testError);
+      });
 
-    })
+    });
 
     describe('Events', () => {
 
-      it(`Should fire the following events`, async () => {
+      it('Should fire the following events', async () => {
         const parent = _win.document.createElement('div');
         _win.document.body.appendChild(parent);
         const opt = new ComponentOptions();
         opt.parent = parent;
         let timesCallHandlerCalled = 0;
-        const events: { [key: string]: Array<ComponentEvent> } = {}
+        const events: { [key: string]: ComponentEvent[] } = {};
         const handler = (evt: ComponentEvent) => {
           timesCallHandlerCalled++;
           if (!events[evt.type.toString()]) {
             events[evt.type.toString()] = new Array<ComponentEvent>();
           }
           events[evt.type.toString()].push(evt);
-        }
+        };
         opt.handlers.beforeCreate = handler;
         opt.handlers.beforeMount = handler;
         opt.handlers.beforeUpdate = handler;
@@ -467,93 +469,93 @@ export function test_Component() {
 
       });
 
-    })
+    });
 
     describe('Misc', () => {
-      it(`if error handler fails we log using the "log" method`, async () => {
-        let consoleLog = new Array<any>();
+      it('if error handler fails we log using the "log" method', async () => {
+        const consoleLog = new Array<any>();
         const options = new ComponentOptions();
-        const err = new Error("Error Handler Error");
+        const err = new Error('Error Handler Error');
         const comp = new StubComponent(_win, options);
         options.handlers = options.handlers || new ComponentEventHandlers();
         options.handlers.error = (evt: ComponentEvent) => {
           throw err;
-        }
+        };
         comp.throwError = true;
-        _win.console.log = function (message?: any, ...optionalParams: any[]) {
-          consoleLog.push({ message, optionalParams });
-        }
+        _win.console.log = (message?: any, ...optionalParams: any[]) => {
+          consoleLog.push({ message: message, optionalParams: optionalParams });
+        };
 
         await comp.dispose();
 
         expect(comp.timesDisposedCalled).to.eq(1);
         expect(consoleLog.length).to.eq(1);
         expect(consoleLog[0].message).to.eq(err);
-      })
+      });
 
-      it(`if error is not registered we log using the "log" method - 1`, async () => {
-        let consoleLog = new Array<any>();
+      it('if error is not registered we log using the "log" method - 1', async () => {
+        const consoleLog = new Array<any>();
         const options = new ComponentOptions();
         const comp = new StubComponent(_win, options);
         options.handlers = options.handlers || new ComponentEventHandlers();
         comp.throwError = true;
-        _win.console.log = function (message?: any, ...optionalParams: any[]) {
-          consoleLog.push({ message, optionalParams });
-        }
+        _win.console.log = (message?: any, ...optionalParams: any[]) => {
+          consoleLog.push({ message: message, optionalParams: optionalParams });
+        };
 
         await comp.dispose();
 
         expect(comp.timesDisposedCalled).to.eq(1);
         expect(consoleLog.length).to.eq(1);
         expect(consoleLog[0].message).to.eq(comp.testError);
-      })
+      });
 
-      it(`if error is not registered we log using the "log" method - 2`, async () => {
-        let consoleLog = new Array<any>();
+      it('if error is not registered we log using the "log" method - 2', async () => {
+        const consoleLog = new Array<any>();
         const options = new ComponentOptions();
-        options.handlers = <ComponentEventHandlers><unknown>undefined;
+        options.handlers = (undefined as unknown as ComponentEventHandlers);
         const comp = new StubComponent(_win, options);
         comp.throwError = true;
-        _win.console.log = function (message?: any, ...optionalParams: any[]) {
-          consoleLog.push({ message, optionalParams });
-        }
+        _win.console.log = (message?: any, ...optionalParams: any[]) => {
+          consoleLog.push({ message: message, optionalParams: optionalParams });
+        };
 
         await comp.dispose();
 
         expect(comp.timesDisposedCalled).to.eq(1);
         expect(consoleLog.length).to.eq(1);
         expect(consoleLog[0].message).to.eq(comp.testError);
-      })
+      });
 
-      it(`doe not fail in log method if "log" method is missing`, async () => {
+      it('doe not fail in log method if "log" method is missing', async () => {
         const comp = new StubComponent(_win, _options);
         comp.throwError = true;
-        (<any>_win.console).log = undefined;
+        (_win.console as any).log = undefined;
 
         await comp.dispose();
 
         expect(comp.timesDisposedCalled).to.eq(1);
-      })
+      });
 
-      it(`doe not fail in log method if "console" is missing`, async () => {
+      it('doe not fail in log method if "console" is missing', async () => {
         const comp = new StubComponent(_win, _options);
         comp.throwError = true;
-        (<any>_win).console = undefined;
+        (_win as any).console = undefined;
 
         await comp.dispose();
 
         expect(comp.timesDisposedCalled).to.eq(1);
-      })
+      });
 
-      it(`doe not fail in log method if "window" is missing`, async () => {
+      it('doe not fail in log method if "window" is missing', async () => {
         const comp = new StubComponent(_win, _options);
         comp.throwError = true;
-        (<any>comp).window = undefined;
+        (comp as any).window = undefined;
 
         await comp.dispose();
 
         expect(comp.timesDisposedCalled).to.eq(1);
-      })
-    })
-  })
+      });
+    });
+  });
 }
