@@ -32,7 +32,7 @@ export class ComponentEvent {
   public data: any;
 
   /**
-   * COnstructor.
+   * Constructor.
    * @param id Component unique idnetifyer.
    * @param type The type of event.
    * @param el The componenet root element.
