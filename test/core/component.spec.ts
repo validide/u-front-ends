@@ -285,7 +285,7 @@ export function test_Component() {
             options.handlers.error = (e: ComponentEvent) => {
               errHandlerCalled = true;
             };
-            _win.console.log = (msg: any, ...opt: any[]) => {
+            (_win as any).console.log = (msg: any, ...opt: any[]) => {
               err = (msg as Error);
             };
             const comp = new StubComponent(_win, options);
@@ -482,7 +482,7 @@ export function test_Component() {
           throw err;
         };
         comp.throwError = true;
-        _win.console.log = (message?: any, ...optionalParams: any[]) => {
+        (_win as any).console.log = (message?: any, ...optionalParams: any[]) => {
           consoleLog.push({ message: message, optionalParams: optionalParams });
         };
 
@@ -499,7 +499,7 @@ export function test_Component() {
         const comp = new StubComponent(_win, options);
         options.handlers = options.handlers || new ComponentEventHandlers();
         comp.throwError = true;
-        _win.console.log = (message?: any, ...optionalParams: any[]) => {
+        (_win as any).console.log = (message?: any, ...optionalParams: any[]) => {
           consoleLog.push({ message: message, optionalParams: optionalParams });
         };
 
@@ -516,7 +516,7 @@ export function test_Component() {
         options.handlers = (undefined as unknown as ComponentEventHandlers);
         const comp = new StubComponent(_win, options);
         comp.throwError = true;
-        _win.console.log = (message?: any, ...optionalParams: any[]) => {
+        (_win as any).console.log = (message?: any, ...optionalParams: any[]) => {
           consoleLog.push({ message: message, optionalParams: optionalParams });
         };
 
@@ -530,7 +530,7 @@ export function test_Component() {
       it('doe not fail in log method if "log" method is missing', async () => {
         const comp = new StubComponent(_win, _options);
         comp.throwError = true;
-        (_win.console as any).log = undefined;
+        ((_win as any).console as any).log = undefined;
 
         await comp.dispose();
 

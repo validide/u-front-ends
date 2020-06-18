@@ -192,7 +192,7 @@ export abstract class Component {
    * @param optionalParams Optional parameters.
    */
   protected log(message?: any, ...optionalParams: any[]): void {
-    const logMethod = this.window?.console?.log;
+    const logMethod = (this.window as any)?.console?.log;
     if (logMethod)
       logMethod(message, optionalParams);
   }
