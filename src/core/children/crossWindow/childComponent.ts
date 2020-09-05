@@ -10,30 +10,30 @@ import { getUrlOrigin } from '../../../dom/document/getUrlOrigin';
  * Cross Window Child Component.
  */
 export class CrossWindowChildComponent extends ChildComponent {
-  private embededId: string;
-  private embededLoadPromise: Promise<void> | null;
-  private embededLoadResolver: (() => void) | null;
-  private embededErrorRejecter: ((e: Error) => void) | null;
-  private embededLoadHandlerRef: ((e: Event) => void) | null;
-  private embededErrorHandlerRef: ((e: ErrorEvent) => void) | null;
+  private embeddedId: string;
+  private embeddedLoadPromise: Promise<void> | null;
+  private embeddedLoadResolver: (() => void) | null;
+  private embeddedErrorRejecter: ((e: Error) => void) | null;
+  private embeddedLoadHandlerRef: ((e: Event) => void) | null;
+  private embeddedErrorHandlerRef: ((e: ErrorEvent) => void) | null;
 
   /**
    * Constructor.
-   * @param window The window refrence.
+   * @param window The window reference.
    * @param options The child options.
    * @param rootFacade he root component facade.
    */
   constructor(window: Window, options: CrossWindowChildComponentOptions, rootFacade: RootComponentFacade) {
     super(window, options, rootFacade);
-    this.embededId = '';
-    this.embededLoadResolver = null;
-    this.embededErrorRejecter = null;
-    this.embededLoadPromise = new Promise((resolve, reject) => {
-      this.embededLoadResolver = resolve;
-      this.embededErrorRejecter = reject;
+    this.embeddedId = '';
+    this.embeddedLoadResolver = null;
+    this.embeddedErrorRejecter = null;
+    this.embeddedLoadPromise = new Promise((resolve, reject) => {
+      this.embeddedLoadResolver = resolve;
+      this.embeddedErrorRejecter = reject;
     });
-    this.embededLoadHandlerRef = this.embededLoadHandler.bind(this);
-    this.embededErrorHandlerRef = this.embededErrorHandler.bind(this);
+    this.embeddedLoadHandlerRef = this.embeddedLoadHandler.bind(this);
+    this.embeddedErrorHandlerRef = this.embeddedErrorHandler.bind(this);
 
   }
 
@@ -41,22 +41,22 @@ export class CrossWindowChildComponent extends ChildComponent {
    * @inheritdoc
    */
   protected disposeCore(): Promise<void> {
-    const embed = this.embededId
-      ? (this.rootElement as HTMLElement).querySelector<HTMLIFrameElement>(`#${this.embededId}`)
+    const embed = this.embeddedId
+      ? (this.rootElement as HTMLElement).querySelector<HTMLIFrameElement>(`#${this.embeddedId}`)
       : null;
     if (embed) {
-      embed.removeEventListener('load', this.embededLoadHandlerRef as () => void);
-      embed.removeEventListener('error', this.embededErrorHandlerRef as (e: ErrorEvent) => void);
+      embed.removeEventListener('load', this.embeddedLoadHandlerRef as () => void);
+      embed.removeEventListener('error', this.embeddedErrorHandlerRef as (e: ErrorEvent) => void);
 
-      // Do not remove the embeded element now as we still need it to comunicate with the content.
+      // Do not remove the embedded element now as we still need it to communicate with the content.
       // The parent "rootElement" will be removed latter anyhow.
       // (<HTMLElement>embed.parentElement).removeChild(embed);
     }
-    this.embededLoadHandlerRef = null;
-    this.embededErrorHandlerRef = null;
-    this.embededLoadResolver = null;
-    this.embededErrorRejecter = null;
-    this.embededLoadPromise = null;
+    this.embeddedLoadHandlerRef = null;
+    this.embeddedErrorHandlerRef = null;
+    this.embeddedLoadResolver = null;
+    this.embeddedErrorRejecter = null;
+    this.embeddedLoadPromise = null;
     return super.disposeCore();
   }
 
@@ -83,14 +83,14 @@ export class CrossWindowChildComponent extends ChildComponent {
 
     const embedId = generateUniqueId(this.getDocument(), 'ufe-cross-');
     embed.id = embedId;
-    this.embededId = embedId;
+    this.embeddedId = embedId;
 
-    embed.addEventListener('load', this.embededLoadHandlerRef as () => void);
-    embed.addEventListener('error', this.embededErrorHandlerRef as (e: ErrorEvent) => void);
+    embed.addEventListener('load', this.embeddedLoadHandlerRef as () => void);
+    embed.addEventListener('error', this.embeddedErrorHandlerRef as (e: ErrorEvent) => void);
 
     (this.rootElement as HTMLDivElement).appendChild(embed);
 
-    await ((this.embededLoadPromise) as Promise<void>);
+    await ((this.embeddedLoadPromise) as Promise<void>);
 
     return await super.mountCore();
   }
@@ -104,46 +104,46 @@ export class CrossWindowChildComponent extends ChildComponent {
     const manager = new CrossWindowCommunicationsManager(
       (document).defaultView as Window,
       CommunicationsEvent.CONTENT_EVENT_TYPE,
-      this.outboundEndpointAccesor(),
+      this.outboundEndpointAccessor(),
       CommunicationsEvent.CONTAINER_EVENT_TYPE,
       getUrlOrigin(document, this.getOptions().url)
     );
     manager.initialize();
     return new CrossWindowContainerCommunicationHandler(
       manager,
-      this.embededId,
+      this.embeddedId,
       methods
     );
   }
 
   /**
-   * Handle the loading of the embeded element.
+   * Handle the loading of the embedded element.
    * @param e The load event.
    */
-  private embededLoadHandler(e: Event): void {
-    (this.embededLoadResolver as () => void)();
+  private embeddedLoadHandler(e: Event): void {
+    (this.embeddedLoadResolver as () => void)();
   }
 
   /**
-   * Handle the errir of the embeded element.
+   * Handle the error of the embedded element.
    * @param e The error event.
    */
-  private embededErrorHandler(e: ErrorEvent): void {
-    (this.embededErrorRejecter as (e: Error) => void)(new Error(`Failed to load embeded element.\nError details:\n${JSON.stringify(e)}`));
+  private embeddedErrorHandler(e: ErrorEvent): void {
+    (this.embeddedErrorRejecter as (e: Error) => void)(new Error(`Failed to load embedded element.\nError details:\n${JSON.stringify(e)}`));
   }
 
   /**
-   * Create the embeded element.
+   * Create the embedded element.
    */
   private createEmbedElement(): HTMLElement {
     const embed = this.getDocument().createElement('iframe');
     const opt = this.getOptions();
-    if (opt.embededAttributes) {
-      const keys = Object.keys(opt.embededAttributes);
+    if (opt.embeddedAttributes) {
+      const keys = Object.keys(opt.embeddedAttributes);
       // tslint:disable-next-line: prefer-for-of
       for (let index = 0; index < keys.length; index++) {
         const key = keys[index];
-        embed.setAttribute(key, opt.embededAttributes[key]);
+        embed.setAttribute(key, opt.embeddedAttributes[key]);
       }
     }
 
@@ -152,18 +152,18 @@ export class CrossWindowChildComponent extends ChildComponent {
   }
 
   /**
-   * Access the outbound comunication endpoint.
+   * Access the outbound communication endpoint.
    */
-  private outboundEndpointAccesor(): Window {
-    const embed = this.embededId
-      ? (this.rootElement as HTMLElement).querySelector<HTMLIFrameElement>(`#${this.embededId}`)
+  private outboundEndpointAccessor(): Window {
+    const embed = this.embeddedId
+      ? (this.rootElement as HTMLElement).querySelector<HTMLIFrameElement>(`#${this.embeddedId}`)
       : null;
 
     if (!embed)
-      throw new Error(`No iframe with "${this.embededId}" id found.`);
+      throw new Error(`No iframe with "${this.embeddedId}" id found.`);
 
     if (!embed.contentWindow)
-      throw new Error(`The iframe with "${this.embededId}" id does not have a "contentWindow"(${embed.contentWindow}).`);
+      throw new Error(`The iframe with "${this.embeddedId}" id does not have a "contentWindow"(${embed.contentWindow}).`);
 
     return embed.contentWindow;
   }

@@ -69,7 +69,7 @@ export function test_RootComponent() {
         try {
           await root.addChild(_childOptions);
         } catch (error) {
-          expect((error as Error).message).to.eq('Wait for the component to initilize before starting to add children.');
+          expect((error as Error).message).to.eq('Wait for the component to initialize before starting to add children.');
         }
       });
 
@@ -132,7 +132,7 @@ export function test_RootComponent() {
         expect(child).to.not.be.null;
 
         (child as MockChildComponent).signalDisposeToParent();
-        // This is not imediate
+        // This is not mediated
         expect(_win.document.getElementById(id)).to.not.be.null;
 
         await getDelayPromise(5);

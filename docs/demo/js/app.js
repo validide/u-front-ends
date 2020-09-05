@@ -1,7 +1,7 @@
 (function (window, ufe, undefined) {
   'use strict';
 
-  var mfeEventHadler = function (evt) {
+  var mfeEventHandler = function (evt) {
     console.log(evt);
     switch (evt.type) {
       case 'beforeCreate':
@@ -37,16 +37,16 @@
   }
 
   var globalHandlers = new ufe.ComponentEventHandlers();
-  globalHandlers['beforeCreate'] = mfeEventHadler;
-  globalHandlers['created'] = mfeEventHadler;
-  globalHandlers['beforeMount'] = mfeEventHadler;
-  globalHandlers['mounted'] = mfeEventHadler;
-  globalHandlers['beforeUpdate'] = mfeEventHadler;
-  globalHandlers['updated'] = mfeEventHadler;
-  globalHandlers['beforeDestroy'] = mfeEventHadler;
-  globalHandlers['destroyed'] = mfeEventHadler;
-  globalHandlers['error'] = mfeEventHadler;
-  globalHandlers['data'] = mfeEventHadler;
+  globalHandlers['beforeCreate'] = mfeEventHandler;
+  globalHandlers['created'] = mfeEventHandler;
+  globalHandlers['beforeMount'] = mfeEventHandler;
+  globalHandlers['mounted'] = mfeEventHandler;
+  globalHandlers['beforeUpdate'] = mfeEventHandler;
+  globalHandlers['updated'] = mfeEventHandler;
+  globalHandlers['beforeDestroy'] = mfeEventHandler;
+  globalHandlers['destroyed'] = mfeEventHandler;
+  globalHandlers['error'] = mfeEventHandler;
+  globalHandlers['data'] = mfeEventHandler;
 
 
   var configuration = new ufe.RootComponentOptions();
@@ -152,11 +152,11 @@
   mainNavBarCustomEl.resources.push(mainNavBarCustomElScript);
 
   var mainNavBarIframe = new ufe.CrossWindowChildComponentOptions();
-  mainNavBarIframe.url ='./embeded-nav-bar.html'
+  mainNavBarIframe.url ='./embedded-nav-bar.html'
   mainNavBarIframe.handlers = Object.assign({}, globalHandlers, {
     'created': function (e) {
       e.el.parentElement.insertBefore(e.el, e.el.parentElement.firstChild);
-      e.el.parentElement.classList.add('embeded-nav-bar');
+      e.el.parentElement.classList.add('embedded-nav-bar');
 
       globalHandlers['created'](e);
     },
@@ -165,7 +165,7 @@
       globalHandlers['destroyed'](e);
     }
   });
-  mainNavBarIframe.embededAttributes = {
+  mainNavBarIframe.embeddedAttributes = {
     'allowtransparency': 'true',
     'frameborder': 0
   };
@@ -228,7 +228,17 @@
   }
 
   function bang() {
-    window.location = ufe.getUrlFullPath(document, './index.html') + '#/';
+    if (window.location.href.indexOf('#') !== -1) {
+      return;
+    }
+
+    var pathname = window.location.pathname;
+    if (pathname === '/') {
+      pathname = '/index.html';
+    }
+    var pathParts = pathname.split('/');
+
+    window.location = ufe.getUrlFullPath(document, './' + pathParts[pathParts.length - 1]) + '#_/';
   }
 
   function initDemoHandlers() {

@@ -11,7 +11,7 @@ export class CrossWindowContainerCommunicationHandler extends ContainerCommunica
   /**
    * Constructor.
    * @param communicationsManager A communications manager.
-   * @param embedId The Id of the embeded element.
+   * @param embedId The Id of the embedded element.
    * @param containerMethods The methods to communicate with the container.
    */
   constructor(
@@ -42,7 +42,7 @@ export class CrossWindowContainerCommunicationHandler extends ContainerCommunica
   }
 
   /**
-   * Attempt a andshake with the content.
+   * Attempt a handshake with the content.
    */
   private attemptHandShake(e: CommunicationsEvent): void{
     const hash = getHashCode(this.embedId).toString(10);

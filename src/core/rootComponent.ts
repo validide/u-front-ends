@@ -37,7 +37,7 @@ export class RootComponent extends Component {
 
   /**
    * Dispose a child by using it's id.
-   * @param childId The child identifyer.
+   * @param childId The child identifier.
    */
   private async disposeChild(childId: string | null): Promise<void> {
     const child = this.getChild(childId);
@@ -63,7 +63,7 @@ export class RootComponent extends Component {
    */
   public async addChild(options: ChildComponentOptions): Promise<string> {
     if (!this.isInitialized)
-      throw new Error('Wait for the component to initilize before starting to add children.');
+      throw new Error('Wait for the component to initialize before starting to add children.');
 
     if (!this.isMounted)
       throw new Error('Wait for the component to mount before starting to add children.');
@@ -90,7 +90,7 @@ export class RootComponent extends Component {
 
   /**
    * Remove a child component.
-   * @param id The child component identifyer.
+   * @param id The child component identifier.
    */
   public removeChild(id: string): Promise<void> {
     return this.disposeChild(id);

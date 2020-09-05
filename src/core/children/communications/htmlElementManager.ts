@@ -1,6 +1,6 @@
-import { CommunicationsEvent } from '../communications/event';
-import { CommunicationsManager, CommunicationsManagerOf } from '../communications/manager';
 import { createCustomEvent } from '../../../dom/document/createCustomEvent';
+import { CommunicationsEvent } from '../communications/event';
+import { CommunicationsManagerOf } from '../communications/manager';
 
 /**
  * @inheritdoc

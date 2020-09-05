@@ -108,7 +108,7 @@ export function test_CrossWindowChildComponent() {
 
     it('should render the iframe with the specified attributes', async () => {
       _opt.url = 'http://localhost:8080/iframe.html';
-      _opt.embededAttributes = {
+      _opt.embeddedAttributes = {
         'data-cutom-attribute': 'my-custom-attribute'
       };
       await _child.initialize();
@@ -130,7 +130,7 @@ export function test_CrossWindowChildComponent() {
       await _child.initialize();
       await _child.mount();
       expect(error).not.to.be.null;
-      expect((error as unknown as Error).message.indexOf('Failed to load embeded element.\nError details:\n')).to.eq(0);
+      expect((error as unknown as Error).message.indexOf('Failed to load embedded element.\nError details:\n')).to.eq(0);
     });
 
     it('should be able to dispose even if it threw an error', async () => {

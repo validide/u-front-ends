@@ -20,7 +20,7 @@ export enum ComponentEventType {
 export type ComponentEventHandler = (event: ComponentEvent) => void;
 
 /**
- * Evnts triggered by the components
+ * Events triggered by the components
  */
 export class ComponentEvent {
   public id: string;
@@ -33,9 +33,9 @@ export class ComponentEvent {
 
   /**
    * Constructor.
-   * @param id Component unique idnetifyer.
+   * @param id Component unique identifier.
    * @param type The type of event.
-   * @param el The componenet root element.
+   * @param el The component root element.
    * @param parentEl The parent element of the component.
    * @param error The error data in case this is an error event.
    */

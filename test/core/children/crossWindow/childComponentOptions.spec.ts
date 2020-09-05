@@ -16,7 +16,7 @@ export function test_CrossWindowChildComponentOptions() {
       expect(conf.parent).to.eq('body');
       expect(conf.url).to.eq('about:blank');
       expect(conf.createEmbedElement).to.be.undefined;
-      expect(conf.embededAttributes).to.be.undefined;
+      expect(conf.embeddedAttributes).to.be.undefined;
     });
   });
 }

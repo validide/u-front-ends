@@ -1,5 +1,4 @@
 import { CommunicationsEvent, CommunicationsEventKind, ContentCommunicationHandler, CommunicationsManager, ContentCommunicationHandlerMethods } from '../communications/index';
-import { CrossWindowCommunicationsManager } from '../communications/crossWindowManager';
 
 /**
  * @inheritdoc
@@ -84,7 +83,7 @@ export class CrossWindowContentCommunicationHandler extends ContentCommunication
   }
 
   /**
-   * Flush all the messages that were enqueues before the handhake.
+   * Flush all the messages that were enqueued before the handshake.
    */
   private flushMessages(): void {
     // tslint:disable-next-line: prefer-for-of

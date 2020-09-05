@@ -31,7 +31,7 @@ export abstract class CommunicationsManager {
   public abstract send(event: CommunicationsEvent): void;
 
   /**
-   * The the callback to handle any incomming messages.
+   * The the callback to handle any incoming messages.
    * @param callback The callback.
    */
   public abstract setEventReceivedCallback(callback: (event: CommunicationsEvent) => void): void;
@@ -60,7 +60,7 @@ export abstract class CommunicationsManager {
 }
 
 /**
- * Comunications manager base class.
+ * Communications manager base class.
  */
 export abstract class CommunicationsManagerOf<TEndpoint> extends CommunicationsManager {
   private inboundEndpoint: TEndpoint | null;
@@ -74,7 +74,7 @@ export abstract class CommunicationsManagerOf<TEndpoint> extends CommunicationsM
    * Constructor
    * @param inboundEndpoint The endpoint for receiving messages.
    * @param inboundEventType The types of messages to receive.
-   * @param outboundEndpoint The endpoint to sent mesages.
+   * @param outboundEndpoint The endpoint to sent messages.
    * @param outboundEventType The messages to send.
    */
   constructor(
@@ -94,7 +94,7 @@ export abstract class CommunicationsManagerOf<TEndpoint> extends CommunicationsM
 
   /**
    * Handle the received events.
-   * @param e The recevied event.
+   * @param e The received event.
    */
   private handleEvent(e: Event): void {
     if (!this.onEventReceived)
@@ -132,14 +132,14 @@ export abstract class CommunicationsManagerOf<TEndpoint> extends CommunicationsM
   /**
    * Start to receive messages
    * @param inboundEndpoint The inbound endpoint
-   * @param handler The event hander
+   * @param handler The event handler
    */
   protected abstract startReceiving(inboundEndpoint: TEndpoint, handler: (e: Event) => void): void;
 
   /**
-   * Stop receiveing messages
+   * Stop receiving messages
    * @param inboundEndpoint The inbound endpoint
-   * @param handler The event hander
+   * @param handler The event handler
    */
   protected abstract stopReceiving(inboundEndpoint: TEndpoint, handler: (e: Event) => void): void;
 

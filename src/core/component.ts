@@ -74,7 +74,7 @@ export abstract class Component {
   }
 
   /**
-   * Load the resources required by the compoent.
+   * Load the resources required by the component.
    */
   protected async loadResources(): Promise<void> {
     if (this.resourcesLoaded)
@@ -87,7 +87,7 @@ export abstract class Component {
       // tslint:disable-next-line: prefer-for-of
       for (let index = 0; index < options.resources.length; index++) {
         const resource = options.resources[index];
-        // DO NOT LOAD ALL AT ONCE AS YOU MIHGT HAVE DEPENDENCIES
+        // DO NOT LOAD ALL AT ONCE AS YOU MIGHT HAVE DEPENDENCIES
         // AND A RESOURCE MIGHT LOAD BEFORE IT'S DEPENDENCY
         await loadResource(document, resource.url, resource.isScript, resource.skip, resource.attributes);
       }
@@ -95,19 +95,19 @@ export abstract class Component {
   }
 
   /**
-   * Get the optons data.
+   * Get the options data.
    */
   protected getOptions(): ComponentOptions {
     return (this.options as ComponentOptions);
   }
 
   /**
-   * Get the wndow reference.
+   * Get the window reference.
    */
   protected getWindow(): Window { return this.window as Window; }
 
   /**
-   * Get the document refrence.
+   * Get the document reference.
    */
   protected getDocument(): Document { return this.getWindow().document; }
 

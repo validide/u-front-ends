@@ -58,7 +58,7 @@ export abstract class ContainerCommunicationHandler {
   }
 
   /**
-   * Core functionality for handling the incomming events.
+   * Core functionality for handling the incoming events.
    * @param e The event.
    */
   protected handleEventCore(e: CommunicationsEvent): void {
@@ -73,7 +73,7 @@ export abstract class ContainerCommunicationHandler {
   }
 
   /**
-   * Handle the incomming communications event.
+   * Handle the incoming communications event.
    * @param e The event
    */
   private handleEvent(e: CommunicationsEvent): void {
@@ -112,7 +112,7 @@ export abstract class ContainerCommunicationHandler {
   }
 
   /**
-   * Reuest that the content begins disposing.
+   * Request that the content begins disposing.
    */
   public requestContentDispose(): void {
     this.send(new CommunicationsEvent(CommunicationsEventKind.BeforeDispose));

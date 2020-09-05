@@ -26,7 +26,7 @@ export abstract class ContentCommunicationHandler {
 
   /**
    * Constructor
-   * @param communicationsManager A comunications manager
+   * @param communicationsManager A communications manager
    * @param methods The callback to dispose the content.
    */
   constructor(
@@ -42,7 +42,7 @@ export abstract class ContentCommunicationHandler {
   }
 
   /**
-   * Core functionality for handling the incomming events.
+   * Core functionality for handling the incoming events.
    * @param e The event.
    */
   protected handleEventCore(e: CommunicationsEvent): void {
@@ -64,7 +64,7 @@ export abstract class ContentCommunicationHandler {
   }
 
   /**
-   * Handle the incomming communications event.
+   * Handle the incoming communications event.
    * @param e The event
    */
   private handleEvent(e: CommunicationsEvent): void {

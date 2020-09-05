@@ -7,7 +7,7 @@ export enum ChildComponentType {
    */
   InWindow = 'inWindow',
   /**
-   * Cross window component(loaded in an embedable form - Iframe)
+   * Cross window component(loaded in an emendable element - Iframe)
    */
   CrossWindow = 'crossWindow'
 }

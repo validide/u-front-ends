@@ -1,4 +1,4 @@
 export * from './childComponent';
 export * from './childComponentOptions';
 export * from './containerCommunicationHandler';
-export * from './contentComunicationHandler';
+export * from './contentCommunicationHandler';

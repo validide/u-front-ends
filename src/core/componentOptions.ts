@@ -18,7 +18,7 @@ export class ComponentEventHandlers {
 }
 
 /**
- * Compoent configuration options.
+ * Component configuration options.
  */
 export class ComponentOptions {
   public parent: string | HTMLElement = 'body';

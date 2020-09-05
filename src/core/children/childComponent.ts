@@ -28,14 +28,14 @@ export abstract class ChildComponent extends Component {
   }
 
   /**
-   * Core method to get the comunication handler.
-   * All derived classes need to implement this to retunr the correct handler implementation.
+   * Core method to get the communication handler.
+   * All derived classes need to implement this to return the correct handler implementation.
    * @param methods
    */
   protected abstract getCommunicationHandlerCore(methods: ContainerCommunicationHandlerMethods): ContainerCommunicationHandler;
 
   /**
-   * Get the comunication handler.
+   * Get the communication handler.
    */
   protected getCommunicationHandler(): ContainerCommunicationHandler {
     const methods = new ContainerCommunicationHandlerMethods();
@@ -63,7 +63,7 @@ export abstract class ChildComponent extends Component {
       return; // Dispose has already started.
 
     this.setContentDisposePromise();
-    // Inform parent the content is beeing disposed.
+    // Inform parent the content is being disposed.
     (this.rootFacade as RootComponentFacade).signalDisposed(this);
   }
 

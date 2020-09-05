@@ -1,6 +1,6 @@
 import { getUuidV4 } from '../../../utilities/random';
 /**
- * Kind of events used to comunicate between content and container component.
+ * Kind of events used to communicate between content and container component.
  */
 export enum CommunicationsEventKind {
   Mounted = 'mounted',
@@ -12,7 +12,7 @@ export enum CommunicationsEventKind {
 }
 
 /**
- * Event used to comunicate between content and container component.
+ * Event used to communicate between content and container component.
  */
 export class CommunicationsEvent {
   /**
@@ -29,7 +29,7 @@ export class CommunicationsEvent {
    */
   public kind: CommunicationsEventKind;
   /**
-   * Unique idnetifyer.
+   * Unique identifier.
    */
   public uuid: string;
   /**
