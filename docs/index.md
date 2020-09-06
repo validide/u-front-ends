@@ -4,13 +4,19 @@ A simple framework for integrating multiple [micro front-ends](https://martinfow
 ## Installation
 You can use the framework by:
 - installing it from NPM and importing it in your files
+
+
 ``` javascript
 import * as ufe from '@validide/u-front-ends';
 
 const root = new ufe.RootComponent(...);
 
 ```
+
+
 - importing directly in the browser the bundle and using it similar to:
+
+
 ``` javascript
 (function (window, ufe, undefined) {
   'use strict';
