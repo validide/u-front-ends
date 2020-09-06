@@ -1,5 +1,5 @@
 # u-front-ends
-A simple framework for integrating multiple [micro frontends](https://martinfowler.com/articles/micro-frontends.html) as one.
+A simple framework for integrating multiple [micro front-ends](https://martinfowler.com/articles/micro-frontends.html) as one.
 
 ## Status
 [![Coverage Status](https://coveralls.io/repos/github/validide/u-front-ends/badge.svg?branch=master)](https://coveralls.io/github/validide/u-front-ends?branch=master)

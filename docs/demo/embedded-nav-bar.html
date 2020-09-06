@@ -48,9 +48,9 @@
     </div>
   </nav>
   <script src="./lib/bundle/index.js"></script>
-  <script src="./js/app.js"></script>
+  <script src="./js/boilerplate.js"></script>
   <script>
-    (function (window, app, ufe, undefined) {
+    (function (window, boilerplate, ufe, undefined) {
 
       var communicationHandler = null;
       if (window.parent !== window) {
@@ -65,7 +65,7 @@
         var contentMethods = new ufe.ContentCommunicationHandlerMethods();
         contentMethods.dispose = function() { dispose(); };
         contentMethods.handleDataEvent = function(data) {
-          console.log('Iframe recevied data: \n\n' + JSON.stringify(data));
+          console.log('Iframe received data: \n\n' + JSON.stringify(data));
          };
         communicationHandler = new ufe.CrossWindowContentCommunicationHandler(
           manager,
@@ -132,10 +132,10 @@
         }
       }
 
-      app.ready(function () {
+      boilerplate.ready(function () {
         intiActions();
       });
-    })(window, window.app, window.validide_uFrontEnds, void (0))
+    })(window, window.__boilerplate, window.validide_uFrontEnds, void (0))
   </script>
 </body>
 
