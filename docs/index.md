@@ -70,13 +70,13 @@ jqueryJs.skip = function() { return !!window.$; }; // If we already have jQuery 
 configuration.resources.push(jqueryJs);
 
 // Create a new instance of the root component.
-var mfe = new ufe.RootComponent(window, configuration);
+var root = new ufe.RootComponent(window, configuration);
 
 // Initialize the root.
-await mfe.initialize();
+await root.initialize();
 
 // Mount the root.
-await mfe.mount();
+await root.mount();
 
 ```
 

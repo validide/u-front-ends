@@ -20,12 +20,21 @@
       </button>
     </div>
     <div class="row">
+      <div class="col">
+        <h1>Counter integration options demo</h1>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col text-center">
+        <h6>Toggle a custom element counter child</h6>
+        <button class="btn btn-primary" id="toggler-ce">Toggle CE Counter</button>
+      </div>
+      <div class="col text-center" id="ce-container"></div>
     </div>
   </div>
   <script>
     (function() {
-      var modernBrowser = true;
-      var handleBrowser = function() {
+      var handleBrowser = function(modernBrowser) {
         if (modernBrowser){
           var alertEl = window.document.getElementById('old-browser');
           if (alertEl) {
@@ -37,24 +46,24 @@
         let a = true;
         eval('"use strict"; class foo {}');
         const func = () => {
-          console.log(`Q: Modern browser?\nA:${modernBrowser ? '😀' : 'NO'}`);
-          handleBrowser();
+          console.log(`Q: Modern browser?\nA:😀`);
+          handleBrowser(true);
         };
         func();
       } catch (e) {
-        modernBrowser = false;
         console.log(e);
-        handleBrowser();
+        handleBrowser(false);
       }
     })();
   </script>
   <script src="./lib/bundle/index.js"></script>
+  <script src="./js/boilerplate.js"></script>
   <script src="./js/demo.js"></script>
   <script>
-    window.demo.ready(function () {
-      window.demo.init();
+    window.__boilerplate.ready(function () {
+      window.__boilerplate.init();
+      window.app.init();
     });
   </script>
 </body>
-
 </html>

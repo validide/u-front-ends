@@ -1,6 +1,7 @@
 (function (window, ufe, undefined) {
   'use strict';
 
+  // ======================================== ROOT INITIALIZATION START ========================================
   // The event handler that will handle all the events.
   var globalEventHandler = function (evt) {
     // console.log(evt);
@@ -8,21 +9,21 @@
       case 'beforeCreate':
         break;
       case 'created':
-        evt.el.classList.add('loading');
+        evt.el.parentElement.classList.add('loading');
         break;
       case 'beforeMount':
         break;
       case 'mounted':
-        evt.el.classList.remove('loading');
+        evt.el.parentElement.classList.remove('loading');
         break;
       case 'beforeUpdate':
-        evt.el.classList.add('loading');
+        evt.el.parentElement.classList.add('loading');
         break;
       case 'updated':
-        evt.el.classList.remove('loading');
+        evt.el.parentElement.classList.remove('loading');
         break;
       case 'beforeDestroy':
-        evt.el.classList.add('loading');
+        evt.el.parentElement.classList.add('loading');
         break;
       case 'destroyed':
         break;
@@ -91,18 +92,68 @@
   };
   configuration.resources.push(bootstrapJs);
 
-  var mfe = new ufe.RootComponent(window, configuration);
+  var root = new ufe.RootComponent(window, configuration);
+  // ======================================== ROOT INITIALIZATION END ========================================
+
+  // ======================================== CUSTOM ELEMENT WRAPPER START ========================================
+  var ceComponentId = '';
+  var ceComponent = new ufe.InWindowChildComponentOptions();
+  ceComponent.handlers = Object.assign({}, globalHandlers, {
+    'created': function (e) {
+      // Manipulate the component location
+      e.el.parentElement.insertBefore(e.el, e.el.parentElement.firstChild);
+
+      // Call the global handler
+      globalHandlers['created'](e);
+    },
+    'destroyed': function (e) {
+      // Clear the Id so we know it was disposed
+      ceComponentId = '';
+
+      // Call the global handler
+      globalHandlers['destroyed'](e);
+    }
+  });
+  ceComponent.tag = 'my-counter-wrapper';
+  ceComponent.inject = function(el) {}
+  ceComponent.parent = '#ce-container'; // Specify where the child should be injected
+  var ceComponentScript = new ufe.ResourceConfiguration();
+  ceComponentScript.url = './js/demo-counter-ce.js';
+  ceComponentScript.isScript = true;
+  ceComponentScript.skip = function () {
+    return !!window.customElements.get('my-counter-wrapper');
+  }
+  ceComponent.resources.push(ceComponentScript);
+  // ======================================== CUSTOM ELEMENT WRAPPER END ========================================
+
+  async function toggleCustomElementComponent(rootComponent) {
+    if (ceComponentId) {
+      // We have the child component mounted so we need to remove it
+      await rootComponent.removeChild(ceComponentId);
+      ceComponentId = '';
+    } else {
+      // We do not have the child component mounted so we need to add it
+      ceComponentId = await rootComponent.addChild(ceComponent);
+    }
+  }
 
   function init() {
-    initDemoHandlers();
 
-    mfe
+
+
+    root
       .initialize()
-      .then(function (root) {
-        return root.mount();
+      .then(function (rootRes) {
+        return rootRes.mount();
       })
-      .then(function () {
+      .then(function (rootRes) {
         document.getElementById('content').classList.remove('d-none');
+
+        document.getElementById('toggler-ce').addEventListener('click', async function(e) {
+          e.preventDefault();
+          await toggleCustomElementComponent(rootRes);
+        })
+
       });
   }
 

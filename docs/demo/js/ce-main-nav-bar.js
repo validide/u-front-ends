@@ -153,7 +153,7 @@
 
     connectedCallback() {
       // We are moving the element after creating it so we need to:
-      // - delay the conect actions a bit
+      // - delay the connect actions a bit
       // - execute the actions only if we are connected
 
       window.setTimeout(()=> {
@@ -164,7 +164,7 @@
     disconnectedCallback() {
 
       // We are moving the element after creating it so we need to:
-      // - delay the disconect actions a bit
+      // - delay the disconnect actions a bit
       // - execute the actions only if we were not re-connected
       window.setTimeout(() => {
         if (!this.isConnected) {
