@@ -25,6 +25,7 @@ export function loadResource(
     } else {
       resource = document.createElement('link');
       (resource as HTMLLinkElement).href = url;
+      (resource as HTMLLinkElement).rel = 'stylesheet';
     }
 
     if (attributes) {

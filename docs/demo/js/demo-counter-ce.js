@@ -141,7 +141,7 @@
       this.communicationHandler.dispose();
       this.communicationHandler = null;
 
-      console.log('Count: ' + this.count);
+      console.log('MyCounterElementWrapper Disposed. Count: ' + this.count);
       // Call the super's dispose method if you have one
       // super.dispose();
     }

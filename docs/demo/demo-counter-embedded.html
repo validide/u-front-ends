@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <title>Micro Front Ends</title>
+  <meta name="description" content="Micro Front Ends">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="./favicon.ico" type="image/x-icon" />
+  <style>
+    span {
+      width: 4rem;
+      display: inline-block;
+      text-align: center;
+      font-size: 200%;
+    }
+
+    button {
+      width: 64px;
+      height: 64px;
+      border: none;
+      border-radius: 10px;
+      background-color: greenyellow;
+      color: white;
+      font-size: 200%;
+    }
+
+    #embedded-counter {
+      text-align: center;
+    }
+
+  </style>
+</head>
+
+<body>
+  <div id="embedded-counter"></div>
+  <script src="./lib/bundle/index.js"></script>
+  <script src="./js/boilerplate.js"></script>
+  <script src="./js/demo-counter-js.js"></script>
+  <script>
+    (function (window, boilerplate, ufe, undefined) {
+      var counter = null;
+      var communicationHandler = null;
+
+      // Only initialize this if we are loaded as a child frame
+      if (window.parent !== window) {
+        var manager = new ufe.CrossWindowCommunicationsManager(
+          window, //inboundEndpoint: Window
+          ufe.CommunicationsEvent.CONTAINER_EVENT_TYPE,
+          window.parent, //outboundEndpoint: Window
+          ufe.CommunicationsEvent.CONTENT_EVENT_TYPE,
+          ufe.getUrlOrigin(document, window.location.href) // You might want to configure this server side
+        );
+        manager.initialize();
+        var contentMethods = new ufe.ContentCommunicationHandlerMethods();
+        contentMethods.dispose = function() { dispose(); };
+        communicationHandler = new ufe.CrossWindowContentCommunicationHandler(
+          manager,
+          contentMethods
+        );
+      }
+
+      function dispose() {
+        if (communicationHandler) {
+          communicationHandler.dispatchBeforeDispose();
+        }
+
+          setTimeout(() => {
+          disposeCore();
+        }, 1_000)
+      }
+
+      function disposeCore() {
+
+        submitHandler = null;
+        if (communicationHandler) {
+          communicationHandler.dispatchDisposed();
+          communicationHandler.dispose();
+        }
+        communicationHandler = null;
+        console.log('EmbeddedCounter Disposed. Count: ' + counter.count);
+        counter.dispose();
+      }
+
+
+
+      function intiActions() {
+        counter = new window.demo_components.MyCounterJavaScript(document.getElementById('embedded-counter'));
+        if (communicationHandler) {
+          // Simulate a delay to consider existing processing
+          window.setTimeout(() => {
+            communicationHandler.dispatchMounted();
+          }, 1_000);
+        }
+      }
+
+      boilerplate.ready(function () {
+        intiActions();
+      });
+    })(window, window.__boilerplate, window.validide_uFrontEnds, void (0))
+  </script>
+</body>
+
+</html>

@@ -116,6 +116,7 @@
             else {
                 resource = document.createElement('link');
                 resource.href = url;
+                resource.rel = 'stylesheet';
             }
             if (attributes) {
                 var keys = Object.keys(attributes);

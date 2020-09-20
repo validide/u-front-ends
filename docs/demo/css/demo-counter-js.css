@@ -1,0 +1,18 @@
+.js-counter * {
+  font-size: 200%;
+}
+
+.js-counter span {
+  width: 4rem;
+  display: inline-block;
+  text-align: center;
+}
+
+.js-counter button {
+  width: 64px;
+  height: 64px;
+  border: none;
+  border-radius: 10px;
+  background-color: royalblue;
+  color: white;
+}

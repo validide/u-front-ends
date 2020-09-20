@@ -95,6 +95,55 @@
   var root = new ufe.RootComponent(window, configuration);
   // ======================================== ROOT INITIALIZATION END ========================================
 
+  // ======================================== CLASSIC JAVASCRIPT WRAPPER START ========================================
+  var jsComponentId = '';
+  var jsComponent = new ufe.InWindowChildComponentOptions();
+  jsComponent.handlers = Object.assign({}, globalHandlers, {
+    'created': function (e) {
+      // Manipulate the component location
+      e.el.parentElement.insertBefore(e.el, e.el.parentElement.firstChild);
+      // The CSS is scoped to the 'js-counter' so we need to add the class on the component
+      e.el.classList.add('js-counter');
+
+      // Call the global handler
+      globalHandlers['created'](e);
+    },
+    'destroyed': function (e) {
+      // Clear the Id so we know it was disposed
+      jsComponentId = '';
+
+      // Call the global handler
+      globalHandlers['destroyed'](e);
+    }
+  });
+  jsComponent.tag = 'div';
+  jsComponent.inject = function (el) {
+    new window.demo_components.MyCounterJavaScriptWrapper(el);
+  }
+  jsComponent.parent = '#js-container'; // Specify where the child should be injected
+  var jsComponentScript = new ufe.ResourceConfiguration();
+  jsComponentScript.url = './js/demo-counter-js.js';
+  jsComponentScript.isScript = true;
+  jsComponentScript.skip = function () {
+    return !!(window.demo_components && window.demo_components.MyCounterJavaScriptWrapper);
+  }
+  jsComponent.resources.push(jsComponentScript);
+  var stylesLoaded = false;
+  var jsComponentStyles = new ufe.ResourceConfiguration();
+  jsComponentStyles.url = './css/demo-counter-js.css';
+  jsComponentStyles.isScript = false;
+  jsComponentStyles.skip = function () {
+    // We could do something smarter to detect if the styles were already loaded
+    if(stylesLoaded) {
+      return true;
+    } else {
+      stylesLoaded = true;
+      return false;
+    }
+  }
+  jsComponent.resources.push(jsComponentStyles);
+  // ======================================== CLASSIC JAVASCRIPT WRAPPER END ========================================
+
   // ======================================== CUSTOM ELEMENT WRAPPER START ========================================
   var ceComponentId = '';
   var ceComponent = new ufe.InWindowChildComponentOptions();
@@ -115,7 +164,7 @@
     }
   });
   ceComponent.tag = 'my-counter-wrapper';
-  ceComponent.inject = function(el) {}
+  ceComponent.inject = function (el) { }
   ceComponent.parent = '#ce-container'; // Specify where the child should be injected
   var ceComponentScript = new ufe.ResourceConfiguration();
   ceComponentScript.url = './js/demo-counter-ce.js';
@@ -126,6 +175,44 @@
   ceComponent.resources.push(ceComponentScript);
   // ======================================== CUSTOM ELEMENT WRAPPER END ========================================
 
+  // ======================================== EMBEDDED WRAPPER START ========================================
+  var embeddedComponentId = '';
+  var embeddedComponent = new ufe.CrossWindowChildComponentOptions();
+  embeddedComponent.url ='./demo-counter-embedded.html'
+  embeddedComponent.handlers = Object.assign({}, globalHandlers, {
+    'created': function (e) {
+      // Manipulate the component location
+      e.el.parentElement.insertBefore(e.el, e.el.parentElement.firstChild);
+
+      // Call the global handler
+      globalHandlers['created'](e);
+    },
+    'destroyed': function (e) {
+      // Clear the Id so we know it was disposed
+      embeddedComponentId = '';
+
+      // Call the global handler
+      globalHandlers['destroyed'](e);
+    }
+  });
+  embeddedComponent.embeddedAttributes = {
+    'allowtransparency': 'true',
+    'frameborder': 0
+  };
+  embeddedComponent.parent = '#embedded-container'; // Specify where the child should be injected
+  // ======================================== EMBEDDED WRAPPER END ========================================
+
+  async function toggleJavaScriptComponent(rootComponent) {
+    if (jsComponentId) {
+      // We have the child component mounted so we need to remove it
+      await rootComponent.removeChild(jsComponentId);
+      jsComponentId = '';
+    } else {
+      // We do not have the child component mounted so we need to add it
+      jsComponentId = await rootComponent.addChild(jsComponent);
+    }
+  }
+
   async function toggleCustomElementComponent(rootComponent) {
     if (ceComponentId) {
       // We have the child component mounted so we need to remove it
@@ -134,6 +221,17 @@
     } else {
       // We do not have the child component mounted so we need to add it
       ceComponentId = await rootComponent.addChild(ceComponent);
+    }
+  }
+
+  async function toggleEmbeddedComponent(rootComponent) {
+    if (embeddedComponentId) {
+      // We have the child component mounted so we need to remove it
+      await rootComponent.removeChild(embeddedComponentId);
+      embeddedComponentId = '';
+    } else {
+      // We do not have the child component mounted so we need to add it
+      embeddedComponentId = await rootComponent.addChild(embeddedComponent);
     }
   }
 
@@ -149,10 +247,20 @@
       .then(function (rootRes) {
         document.getElementById('content').classList.remove('d-none');
 
-        document.getElementById('toggler-ce').addEventListener('click', async function(e) {
+        document.getElementById('toggler-js').addEventListener('click', async function (e) {
+          e.preventDefault();
+          await toggleJavaScriptComponent(rootRes);
+        });
+
+        document.getElementById('toggler-ce').addEventListener('click', async function (e) {
           e.preventDefault();
           await toggleCustomElementComponent(rootRes);
-        })
+        });
+
+        document.getElementById('toggler-embedded').addEventListener('click', async function (e) {
+          e.preventDefault();
+          await toggleEmbeddedComponent(rootRes);
+        });
 
       });
   }
