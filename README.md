@@ -21,5 +21,6 @@ Naming stuff is one of the hardest things in programming so:
 
 ## Documentation and demos
 
+* [Demo](https://validide.github.io/u-front-ends/demo/#_/)
 * [Documentation](https://validide.github.io/u-front-ends/)
-* [Browser API tests](https://validide.github.io/u-front-ends/demo/browser-tests.html)
+* [Browser API manual tests](https://validide.github.io/u-front-ends/demo/browser-tests.html)
