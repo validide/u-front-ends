@@ -2,6 +2,7 @@
 A simple framework for integrating multiple [micro front-ends](https://martinfowler.com/articles/micro-frontends.html) as one.
 
 ## Status
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/5ac128d4b7284a9ca5f411b2b3ac61bb)](https://www.codacy.com/gh/validide/u-front-ends/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=validide/u-front-ends&amp;utm_campaign=Badge_Grade)
 [![Coverage Status](https://coveralls.io/repos/github/validide/u-front-ends/badge.svg?branch=master)](https://coveralls.io/github/validide/u-front-ends?branch=master)
 [![npm version](https://img.shields.io/npm/v/@validide/u-front-ends)](https://www.npmjs.com/package/@validide/u-front-ends)
 
