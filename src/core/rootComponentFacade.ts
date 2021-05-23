@@ -11,6 +11,7 @@ export class RootComponentFacade {
 
   /**
    * Constructor.
+   *
    * @param signalDisposed The function to invoke to signal that the child was disposed.
    */
   constructor(

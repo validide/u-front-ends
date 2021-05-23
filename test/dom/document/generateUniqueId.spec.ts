@@ -1,9 +1,19 @@
+/* eslint-disable @typescript-eslint/restrict-template-expressions */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unused-expressions */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-return */
+/* eslint-disable no-underscore-dangle */
+/* eslint-disable @typescript-eslint/ban-types */
+/* eslint-disable @typescript-eslint/naming-convention */
+/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
+/* eslint-disable prefer-arrow/prefer-arrow-functions */
 import 'mocha';
 import { generateUniqueId } from '../../../src/index';
 import { expect } from 'chai';
 import { JSDOM } from 'jsdom';
 import { values_falsies } from '../../utils';
-// tslint:disable: no-unused-expression
 
 function getNewDocument(): Document { return new JSDOM('<!DOCTYPE html>').window.document; }
 
@@ -39,7 +49,7 @@ export function test_generateUniqueId() {
     it('should return an id that is unique', () => {
       let called = 0;
       const fake = {
-        getElementById: (elementId: string): HTMLElement | null => {
+        getElementById: (): HTMLElement | null => {
           if (called >= values_falsies.length) {
             return doc.createElement('div');
           }

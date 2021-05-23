@@ -1,3 +1,14 @@
+/* eslint-disable @typescript-eslint/restrict-template-expressions */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unused-expressions */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-return */
+/* eslint-disable no-underscore-dangle */
+/* eslint-disable @typescript-eslint/ban-types */
+/* eslint-disable @typescript-eslint/naming-convention */
+/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
+/* eslint-disable prefer-arrow/prefer-arrow-functions */
 import 'mocha';
 import { JSDOM } from 'jsdom';
 import { expect } from 'chai';
@@ -26,14 +37,14 @@ export function test_InWindowContainerCommunicationHandler() {
       _mngr.dispose();
       _win.close();
       _jsDom.window.close();
-    })
+    });
 
     it('requires a handler and methods as parameters', () => {
       expect(() => new InWindowContainerCommunicationHandler(
         _mngr,
         new ContainerCommunicationHandlerMethods()
       )).not.to.throw();
-    })
+    });
 
 
     it('should inherit from ContainerCommunicationHandler', () => {
@@ -42,6 +53,6 @@ export function test_InWindowContainerCommunicationHandler() {
         new ContainerCommunicationHandlerMethods()
       );
       expect(handler).to.be.an.instanceOf(ContainerCommunicationHandler);
-    })
+    });
   });
 }

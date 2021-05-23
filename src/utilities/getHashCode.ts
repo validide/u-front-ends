@@ -1,7 +1,10 @@
+/* eslint-disable no-bitwise */
 /**
  * Get a hash code for the given string
+ *
  * @returns The has code
  */
+// eslint-disable-next-line prefer-arrow/prefer-arrow-functions
 function getHashCode(value: string): number {
   let hash = 0;
   const length = value.length;
@@ -12,9 +15,7 @@ function getHashCode(value: string): number {
 
   while (index < length) {
     char = value.charCodeAt(index);
-    // tslint:disable-next-line: no-bitwise
     hash = ((hash << 5) - hash) + char;
-    // tslint:disable-next-line: no-bitwise
     hash |= 0; // Convert to 32bit integer
 
     index++;

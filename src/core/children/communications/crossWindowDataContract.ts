@@ -7,6 +7,7 @@ export class CrossWindowCommunicationDataContract<T> {
 
   /**
    * Constructor.
+   *
    * @param type Data type.
    * @param detail Data detail.
    */

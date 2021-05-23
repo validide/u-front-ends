@@ -1,3 +1,14 @@
+/* eslint-disable @typescript-eslint/restrict-template-expressions */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unused-expressions */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-return */
+/* eslint-disable no-underscore-dangle */
+/* eslint-disable @typescript-eslint/ban-types */
+/* eslint-disable @typescript-eslint/naming-convention */
+/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
+/* eslint-disable prefer-arrow/prefer-arrow-functions */
 import 'mocha';
 import { JSDOM } from 'jsdom';
 import { expect } from 'chai';
@@ -6,7 +17,6 @@ import { MockCommunicationsManager } from '../../../mocks/mockCommunicationsMana
 import { CommunicationsEvent, CommunicationsEventKind, ContentCommunicationHandlerMethods } from '../../../../src';
 import { createCustomEvent } from '../../../../src/dom/document/createCustomEvent';
 import { values_falsies } from '../../../utils';
-// tslint:disable: no-unused-expression
 
 export function test_ContentCommunicationHandler() {
   describe('ContentCommunicationHandler', () => {
@@ -84,31 +94,31 @@ export function test_ContentCommunicationHandler() {
     it('should send an event when calling "dispatchMounted"', () => {
       expect(() => _handler.dispatchMounted()).not.to.throw();
       expect(_mngr.sentEvents.length).to.eq(1);
-      expect((_mngr.sentEvents[0] as CommunicationsEvent).kind).to.eql(CommunicationsEventKind.Mounted);
+      expect((_mngr.sentEvents[0] ).kind).to.eql(CommunicationsEventKind.Mounted);
     });
 
     it('should send an event when calling "dispatchBeforeUpdate"', () => {
       expect(() => _handler.dispatchBeforeUpdate()).not.to.throw();
       expect(_mngr.sentEvents.length).to.eq(1);
-      expect((_mngr.sentEvents[0] as CommunicationsEvent).kind).to.eql(CommunicationsEventKind.BeforeUpdate);
+      expect((_mngr.sentEvents[0] ).kind).to.eql(CommunicationsEventKind.BeforeUpdate);
     });
 
     it('should send an event when calling "dispatchUpdated"', () => {
       expect(() => _handler.dispatchUpdated()).not.to.throw();
       expect(_mngr.sentEvents.length).to.eq(1);
-      expect((_mngr.sentEvents[0] as CommunicationsEvent).kind).to.eql(CommunicationsEventKind.Updated);
+      expect((_mngr.sentEvents[0] ).kind).to.eql(CommunicationsEventKind.Updated);
     });
 
     it('should send an event when calling "dispatchBeforeDispose"', () => {
       expect(() => _handler.dispatchBeforeDispose()).not.to.throw();
       expect(_mngr.sentEvents.length).to.eq(1);
-      expect((_mngr.sentEvents[0] as CommunicationsEvent).kind).to.eql(CommunicationsEventKind.BeforeDispose);
+      expect((_mngr.sentEvents[0] ).kind).to.eql(CommunicationsEventKind.BeforeDispose);
     });
 
     it('should send an event when calling "dispatchDisposed"', () => {
       expect(() => _handler.dispatchDisposed()).not.to.throw();
       expect(_mngr.sentEvents.length).to.eq(1);
-      expect((_mngr.sentEvents[0] as CommunicationsEvent).kind).to.eql(CommunicationsEventKind.Disposed);
+      expect((_mngr.sentEvents[0] ).kind).to.eql(CommunicationsEventKind.Disposed);
     });
 
     it('should send data', () => {

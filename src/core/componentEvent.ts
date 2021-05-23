@@ -33,6 +33,7 @@ export class ComponentEvent {
 
   /**
    * Constructor.
+   *
    * @param id Component unique identifier.
    * @param type The type of event.
    * @param el The component root element.

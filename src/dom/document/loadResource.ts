@@ -1,15 +1,17 @@
 /**
  * A function to load a resource and wait for it to load.
+ *
  * @param document The reference to the document object.
  * @param url The resource URL.
  * @param isScript Is this resource a script or a stylesheet?
  * @param skipLoading Function to determine if the resource should not be loaded.
  * @param attributes Extra attributes to add on the HTML element before attaching it to the document.
  */
+// eslint-disable-next-line prefer-arrow/prefer-arrow-functions
 export function loadResource(
   document: Document,
   url: string,
-  isScript: boolean = true,
+  isScript = true,
   skipLoading?: () => boolean,
   attributes?: { [key: string]: string }
 ): Promise<void> {
@@ -21,18 +23,16 @@ export function loadResource(
 
     if (isScript) {
       resource = document.createElement('script');
-      (resource as HTMLScriptElement).src = url;
+      (resource ).src = url;
     } else {
       resource = document.createElement('link');
-      (resource as HTMLLinkElement).href = url;
-      (resource as HTMLLinkElement).rel = 'stylesheet';
+      (resource ).href = url;
+      (resource ).rel = 'stylesheet';
     }
 
     if (attributes) {
       const keys = Object.keys(attributes);
-      // tslint:disable-next-line: prefer-for-of
-      for (let index = 0; index < keys.length; index++) {
-        const key = keys[index];
+      for (const key of keys) {
         resource.setAttribute(key, attributes[key]);
       }
     }

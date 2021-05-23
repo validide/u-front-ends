@@ -1,3 +1,15 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/restrict-template-expressions */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unused-expressions */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-return */
+/* eslint-disable no-underscore-dangle */
+/* eslint-disable @typescript-eslint/ban-types */
+/* eslint-disable @typescript-eslint/naming-convention */
+/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
+/* eslint-disable prefer-arrow/prefer-arrow-functions */
 import { expect } from 'chai';
 import { JSDOM } from 'jsdom';
 import 'mocha';
@@ -5,7 +17,6 @@ import { CommunicationsEvent, CommunicationsEventKind, ContainerCommunicationHan
 import { MockCrossWindowCommunicationsManager } from '../../../mocks/mockCrossWindowCommunicationsManager';
 import { MockCrossWindowContainerCommunicationHandler } from '../../../mocks/mockCrossWindowContainerCommunicationHandler';
 import { values_falsies } from '../../../utils';
-// tslint:disable: no-unused-expression
 
 export function test_CrossWindowContainerCommunicationHandler() {
   describe('CrossWindowContentCommunicatinsHandler', () => {

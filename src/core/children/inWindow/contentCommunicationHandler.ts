@@ -1,5 +1,4 @@
-import { ContentCommunicationHandler, CommunicationsEvent, CommunicationsManager, ContentCommunicationHandlerMethods } from '../communications/index';
-import { HTMLElementCommunicationsManager } from '../communications/htmlElementManager';
+import { CommunicationsManager, ContentCommunicationHandler, ContentCommunicationHandlerMethods } from '../communications/index';
 
 /**
  * @inheritdoc
@@ -7,6 +6,7 @@ import { HTMLElementCommunicationsManager } from '../communications/htmlElementM
 export class InWindowContentCommunicationHandler extends ContentCommunicationHandler {
   /**
    * Constructor.
+   *
    * @param el The element to use for sending and receiving messages.
    * @param methods The callback to dispose the content.
    */

@@ -42,6 +42,7 @@ export abstract class ContainerCommunicationHandler {
 
   /**
    * Constructor
+   *
    * @param communicationsManager A communications manager.
    * @param handlerMethods A collection of handler methods.
    */
@@ -59,6 +60,7 @@ export abstract class ContainerCommunicationHandler {
 
   /**
    * Core functionality for handling the incoming events.
+   *
    * @param e The event.
    */
   protected handleEventCore(e: CommunicationsEvent): void {
@@ -74,6 +76,7 @@ export abstract class ContainerCommunicationHandler {
 
   /**
    * Handle the incoming communications event.
+   *
    * @param e The event
    */
   private handleEvent(e: CommunicationsEvent): void {
@@ -95,6 +98,7 @@ export abstract class ContainerCommunicationHandler {
 
   /**
    * Send a message.
+   *
    * @param event The message.
    */
   public send(event: CommunicationsEvent): void{
@@ -103,10 +107,13 @@ export abstract class ContainerCommunicationHandler {
 
   /**
    * Send data.
+   *
    * @param data The data to send.
    */
+  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
   public sendData(data: any): void{
     const event = new CommunicationsEvent(CommunicationsEventKind.Data);
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     event.data = data;
     this.communicationsManager?.send(event);
   }

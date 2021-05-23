@@ -9,6 +9,7 @@ export class CrossWindowContentCommunicationHandler extends ContentCommunication
 
   /**
    * Constructor.
+   *
    * @param communicationsManager A communications manager.
    * @param methods The callback to dispose the content.
    */
@@ -58,6 +59,7 @@ export class CrossWindowContentCommunicationHandler extends ContentCommunication
 
   /**
    * Attempt a handshake with the container.
+   *
    * @param e The communication event.
    */
   private attemptHandShake(e: CommunicationsEvent): void {
@@ -77,6 +79,7 @@ export class CrossWindowContentCommunicationHandler extends ContentCommunication
       // Phase 1 of the handshake - we got the hash so send it back.
       const response = new CommunicationsEvent(CommunicationsEventKind.Mounted);
       response.contentId = this.iframeId;
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       response.data = e.data;
       this.send(response);
     }
@@ -86,9 +89,7 @@ export class CrossWindowContentCommunicationHandler extends ContentCommunication
    * Flush all the messages that were enqueued before the handshake.
    */
   private flushMessages(): void {
-    // tslint:disable-next-line: prefer-for-of
-    for (let index = 0; index < this.messageQueue.length; index++) {
-      const msg = this.messageQueue[index];
+    for (const msg of this.messageQueue) {
       msg.contentId = this.iframeId;
       this.send(msg);
     }

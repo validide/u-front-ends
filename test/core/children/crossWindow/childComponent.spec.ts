@@ -1,16 +1,27 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/restrict-template-expressions */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unused-expressions */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-return */
+/* eslint-disable no-underscore-dangle */
+/* eslint-disable @typescript-eslint/ban-types */
+/* eslint-disable @typescript-eslint/naming-convention */
+/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
+/* eslint-disable prefer-arrow/prefer-arrow-functions */
 import 'mocha';
-import { JSDOM, ResourceLoader, FetchOptions, VirtualConsole } from 'jsdom';
+import { AbortablePromise, FetchOptions, JSDOM, ResourceLoader, VirtualConsole } from 'jsdom';
 import { expect } from 'chai';
 import { CrossWindowChildComponent, ChildComponentOptions, RootComponentFacade, noop, ChildComponent, Component, CrossWindowChildComponentOptions, ContainerCommunicationHandlerMethods, CrossWindowContainerCommunicationHandler, ComponentEvent } from '../../../../src';
 import { MockCrossWindowChildComponent} from '../../../mocks/mockCrossWindowChildComponent';
-import { values_falsies, getDelayPromise } from '../../../utils';
-// tslint:disable: no-unused-expression
+import { values_falsies } from '../../../utils';
 
 class CustomResourceLoader extends ResourceLoader {
-  fetch(url: string, options: FetchOptions) {
+  fetch(url: string, options: FetchOptions): AbortablePromise<Buffer> | null {
     return url.indexOf('error') !== -1
-      ? Promise.reject(new Error('Some network error'))
-      : Promise.resolve(Buffer.from(''));
+      ? Promise.reject(new Error('Some network error')) as AbortablePromise<Buffer>
+      : Promise.resolve(Buffer.from('')) as AbortablePromise<Buffer>;
   }
 }
 
@@ -64,12 +75,12 @@ export function test_CrossWindowChildComponent() {
       await _child.initialize();
       const mountProm = _child.mount();
       expect(_child.getCommunicationHandlerCore(new ContainerCommunicationHandlerMethods()))
-      .to.be.an.instanceof(CrossWindowContainerCommunicationHandler);
+        .to.be.an.instanceof(CrossWindowContainerCommunicationHandler);
     });
 
-    it('should throw if getCommunicationHandlerCore can not find the embeded element', async () => {
+    it('should throw if getCommunicationHandlerCore can not find the embeded element', () => {
       try {
-        await _child.getCommunicationHandlerCore(new ContainerCommunicationHandlerMethods());
+        _child.getCommunicationHandlerCore(new ContainerCommunicationHandlerMethods());
         expect(false).to.be.true;
       } catch (error) {
         expect((error as Error).message).to.eq('No iframe with "" id found.');
@@ -78,7 +89,7 @@ export function test_CrossWindowChildComponent() {
 
     values_falsies.forEach(f => {
       it('should throw if getCommunicationHandlerCore can not access the contentWindow', async () => {
-        let embededId: string = '';
+        let embededId = '';
         let originalContentWindow: any = null;
         let embed: HTMLIFrameElement | null = null;
         try {
@@ -92,7 +103,7 @@ export function test_CrossWindowChildComponent() {
           });
           embededId = embed.id;
           expect(embed.contentWindow).to.eq(f);
-          await _child.getCommunicationHandlerCore(new ContainerCommunicationHandlerMethods());
+          _child.getCommunicationHandlerCore(new ContainerCommunicationHandlerMethods());
           expect(false).to.be.true;
         } catch (error) {
           expect((error as Error).message).to.eq(`The iframe with "${embededId}" id does not have a "contentWindow"(${f}).`);

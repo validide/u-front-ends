@@ -1,5 +1,5 @@
 /**
  * A function that does nothing.
  */
-// tslint:disable-next-line: no-empty
-export function noop(): void {}
+// eslint-disable-next-line prefer-arrow/prefer-arrow-functions
+export function noop(): void {/* NOOP */ }

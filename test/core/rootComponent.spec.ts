@@ -1,10 +1,20 @@
+/* eslint-disable @typescript-eslint/restrict-template-expressions */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unused-expressions */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-return */
+/* eslint-disable no-underscore-dangle */
+/* eslint-disable @typescript-eslint/ban-types */
+/* eslint-disable @typescript-eslint/naming-convention */
+/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
+/* eslint-disable prefer-arrow/prefer-arrow-functions */
 import 'mocha';
 import { JSDOM } from 'jsdom';
 import { expect } from 'chai';
 import { RootComponent, RootComponentOptions, ChildComponentOptions } from '../../src';
 import { values_falsies, getDelayPromise } from '../utils';
 import { MockChildComponentFactory, MockChildComponent } from '../mocks/mockChildComponentFactory';
-// tslint:disable: no-unused-expression
 
 export function test_RootComponent() {
   describe('RootComponent', () => {
@@ -32,13 +42,13 @@ export function test_RootComponent() {
 
       values_falsies.forEach((f: any) => {
         it(`passing a falsie as the "window" argument throws - ${f}`, () => {
-          expect(() => new RootComponent(f as any, _options)).to.throw('Missing "window" argument.');
+          expect(() => new RootComponent(f , _options)).to.throw('Missing "window" argument.');
         });
       });
 
       values_falsies.forEach((f: any) => {
         it(`passing a falsie as the "options" argument throws - ${f}`, () => {
-          expect(() => new RootComponent(_win, f as any)).to.throw('Missing "options" argument.');
+          expect(() => new RootComponent(_win, f )).to.throw('Missing "options" argument.');
         });
       });
 
@@ -103,10 +113,10 @@ export function test_RootComponent() {
     });
 
     describe('remove child', () => {
-      it('should not throw if ID does not exist', async () => {
+      it('should not throw if ID does not exist', () => {
         const root = new RootComponent(_win, _options);
         expect(async () => await root.removeChild('some_id_that_does_not_exit'))
-            .not.to.throw();
+          .not.to.throw();
       });
 
       it('should remove child', async () => {

@@ -9,7 +9,7 @@ export class ChildComponentOptions extends ComponentOptions {
   /**
    * The the interval to wait for the component before triggering an error and the 'disposed' event.
    */
-  public contentDisposeTimeout: number = 3000;
+  public contentDisposeTimeout = 3000;
 
   constructor() {
     super();

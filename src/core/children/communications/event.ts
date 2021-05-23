@@ -47,6 +47,7 @@ export class CommunicationsEvent {
 
   /**
    * Constructor.
+   *
    * @param kind The kind of event.
    */
   constructor(kind: CommunicationsEventKind) {

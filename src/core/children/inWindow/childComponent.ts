@@ -10,6 +10,7 @@ import { InWindowContainerCommunicationHandler } from './containerCommunicationH
 export class InWindowChildComponent extends ChildComponent {
   /**
    * Constructor.
+   *
    * @param window The window reference.
    * @param options The child component options.
    * @param rootFacade The facade to the root component.

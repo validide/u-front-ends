@@ -1,9 +1,19 @@
+/* eslint-disable @typescript-eslint/restrict-template-expressions */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unused-expressions */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-return */
+/* eslint-disable no-underscore-dangle */
+/* eslint-disable @typescript-eslint/ban-types */
+/* eslint-disable @typescript-eslint/naming-convention */
+/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
+/* eslint-disable prefer-arrow/prefer-arrow-functions */
 import 'mocha';
 import { JSDOM } from 'jsdom';
 import { expect } from 'chai';
 import { ChildComponentOptions, RootComponentFacade, noop, ContainerCommunicationHandler } from '../../../src';
 import { MockChildComponent, MockContainerCommunicationHandler } from '../../mocks/mockChildComponentFactory';
-// tslint:disable: no-unused-expression
 
 export function test_ChildComponent() {
   describe('ChildComponent', () => {
@@ -80,7 +90,7 @@ export function test_ChildComponent() {
 
     it('"contentBeginDisposed" calls parent only once', async () => {
       _options.tag= 'ce-dipose-tests';
-      let disposedRootCalls: number = 0;
+      let disposedRootCalls = 0;
       const mock = new MockChildComponent(_win, _options, new RootComponentFacade(() => {disposedRootCalls++;}));
       await mock.initialize();
       await mock.mount();
@@ -118,7 +128,7 @@ export function test_ChildComponent() {
     it('calls root in case the call content disposed is signaled before the begin dispose', async () => {
       _options.tag= 'ce-dipose-tests';
       _options.contentDisposeTimeout = 7;
-      let disposedRootCalls: number = 0;
+      let disposedRootCalls = 0;
       const mock = new MockChildComponent(_win, _options, new RootComponentFacade(() => {disposedRootCalls++;}));
       await mock.initialize();
       await mock.mount();
@@ -134,10 +144,10 @@ export function test_ChildComponent() {
       let updated = false;
       let data: any = null;
       _options.tag= 'ce-dipose-tests';
-      _options.handlers.mounted =evt => {mounted = true;};
-      _options.handlers.beforeUpdate =evt => {beforeUpdate = true;};
-      _options.handlers.updated =evt => {updated = true;};
-      _options.handlers.data =evt => {data = evt.data;};
+      _options.handlers.mounted = () => {mounted = true;};
+      _options.handlers.beforeUpdate = () => {beforeUpdate = true;};
+      _options.handlers.updated = () => {updated = true;};
+      _options.handlers.data = evt => {data = evt.data;};
 
       const mock = new MockChildComponent(_win, _options, new RootComponentFacade(noop));
       await mock.initialize();
@@ -170,7 +180,7 @@ export function test_ChildComponent() {
       expect(called).to.be.true;
     });
 
-    it('should not fail when calling sendData without a handler', async () => {
+    it('should not fail when calling sendData without a handler', () => {
       const mock = new MockChildComponent(_win, _options, new RootComponentFacade(noop));
 
       expect(() => mock.sendData(null)).not.to.throw();

@@ -4,10 +4,13 @@
     (global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global.validide_uFrontEnds = {}));
 }(this, (function (exports) { 'use strict';
 
+    /* eslint-disable no-bitwise */
     /**
      * Get a hash code for the given string
+     *
      * @returns The has code
      */
+    // eslint-disable-next-line prefer-arrow/prefer-arrow-functions
     function getHashCode(value) {
         var hash = 0;
         var length = value.length;
@@ -17,9 +20,7 @@
             return hash;
         while (index < length) {
             char = value.charCodeAt(index);
-            // tslint:disable-next-line: no-bitwise
             hash = ((hash << 5) - hash) + char;
-            // tslint:disable-next-line: no-bitwise
             hash |= 0; // Convert to 32bit integer
             index++;
         }
@@ -28,36 +29,43 @@
 
     /**
      * Generate a v4 UUID/GUID
+     *
      * @returns A random generated string
      */
+    // eslint-disable-next-line prefer-arrow/prefer-arrow-functions
     function getUuidV4() {
         return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-            // tslint:disable: one-variable-per-declaration
-            // tslint:disable: no-bitwise
-            var r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
+            // eslint-disable-next-line no-bitwise
+            var r = Math.random() * 16 | 0;
+            var v = c === 'x' ? r : (r & 0x3 | 0x8);
             return v.toString(16);
         });
     }
     /**
      * Generate a random string
+     *
      * @returns A random generated string
      */
+    // eslint-disable-next-line prefer-arrow/prefer-arrow-functions
     function getRandomString() { return Math.random().toString(36).substring(2); }
 
     /**
      * A function that does nothing.
      */
-    // tslint:disable-next-line: no-empty
+    // eslint-disable-next-line prefer-arrow/prefer-arrow-functions
     function noop() { }
 
     /**
      * Generate a random id that is not present in the document at this time
+     *
      * @param document The reference to the document object
      * @returns A random generated string
      */
+    // eslint-disable-next-line prefer-arrow/prefer-arrow-functions
     function generateUniqueId(document, prefix) {
         if (prefix === void 0) { prefix = ''; }
         var prefixString = (prefix !== null && prefix !== void 0 ? prefix : '');
+        // eslint-disable-next-line no-constant-condition
         while (true) {
             // The 'A-' will ensure this is always a valid JavaScript ID
             var id = prefixString + 'A-' + getRandomString() + getRandomString();
@@ -69,10 +77,12 @@
 
     /**
      * Return the full path of an url (the origin and path name)
+     *
      * @param document The reference to the document object
      * @param url The ´url´ for which to get the full path
      * @returns A string representing the url full path
      */
+    // eslint-disable-next-line prefer-arrow/prefer-arrow-functions
     function getUrlFullPath(document, url) {
         if (!url)
             return '';
@@ -83,10 +93,12 @@
 
     /**
      * Return the origin of an url
+     *
      * @param document The reference to the document object
      * @param url The ´url´ for which to get the 'origin'
      * @returns A string representing the url origin
      */
+    // eslint-disable-next-line prefer-arrow/prefer-arrow-functions
     function getUrlOrigin(document, url) {
         if (!url)
             return '';
@@ -97,12 +109,14 @@
 
     /**
      * A function to load a resource and wait for it to load.
+     *
      * @param document The reference to the document object.
      * @param url The resource URL.
      * @param isScript Is this resource a script or a stylesheet?
      * @param skipLoading Function to determine if the resource should not be loaded.
      * @param attributes Extra attributes to add on the HTML element before attaching it to the document.
      */
+    // eslint-disable-next-line prefer-arrow/prefer-arrow-functions
     function loadResource(document, url, isScript, skipLoading, attributes) {
         if (isScript === void 0) { isScript = true; }
         if (skipLoading && skipLoading())
@@ -111,18 +125,17 @@
             var resource;
             if (isScript) {
                 resource = document.createElement('script');
-                resource.src = url;
+                (resource).src = url;
             }
             else {
                 resource = document.createElement('link');
-                resource.href = url;
-                resource.rel = 'stylesheet';
+                (resource).href = url;
+                (resource).rel = 'stylesheet';
             }
             if (attributes) {
                 var keys = Object.keys(attributes);
-                // tslint:disable-next-line: prefer-for-of
-                for (var index = 0; index < keys.length; index++) {
-                    var key = keys[index];
+                for (var _i = 0, keys_1 = keys; _i < keys_1.length; _i++) {
+                    var key = keys_1[_i];
                     resource.setAttribute(key, attributes[key]);
                 }
             }
@@ -135,6 +148,7 @@
     /**
      * Lifecycle event types.
      */
+    exports.ComponentEventType = void 0;
     (function (ComponentEventType) {
         ComponentEventType["BeforeCreate"] = "beforeCreate";
         ComponentEventType["Created"] = "created";
@@ -153,6 +167,7 @@
     var ComponentEvent = /** @class */ (function () {
         /**
          * Constructor.
+         *
          * @param id Component unique identifier.
          * @param type The type of event.
          * @param el The component root element.
@@ -170,7 +185,7 @@
         return ComponentEvent;
     }());
 
-    var __awaiter = (window && window.__awaiter) || function (thisArg, _arguments, P, generator) {
+    var __awaiter$4 = (window && window.__awaiter) || function (thisArg, _arguments, P, generator) {
         function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
         return new (P || (P = Promise))(function (resolve, reject) {
             function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
@@ -179,7 +194,7 @@
             step((generator = generator.apply(thisArg, _arguments || [])).next());
         });
     };
-    var __generator = (window && window.__generator) || function (thisArg, body) {
+    var __generator$4 = (window && window.__generator) || function (thisArg, body) {
         var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
         return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
         function verb(n) { return function (v) { return step([n, v]); }; }
@@ -212,6 +227,7 @@
     var Component = /** @class */ (function () {
         /**
          * Constructor
+         *
          * @param window The reference to the window object
          * @param options The component options
          */
@@ -256,6 +272,7 @@
                 }
             }
             if (!parent)
+                // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
                 throw new Error("Failed to find parent \"" + opt.parent + "\".");
             return parent;
         };
@@ -263,10 +280,10 @@
          * Load the resources required by the component.
          */
         Component.prototype.loadResources = function () {
-            return __awaiter(this, void 0, void 0, function () {
-                var options, document_1, index, resource;
-                return __generator(this, function (_a) {
-                    switch (_a.label) {
+            return __awaiter$4(this, void 0, void 0, function () {
+                var options, document_1, _i, _a, resource;
+                return __generator$4(this, function (_b) {
+                    switch (_b.label) {
                         case 0:
                             if (this.resourcesLoaded)
                                 return [2 /*return*/];
@@ -274,21 +291,21 @@
                             options = this.getOptions();
                             if (!(options.resources && options.resources.length > 0)) return [3 /*break*/, 4];
                             document_1 = this.getDocument();
-                            index = 0;
-                            _a.label = 1;
+                            _i = 0, _a = options.resources;
+                            _b.label = 1;
                         case 1:
-                            if (!(index < options.resources.length)) return [3 /*break*/, 4];
-                            resource = options.resources[index];
+                            if (!(_i < _a.length)) return [3 /*break*/, 4];
+                            resource = _a[_i];
                             // DO NOT LOAD ALL AT ONCE AS YOU MIGHT HAVE DEPENDENCIES
                             // AND A RESOURCE MIGHT LOAD BEFORE IT'S DEPENDENCY
                             return [4 /*yield*/, loadResource(document_1, resource.url, resource.isScript, resource.skip, resource.attributes)];
                         case 2:
                             // DO NOT LOAD ALL AT ONCE AS YOU MIGHT HAVE DEPENDENCIES
                             // AND A RESOURCE MIGHT LOAD BEFORE IT'S DEPENDENCY
-                            _a.sent();
-                            _a.label = 3;
+                            _b.sent();
+                            _b.label = 3;
                         case 3:
-                            index++;
+                            _i++;
                             return [3 /*break*/, 1];
                         case 4: return [2 /*return*/];
                     }
@@ -299,7 +316,7 @@
          * Get the options data.
          */
         Component.prototype.getOptions = function () {
-            return this.options;
+            return (this.options);
         };
         /**
          * Get the window reference.
@@ -330,6 +347,7 @@
         Component.prototype.disposeCore = function () { return Promise.resolve(); };
         /**
          * Call the global error handler.
+         *
          * @param e The error object
          */
         Component.prototype.callErrorHandler = function (e) {
@@ -349,8 +367,10 @@
         };
         /**
          * Call a specific event handler.
+         *
          * @param type The type of handler to call.
          */
+        // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
         Component.prototype.callHandler = function (type, data) {
             if (type === exports.ComponentEventType.Error)
                 throw new Error("For calling the \"" + exports.ComponentEventType.Error + "\" handler use the \"callErrorHandler\" method.");
@@ -360,6 +380,7 @@
             if (handler) {
                 try {
                     var event_1 = new ComponentEvent(this.id, type, this.rootElement, this.getParentElement(), null);
+                    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
                     event_1.data = data;
                     handler(event_1);
                 }
@@ -370,27 +391,34 @@
         };
         /**
          * Logging method.
+         *
          * @param message The message.
          * @param optionalParams Optional parameters.
          */
+        // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
         Component.prototype.log = function (message) {
             var _a, _b;
             var optionalParams = [];
             for (var _i = 1; _i < arguments.length; _i++) {
                 optionalParams[_i - 1] = arguments[_i];
             }
+            /* eslint-disable @typescript-eslint/no-unsafe-assignment */
+            /* eslint-disable @typescript-eslint/no-unsafe-member-access */
             var logMethod = (_b = (_a = this.window) === null || _a === void 0 ? void 0 : _a.console) === null || _b === void 0 ? void 0 : _b.log;
             if (logMethod)
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-call
                 logMethod(message, optionalParams);
+            /* eslint-enable @typescript-eslint/no-unsafe-member-access */
+            /* eslint-enable @typescript-eslint/no-unsafe-assignment */
         };
         /**
          * Method invoked to initialize the component.
          * It should create the root element and any base dependencies.
          */
         Component.prototype.initialize = function () {
-            return __awaiter(this, void 0, void 0, function () {
+            return __awaiter$4(this, void 0, void 0, function () {
                 var e_1;
-                return __generator(this, function (_a) {
+                return __generator$4(this, function (_a) {
                     switch (_a.label) {
                         case 0:
                             if (this.isInitialized)
@@ -423,9 +451,9 @@
          * Method invoked to mount the actual content of the component.
          */
         Component.prototype.mount = function () {
-            return __awaiter(this, void 0, void 0, function () {
+            return __awaiter$4(this, void 0, void 0, function () {
                 var e_2;
-                return __generator(this, function (_a) {
+                return __generator$4(this, function (_a) {
                     switch (_a.label) {
                         case 0:
                             if (!this.isInitialized) {
@@ -457,9 +485,9 @@
          */
         Component.prototype.dispose = function () {
             var _a, _b;
-            return __awaiter(this, void 0, void 0, function () {
+            return __awaiter$4(this, void 0, void 0, function () {
                 var e_3;
-                return __generator(this, function (_c) {
+                return __generator$4(this, function (_c) {
                     switch (_c.label) {
                         case 0:
                             if (this.disposed)
@@ -494,6 +522,10 @@
         return Component;
     }());
 
+    /**
+     * Kind of events used to communicate between content and container component.
+     */
+    exports.CommunicationsEventKind = void 0;
     (function (CommunicationsEventKind) {
         CommunicationsEventKind["Mounted"] = "mounted";
         CommunicationsEventKind["BeforeUpdate"] = "beforeUpdate";
@@ -508,6 +540,7 @@
     var CommunicationsEvent = /** @class */ (function () {
         /**
          * Constructor.
+         *
          * @param kind The kind of event.
          */
         function CommunicationsEvent(kind) {
@@ -567,6 +600,7 @@
     var ContainerCommunicationHandler = /** @class */ (function () {
         /**
          * Constructor
+         *
          * @param communicationsManager A communications manager.
          * @param handlerMethods A collection of handler methods.
          */
@@ -581,6 +615,7 @@
         }
         /**
          * Core functionality for handling the incoming events.
+         *
          * @param e The event.
          */
         ContainerCommunicationHandler.prototype.handleEventCore = function (e) {
@@ -593,6 +628,7 @@
         };
         /**
          * Handle the incoming communications event.
+         *
          * @param e The event
          */
         ContainerCommunicationHandler.prototype.handleEvent = function (e) {
@@ -612,6 +648,7 @@
         };
         /**
          * Send a message.
+         *
          * @param event The message.
          */
         ContainerCommunicationHandler.prototype.send = function (event) {
@@ -620,11 +657,14 @@
         };
         /**
          * Send data.
+         *
          * @param data The data to send.
          */
+        // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
         ContainerCommunicationHandler.prototype.sendData = function (data) {
             var _g;
             var event = new CommunicationsEvent(exports.CommunicationsEventKind.Data);
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
             event.data = data;
             (_g = this.communicationsManager) === null || _g === void 0 ? void 0 : _g.send(event);
         };
@@ -659,6 +699,7 @@
     var ContentCommunicationHandler = /** @class */ (function () {
         /**
          * Constructor
+         *
          * @param communicationsManager A communications manager
          * @param methods The callback to dispose the content.
          */
@@ -673,6 +714,7 @@
         }
         /**
          * Core functionality for handling the incoming events.
+         *
          * @param e The event.
          */
         ContentCommunicationHandler.prototype.handleEventCore = function (e) {
@@ -694,6 +736,7 @@
         };
         /**
          * Handle the incoming communications event.
+         *
          * @param e The event
          */
         ContentCommunicationHandler.prototype.handleEvent = function (e) {
@@ -703,10 +746,10 @@
          * Core dispose function.
          * Any component derived should override this to add clean-up after itself.
          */
-        // tslint:disable-next-line: no-empty
         ContentCommunicationHandler.prototype.disposeCore = function () { };
         /**
          * Send a message.
+         *
          * @param event The message.
          */
         ContentCommunicationHandler.prototype.send = function (event) {
@@ -716,8 +759,10 @@
         /**
          * Dispatch event to signal mounting finished.
          */
+        // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
         ContentCommunicationHandler.prototype.sendData = function (data) {
             var evt = new CommunicationsEvent(exports.CommunicationsEventKind.Data);
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
             evt.data = data;
             this.send(evt);
         };
@@ -773,6 +818,7 @@
     var CrossWindowCommunicationDataContract = /** @class */ (function () {
         /**
          * Constructor.
+         *
          * @param type Data type.
          * @param detail Data detail.
          */
@@ -783,7 +829,7 @@
         return CrossWindowCommunicationDataContract;
     }());
 
-    var __extends = (window && window.__extends) || (function () {
+    var __extends$e = (window && window.__extends) || (function () {
         var extendStatics = function (d, b) {
             extendStatics = Object.setPrototypeOf ||
                 ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
@@ -791,6 +837,8 @@
             return extendStatics(d, b);
         };
         return function (d, b) {
+            if (typeof b !== "function" && b !== null)
+                throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
             extendStatics(d, b);
             function __() { this.constructor = d; }
             d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
@@ -807,12 +855,10 @@
         /**
          * Initialize the manager.
          */
-        // tslint:disable-next-line: no-empty
         CommunicationsManager.prototype.initializeCore = function () { };
         /**
          * Clean any resources before the manager is disposed.
          */
-        // tslint:disable-next-line: no-empty
         CommunicationsManager.prototype.disposeCore = function () { };
         /**
          * Initialize the manager.
@@ -838,9 +884,10 @@
      * Communications manager base class.
      */
     var CommunicationsManagerOf = /** @class */ (function (_super) {
-        __extends(CommunicationsManagerOf, _super);
+        __extends$e(CommunicationsManagerOf, _super);
         /**
          * Constructor
+         *
          * @param inboundEndpoint The endpoint for receiving messages.
          * @param inboundEventType The types of messages to receive.
          * @param outboundEndpoint The endpoint to sent messages.
@@ -858,6 +905,7 @@
         }
         /**
          * Handle the received events.
+         *
          * @param e The received event.
          */
         CommunicationsManagerOf.prototype.handleEvent = function (e) {
@@ -900,13 +948,14 @@
         /**
          * @inheritdoc
          */
+        // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
         CommunicationsManagerOf.prototype.setEventReceivedCallback = function (callback) {
             this.onEventReceived = callback;
         };
         return CommunicationsManagerOf;
     }(CommunicationsManager));
 
-    var __extends$1 = (window && window.__extends) || (function () {
+    var __extends$d = (window && window.__extends) || (function () {
         var extendStatics = function (d, b) {
             extendStatics = Object.setPrototypeOf ||
                 ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
@@ -914,6 +963,8 @@
             return extendStatics(d, b);
         };
         return function (d, b) {
+            if (typeof b !== "function" && b !== null)
+                throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
             extendStatics(d, b);
             function __() { this.constructor = d; }
             d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
@@ -923,9 +974,10 @@
      * @inheritdoc
      */
     var CrossWindowCommunicationsManager = /** @class */ (function (_super) {
-        __extends$1(CrossWindowCommunicationsManager, _super);
+        __extends$d(CrossWindowCommunicationsManager, _super);
         /**
          * Constructor
+         *
          * @param inboundEndpoint The endpoint for receiving messages.
          * @param inboundEventType The types of messages to receive.
          * @param outboundEndpoint The endpoint to sent messages.
@@ -971,6 +1023,10 @@
         return CrossWindowCommunicationsManager;
     }(CommunicationsManagerOf));
 
+    /* eslint-disable @typescript-eslint/no-unsafe-call */
+    /* eslint-disable @typescript-eslint/no-unsafe-member-access */
+    /* eslint-disable @typescript-eslint/no-unsafe-return */
+    /* eslint-disable prefer-arrow/prefer-arrow-functions */
     function customEventPolyfill(document, typeArg, eventInitDict) {
         var params = eventInitDict || { bubbles: false, cancelable: false, detail: null };
         var evt = document.createEvent('CustomEvent');
@@ -980,14 +1036,14 @@
     function createCustomEvent(document, typeArg, eventInitDict) {
         var win = document === null || document === void 0 ? void 0 : document.defaultView;
         if (!win)
-            throw new Error('Document does not have a defualt view.');
+            throw new Error('Document does not have a default view.');
         if (typeof win.CustomEvent !== 'function') {
             return new customEventPolyfill(document, typeArg, eventInitDict);
         }
         return new win.CustomEvent(typeArg, eventInitDict);
     }
 
-    var __extends$2 = (window && window.__extends) || (function () {
+    var __extends$c = (window && window.__extends) || (function () {
         var extendStatics = function (d, b) {
             extendStatics = Object.setPrototypeOf ||
                 ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
@@ -995,6 +1051,8 @@
             return extendStatics(d, b);
         };
         return function (d, b) {
+            if (typeof b !== "function" && b !== null)
+                throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
             extendStatics(d, b);
             function __() { this.constructor = d; }
             d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
@@ -1004,7 +1062,7 @@
      * @inheritdoc
      */
     var HTMLElementCommunicationsManager = /** @class */ (function (_super) {
-        __extends$2(HTMLElementCommunicationsManager, _super);
+        __extends$c(HTMLElementCommunicationsManager, _super);
         /**
          * @inheritdoc
          */
@@ -1046,7 +1104,7 @@
         return HTMLElementCommunicationsManager;
     }(CommunicationsManagerOf));
 
-    var __extends$3 = (window && window.__extends) || (function () {
+    var __extends$b = (window && window.__extends) || (function () {
         var extendStatics = function (d, b) {
             extendStatics = Object.setPrototypeOf ||
                 ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
@@ -1054,12 +1112,14 @@
             return extendStatics(d, b);
         };
         return function (d, b) {
+            if (typeof b !== "function" && b !== null)
+                throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
             extendStatics(d, b);
             function __() { this.constructor = d; }
             d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
         };
     })();
-    var __awaiter$1 = (window && window.__awaiter) || function (thisArg, _arguments, P, generator) {
+    var __awaiter$3 = (window && window.__awaiter) || function (thisArg, _arguments, P, generator) {
         function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
         return new (P || (P = Promise))(function (resolve, reject) {
             function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
@@ -1068,7 +1128,7 @@
             step((generator = generator.apply(thisArg, _arguments || [])).next());
         });
     };
-    var __generator$1 = (window && window.__generator) || function (thisArg, body) {
+    var __generator$3 = (window && window.__generator) || function (thisArg, body) {
         var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
         return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
         function verb(n) { return function (v) { return step([n, v]); }; }
@@ -1099,9 +1159,10 @@
      * Child component base class.
      */
     var ChildComponent = /** @class */ (function (_super) {
-        __extends$3(ChildComponent, _super);
+        __extends$b(ChildComponent, _super);
         /**
          * Constructor.
+         *
          * @param window The window reference.
          * @param options The child options.
          * @param rootFacade The facade to the root component.
@@ -1161,7 +1222,7 @@
             var _this = this;
             this.contentDisposePromise = Promise
                 .race([
-                new Promise(function (resolver, rejecter) {
+                new Promise(function (resolver) {
                     _this.contentDisposePromiseResolver = resolver;
                 }),
                 new Promise(function (resolveTimeout, rejectTimeout) {
@@ -1200,8 +1261,8 @@
          * @@inheritdoc
          */
         ChildComponent.prototype.disposeCore = function () {
-            return __awaiter$1(this, void 0, void 0, function () {
-                return __generator$1(this, function (_a) {
+            return __awaiter$3(this, void 0, void 0, function () {
+                return __generator$3(this, function (_a) {
                     switch (_a.label) {
                         case 0:
                             this.startDisposingContent();
@@ -1222,8 +1283,10 @@
         };
         /**
          * Send data.
+         *
          * @param data The data to send.
          */
+        // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
         ChildComponent.prototype.sendData = function (data) {
             var _a;
             (_a = this.communicationHandler) === null || _a === void 0 ? void 0 : _a.sendData(data);
@@ -1234,6 +1297,7 @@
     /**
      * The type of child component.
      */
+    exports.ChildComponentType = void 0;
     (function (ChildComponentType) {
         /**
          * In window component(JavaScript or WebComponent Custom Element)
@@ -1245,7 +1309,7 @@
         ChildComponentType["CrossWindow"] = "crossWindow";
     })(exports.ChildComponentType || (exports.ChildComponentType = {}));
 
-    var __extends$4 = (window && window.__extends) || (function () {
+    var __extends$a = (window && window.__extends) || (function () {
         var extendStatics = function (d, b) {
             extendStatics = Object.setPrototypeOf ||
                 ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
@@ -1253,6 +1317,8 @@
             return extendStatics(d, b);
         };
         return function (d, b) {
+            if (typeof b !== "function" && b !== null)
+                throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
             extendStatics(d, b);
             function __() { this.constructor = d; }
             d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
@@ -1262,7 +1328,7 @@
      * @inheritdoc
      */
     var InWindowContainerCommunicationHandler = /** @class */ (function (_super) {
-        __extends$4(InWindowContainerCommunicationHandler, _super);
+        __extends$a(InWindowContainerCommunicationHandler, _super);
         /**
          * @inheritdoc
          */
@@ -1272,7 +1338,7 @@
         return InWindowContainerCommunicationHandler;
     }(ContainerCommunicationHandler));
 
-    var __extends$5 = (window && window.__extends) || (function () {
+    var __extends$9 = (window && window.__extends) || (function () {
         var extendStatics = function (d, b) {
             extendStatics = Object.setPrototypeOf ||
                 ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
@@ -1280,6 +1346,8 @@
             return extendStatics(d, b);
         };
         return function (d, b) {
+            if (typeof b !== "function" && b !== null)
+                throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
             extendStatics(d, b);
             function __() { this.constructor = d; }
             d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
@@ -1325,9 +1393,10 @@
      * In Window Child Component.
      */
     var InWindowChildComponent = /** @class */ (function (_super) {
-        __extends$5(InWindowChildComponent, _super);
+        __extends$9(InWindowChildComponent, _super);
         /**
          * Constructor.
+         *
          * @param window The window reference.
          * @param options The child component options.
          * @param rootFacade The facade to the root component.
@@ -1375,7 +1444,7 @@
         return InWindowChildComponent;
     }(ChildComponent));
 
-    var __extends$6 = (window && window.__extends) || (function () {
+    var __extends$8 = (window && window.__extends) || (function () {
         var extendStatics = function (d, b) {
             extendStatics = Object.setPrototypeOf ||
                 ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
@@ -1383,6 +1452,8 @@
             return extendStatics(d, b);
         };
         return function (d, b) {
+            if (typeof b !== "function" && b !== null)
+                throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
             extendStatics(d, b);
             function __() { this.constructor = d; }
             d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
@@ -1392,9 +1463,10 @@
      * @inheritdoc
      */
     var CrossWindowContainerCommunicationHandler = /** @class */ (function (_super) {
-        __extends$6(CrossWindowContainerCommunicationHandler, _super);
+        __extends$8(CrossWindowContainerCommunicationHandler, _super);
         /**
          * Constructor.
+         *
          * @param communicationsManager A communications manager.
          * @param embedId The Id of the embedded element.
          * @param containerMethods The methods to communicate with the container.
@@ -1444,12 +1516,14 @@
             return extendStatics(d, b);
         };
         return function (d, b) {
+            if (typeof b !== "function" && b !== null)
+                throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
             extendStatics(d, b);
             function __() { this.constructor = d; }
             d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
         };
     })();
-    var __awaiter$3 = (window && window.__awaiter) || function (thisArg, _arguments, P, generator) {
+    var __awaiter$1 = (window && window.__awaiter) || function (thisArg, _arguments, P, generator) {
         function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
         return new (P || (P = Promise))(function (resolve, reject) {
             function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
@@ -1458,7 +1532,7 @@
             step((generator = generator.apply(thisArg, _arguments || [])).next());
         });
     };
-    var __generator$3 = (window && window.__generator) || function (thisArg, body) {
+    var __generator$1 = (window && window.__generator) || function (thisArg, body) {
         var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
         return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
         function verb(n) { return function (v) { return step([n, v]); }; }
@@ -1492,6 +1566,7 @@
         __extends$7(CrossWindowChildComponent, _super);
         /**
          * Constructor.
+         *
          * @param window The window reference.
          * @param options The child options.
          * @param rootFacade he root component facade.
@@ -1540,9 +1615,9 @@
          * @inheritdoc
          */
         CrossWindowChildComponent.prototype.mountCore = function () {
-            return __awaiter$3(this, void 0, void 0, function () {
+            return __awaiter$1(this, void 0, void 0, function () {
                 var createEmbedElementFn, embed, embedId;
-                return __generator$3(this, function (_a) {
+                return __generator$1(this, function (_a) {
                     switch (_a.label) {
                         case 0:
                             createEmbedElementFn = this.getOptions().createEmbedElement;
@@ -1582,13 +1657,15 @@
         };
         /**
          * Handle the loading of the embedded element.
+         *
          * @param e The load event.
          */
-        CrossWindowChildComponent.prototype.embeddedLoadHandler = function (e) {
+        CrossWindowChildComponent.prototype.embeddedLoadHandler = function () {
             this.embeddedLoadResolver();
         };
         /**
          * Handle the error of the embedded element.
+         *
          * @param e The error event.
          */
         CrossWindowChildComponent.prototype.embeddedErrorHandler = function (e) {
@@ -1602,9 +1679,8 @@
             var opt = this.getOptions();
             if (opt.embeddedAttributes) {
                 var keys = Object.keys(opt.embeddedAttributes);
-                // tslint:disable-next-line: prefer-for-of
-                for (var index = 0; index < keys.length; index++) {
-                    var key = keys[index];
+                for (var _i = 0, keys_1 = keys; _i < keys_1.length; _i++) {
+                    var key = keys_1[_i];
                     embed.setAttribute(key, opt.embeddedAttributes[key]);
                 }
             }
@@ -1621,6 +1697,7 @@
             if (!embed)
                 throw new Error("No iframe with \"" + this.embeddedId + "\" id found.");
             if (!embed.contentWindow)
+                // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
                 throw new Error("The iframe with \"" + this.embeddedId + "\" id does not have a \"contentWindow\"(" + embed.contentWindow + ").");
             return embed.contentWindow;
         };
@@ -1649,7 +1726,7 @@
         return ComponentOptions;
     }());
 
-    var __extends$8 = (window && window.__extends) || (function () {
+    var __extends$6 = (window && window.__extends) || (function () {
         var extendStatics = function (d, b) {
             extendStatics = Object.setPrototypeOf ||
                 ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
@@ -1657,6 +1734,8 @@
             return extendStatics(d, b);
         };
         return function (d, b) {
+            if (typeof b !== "function" && b !== null)
+                throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
             extendStatics(d, b);
             function __() { this.constructor = d; }
             d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
@@ -1666,7 +1745,7 @@
      * Child component options.
      */
     var ChildComponentOptions = /** @class */ (function (_super) {
-        __extends$8(ChildComponentOptions, _super);
+        __extends$6(ChildComponentOptions, _super);
         function ChildComponentOptions() {
             var _this = _super.call(this) || this;
             _this.type = exports.ChildComponentType.InWindow;
@@ -1679,7 +1758,7 @@
         return ChildComponentOptions;
     }(ComponentOptions));
 
-    var __extends$9 = (window && window.__extends) || (function () {
+    var __extends$5 = (window && window.__extends) || (function () {
         var extendStatics = function (d, b) {
             extendStatics = Object.setPrototypeOf ||
                 ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
@@ -1687,6 +1766,8 @@
             return extendStatics(d, b);
         };
         return function (d, b) {
+            if (typeof b !== "function" && b !== null)
+                throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
             extendStatics(d, b);
             function __() { this.constructor = d; }
             d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
@@ -1696,7 +1777,7 @@
      * Cross Window Child Component Options.
      */
     var CrossWindowChildComponentOptions = /** @class */ (function (_super) {
-        __extends$9(CrossWindowChildComponentOptions, _super);
+        __extends$5(CrossWindowChildComponentOptions, _super);
         /**
          * Constructor.
          */
@@ -1709,7 +1790,7 @@
         return CrossWindowChildComponentOptions;
     }(ChildComponentOptions));
 
-    var __extends$a = (window && window.__extends) || (function () {
+    var __extends$4 = (window && window.__extends) || (function () {
         var extendStatics = function (d, b) {
             extendStatics = Object.setPrototypeOf ||
                 ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
@@ -1717,6 +1798,8 @@
             return extendStatics(d, b);
         };
         return function (d, b) {
+            if (typeof b !== "function" && b !== null)
+                throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
             extendStatics(d, b);
             function __() { this.constructor = d; }
             d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
@@ -1726,9 +1809,10 @@
      * @inheritdoc
      */
     var CrossWindowContentCommunicationHandler = /** @class */ (function (_super) {
-        __extends$a(CrossWindowContentCommunicationHandler, _super);
+        __extends$4(CrossWindowContentCommunicationHandler, _super);
         /**
          * Constructor.
+         *
          * @param communicationsManager A communications manager.
          * @param methods The callback to dispose the content.
          */
@@ -1774,6 +1858,7 @@
         };
         /**
          * Attempt a handshake with the container.
+         *
          * @param e The communication event.
          */
         CrossWindowContentCommunicationHandler.prototype.attemptHandShake = function (e) {
@@ -1791,6 +1876,7 @@
                 // Phase 1 of the handshake - we got the hash so send it back.
                 var response = new CommunicationsEvent(exports.CommunicationsEventKind.Mounted);
                 response.contentId = this.iframeId;
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
                 response.data = e.data;
                 this.send(response);
             }
@@ -1799,9 +1885,8 @@
          * Flush all the messages that were enqueued before the handshake.
          */
         CrossWindowContentCommunicationHandler.prototype.flushMessages = function () {
-            // tslint:disable-next-line: prefer-for-of
-            for (var index = 0; index < this.messageQueue.length; index++) {
-                var msg = this.messageQueue[index];
+            for (var _i = 0, _a = this.messageQueue; _i < _a.length; _i++) {
+                var msg = _a[_i];
                 msg.contentId = this.iframeId;
                 this.send(msg);
             }
@@ -1817,6 +1902,7 @@
         }
         /**
          * Create a child component.
+         *
          * @param window The window reference.
          * @param options The child component options.
          * @param rootFacade The facade for the root component.
@@ -1828,13 +1914,14 @@
                 case exports.ChildComponentType.CrossWindow:
                     return new CrossWindowChildComponent(window, options, rootFacade);
                 default:
+                    // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
                     throw new Error("The \"" + options.type + "\" is not configured.");
             }
         };
         return ChildComponentFactory;
     }());
 
-    var __extends$b = (window && window.__extends) || (function () {
+    var __extends$3 = (window && window.__extends) || (function () {
         var extendStatics = function (d, b) {
             extendStatics = Object.setPrototypeOf ||
                 ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
@@ -1842,6 +1929,8 @@
             return extendStatics(d, b);
         };
         return function (d, b) {
+            if (typeof b !== "function" && b !== null)
+                throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
             extendStatics(d, b);
             function __() { this.constructor = d; }
             d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
@@ -1851,7 +1940,7 @@
      * In Window Child Component Options.
      */
     var InWindowChildComponentOptions = /** @class */ (function (_super) {
-        __extends$b(InWindowChildComponentOptions, _super);
+        __extends$3(InWindowChildComponentOptions, _super);
         /**
          * Constructor.
          */
@@ -1861,7 +1950,7 @@
         return InWindowChildComponentOptions;
     }(ChildComponentOptions));
 
-    var __extends$c = (window && window.__extends) || (function () {
+    var __extends$2 = (window && window.__extends) || (function () {
         var extendStatics = function (d, b) {
             extendStatics = Object.setPrototypeOf ||
                 ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
@@ -1869,6 +1958,8 @@
             return extendStatics(d, b);
         };
         return function (d, b) {
+            if (typeof b !== "function" && b !== null)
+                throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
             extendStatics(d, b);
             function __() { this.constructor = d; }
             d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
@@ -1878,9 +1969,10 @@
      * @inheritdoc
      */
     var InWindowContentCommunicationHandler = /** @class */ (function (_super) {
-        __extends$c(InWindowContentCommunicationHandler, _super);
+        __extends$2(InWindowContentCommunicationHandler, _super);
         /**
          * Constructor.
+         *
          * @param el The element to use for sending and receiving messages.
          * @param methods The callback to dispose the content.
          */
@@ -1908,6 +2000,7 @@
     var RootComponentFacade = /** @class */ (function () {
         /**
          * Constructor.
+         *
          * @param signalDisposed The function to invoke to signal that the child was disposed.
          */
         function RootComponentFacade(signalDisposed) {
@@ -1916,7 +2009,7 @@
         return RootComponentFacade;
     }());
 
-    var __extends$d = (window && window.__extends) || (function () {
+    var __extends$1 = (window && window.__extends) || (function () {
         var extendStatics = function (d, b) {
             extendStatics = Object.setPrototypeOf ||
                 ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
@@ -1924,12 +2017,14 @@
             return extendStatics(d, b);
         };
         return function (d, b) {
+            if (typeof b !== "function" && b !== null)
+                throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
             extendStatics(d, b);
             function __() { this.constructor = d; }
             d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
         };
     })();
-    var __awaiter$4 = (window && window.__awaiter) || function (thisArg, _arguments, P, generator) {
+    var __awaiter = (window && window.__awaiter) || function (thisArg, _arguments, P, generator) {
         function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
         return new (P || (P = Promise))(function (resolve, reject) {
             function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
@@ -1938,7 +2033,7 @@
             step((generator = generator.apply(thisArg, _arguments || [])).next());
         });
     };
-    var __generator$4 = (window && window.__generator) || function (thisArg, body) {
+    var __generator = (window && window.__generator) || function (thisArg, body) {
         var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
         return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
         function verb(n) { return function (v) { return step([n, v]); }; }
@@ -1970,7 +2065,7 @@
      * There is not limitation right no but ideally there should only be one of these on a page.
      */
     var RootComponent = /** @class */ (function (_super) {
-        __extends$d(RootComponent, _super);
+        __extends$1(RootComponent, _super);
         function RootComponent(window, options) {
             var _this = _super.call(this, window, options) || this;
             _this.children = {};
@@ -1979,17 +2074,26 @@
         /**
          * Schedule the disposing of the child on exiting the function.
          * The dispose method is async but we do not want to wait for that.
+         *
          * @param child The child that was disposed.
          */
         RootComponent.prototype.scheduleDisposeChild = function (child) {
             var _this = this;
             // Schedule this later
-            this.getWindow().setTimeout(function () {
-                _this.disposeChildByRef(child);
-            }, 0);
+            this.getWindow().setTimeout(function () { return __awaiter(_this, void 0, void 0, function () {
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0: return [4 /*yield*/, this.disposeChildByRef(child)];
+                        case 1:
+                            _a.sent();
+                            return [2 /*return*/];
+                    }
+                });
+            }); }, 0);
         };
         /**
          * Dispose a child using it's reference.
+         *
          * @param child
          */
         RootComponent.prototype.disposeChildByRef = function (child) {
@@ -1997,12 +2101,13 @@
         };
         /**
          * Dispose a child by using it's id.
+         *
          * @param childId The child identifier.
          */
         RootComponent.prototype.disposeChild = function (childId) {
-            return __awaiter$4(this, void 0, void 0, function () {
+            return __awaiter(this, void 0, void 0, function () {
                 var child;
-                return __generator$4(this, function (_a) {
+                return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0:
                             child = this.getChild(childId);
@@ -2026,12 +2131,13 @@
         };
         /**
          * Add a child component.
+         *
          * @param options Child component options.
          */
         RootComponent.prototype.addChild = function (options) {
-            return __awaiter$4(this, void 0, void 0, function () {
+            return __awaiter(this, void 0, void 0, function () {
                 var child, id;
-                return __generator$4(this, function (_a) {
+                return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0:
                             if (!this.isInitialized)
@@ -2053,6 +2159,7 @@
         };
         /**
          * Get the child with the given identifier.
+         *
          * @param id The child identifier.
          */
         RootComponent.prototype.getChild = function (id) {
@@ -2060,6 +2167,7 @@
         };
         /**
          * Remove a child component.
+         *
          * @param id The child component identifier.
          */
         RootComponent.prototype.removeChild = function (id) {
@@ -2068,7 +2176,7 @@
         return RootComponent;
     }(Component));
 
-    var __extends$e = (window && window.__extends) || (function () {
+    var __extends = (window && window.__extends) || (function () {
         var extendStatics = function (d, b) {
             extendStatics = Object.setPrototypeOf ||
                 ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
@@ -2076,6 +2184,8 @@
             return extendStatics(d, b);
         };
         return function (d, b) {
+            if (typeof b !== "function" && b !== null)
+                throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
             extendStatics(d, b);
             function __() { this.constructor = d; }
             d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
@@ -2085,7 +2195,7 @@
      * Options for the root component.
      */
     var RootComponentOptions = /** @class */ (function (_super) {
-        __extends$e(RootComponentOptions, _super);
+        __extends(RootComponentOptions, _super);
         function RootComponentOptions() {
             var _this = _super.call(this) || this;
             _this.tag = 'script';

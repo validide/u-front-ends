@@ -1,3 +1,14 @@
+/* eslint-disable @typescript-eslint/restrict-template-expressions */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unused-expressions */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-return */
+/* eslint-disable no-underscore-dangle */
+/* eslint-disable @typescript-eslint/ban-types */
+/* eslint-disable @typescript-eslint/naming-convention */
+/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
+/* eslint-disable prefer-arrow/prefer-arrow-functions */
 import 'mocha';
 import { expect } from 'chai';
 import { JSDOM } from 'jsdom';
@@ -14,7 +25,7 @@ export function test_createCustomEvent() {
     values_falsies.forEach(f => {
       it('should return an id that is unique within the DOM', () => {
         expect(() => createCustomEvent(f as unknown as Document, ''))
-          .to.throw('Document does not have a defualt view.');
+          .to.throw('Document does not have a default view.');
       });
     });
 
@@ -22,7 +33,7 @@ export function test_createCustomEvent() {
       expect(createCustomEvent(doc, 'test').type).to.eq('test');
     });
 
-    it('should return a custom event using polifill', () => {
+    it('should return a custom event using polyfill', () => {
       Object.defineProperty(doc, 'defaultView', {
         value: {},
         writable: false

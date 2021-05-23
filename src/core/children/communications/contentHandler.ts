@@ -26,6 +26,7 @@ export abstract class ContentCommunicationHandler {
 
   /**
    * Constructor
+   *
    * @param communicationsManager A communications manager
    * @param methods The callback to dispose the content.
    */
@@ -43,6 +44,7 @@ export abstract class ContentCommunicationHandler {
 
   /**
    * Core functionality for handling the incoming events.
+   *
    * @param e The event.
    */
   protected handleEventCore(e: CommunicationsEvent): void {
@@ -65,6 +67,7 @@ export abstract class ContentCommunicationHandler {
 
   /**
    * Handle the incoming communications event.
+   *
    * @param e The event
    */
   private handleEvent(e: CommunicationsEvent): void {
@@ -75,11 +78,11 @@ export abstract class ContentCommunicationHandler {
    * Core dispose function.
    * Any component derived should override this to add clean-up after itself.
    */
-  // tslint:disable-next-line: no-empty
-  protected disposeCore(): void { }
+  protected disposeCore(): void { /* NOOP */ }
 
   /**
    * Send a message.
+   *
    * @param event The message.
    */
   public send(event: CommunicationsEvent): void{
@@ -89,8 +92,10 @@ export abstract class ContentCommunicationHandler {
   /**
    * Dispatch event to signal mounting finished.
    */
+  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
   public sendData(data: any): void {
     const evt = new CommunicationsEvent(CommunicationsEventKind.Data);
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     evt.data = data;
     this.send(evt);
   }

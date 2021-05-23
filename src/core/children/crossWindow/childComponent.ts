@@ -19,6 +19,7 @@ export class CrossWindowChildComponent extends ChildComponent {
 
   /**
    * Constructor.
+   *
    * @param window The window reference.
    * @param options The child options.
    * @param rootFacade he root component facade.
@@ -118,14 +119,16 @@ export class CrossWindowChildComponent extends ChildComponent {
 
   /**
    * Handle the loading of the embedded element.
+   *
    * @param e The load event.
    */
-  private embeddedLoadHandler(e: Event): void {
+  private embeddedLoadHandler(): void {
     (this.embeddedLoadResolver as () => void)();
   }
 
   /**
    * Handle the error of the embedded element.
+   *
    * @param e The error event.
    */
   private embeddedErrorHandler(e: ErrorEvent): void {
@@ -140,9 +143,7 @@ export class CrossWindowChildComponent extends ChildComponent {
     const opt = this.getOptions();
     if (opt.embeddedAttributes) {
       const keys = Object.keys(opt.embeddedAttributes);
-      // tslint:disable-next-line: prefer-for-of
-      for (let index = 0; index < keys.length; index++) {
-        const key = keys[index];
+      for (const key of keys) {
         embed.setAttribute(key, opt.embeddedAttributes[key]);
       }
     }
@@ -163,6 +164,7 @@ export class CrossWindowChildComponent extends ChildComponent {
       throw new Error(`No iframe with "${this.embeddedId}" id found.`);
 
     if (!embed.contentWindow)
+      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
       throw new Error(`The iframe with "${this.embeddedId}" id does not have a "contentWindow"(${embed.contentWindow}).`);
 
     return embed.contentWindow;

@@ -10,6 +10,7 @@ export class CrossWindowContainerCommunicationHandler extends ContainerCommunica
 
   /**
    * Constructor.
+   *
    * @param communicationsManager A communications manager.
    * @param embedId The Id of the embedded element.
    * @param containerMethods The methods to communicate with the container.

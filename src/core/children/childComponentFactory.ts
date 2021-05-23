@@ -11,6 +11,7 @@ import { Component } from '../component';
 export class ChildComponentFactory {
   /**
    * Create a child component.
+   *
    * @param window The window reference.
    * @param options The child component options.
    * @param rootFacade The facade for the root component.
@@ -20,8 +21,9 @@ export class ChildComponentFactory {
       case ChildComponentType.InWindow:
         return new InWindowChildComponent(window, options, rootFacade);
       case ChildComponentType.CrossWindow:
-          return new CrossWindowChildComponent(window, options as CrossWindowChildComponentOptions, rootFacade);
+        return new CrossWindowChildComponent(window, options as CrossWindowChildComponentOptions, rootFacade);
       default:
+        // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
         throw new Error(`The "${options.type}" is not configured.`);
     }
   }

@@ -1,4 +1,4 @@
-import { ContainerCommunicationHandlerMethods, CommunicationsEvent, ContainerCommunicationHandler, HTMLElementCommunicationsManager, CommunicationsManager } from '../communications/index';
+import { CommunicationsManager, ContainerCommunicationHandler, ContainerCommunicationHandlerMethods } from '../communications/index';
 
 /**
  * @inheritdoc

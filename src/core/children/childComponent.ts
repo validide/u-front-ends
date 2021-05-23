@@ -15,6 +15,7 @@ export abstract class ChildComponent extends Component {
 
   /**
    * Constructor.
+   *
    * @param window The window reference.
    * @param options The child options.
    * @param rootFacade The facade to the root component.
@@ -30,6 +31,7 @@ export abstract class ChildComponent extends Component {
   /**
    * Core method to get the communication handler.
    * All derived classes need to implement this to return the correct handler implementation.
+   *
    * @param methods
    */
   protected abstract getCommunicationHandlerCore(methods: ContainerCommunicationHandlerMethods): ContainerCommunicationHandler;
@@ -86,18 +88,18 @@ export abstract class ChildComponent extends Component {
   private setContentDisposePromise(): void {
     this.contentDisposePromise = Promise
       .race<void>([
-        new Promise<void>((resolver, rejecter) => {
-          this.contentDisposePromiseResolver = resolver;
-        }),
-        new Promise<void>((resolveTimeout, rejectTimeout) => {
-          this
-            .getWindow()
-            .setTimeout(
-              () => rejectTimeout(new Error('Child dispose timeout.')),
-              this.getOptions().contentDisposeTimeout
-            );
-        })
-      ])
+      new Promise<void>(resolver => {
+        this.contentDisposePromiseResolver = resolver;
+      }),
+      new Promise<void>((resolveTimeout, rejectTimeout) => {
+        this
+          .getWindow()
+          .setTimeout(
+            () => rejectTimeout(new Error('Child dispose timeout.')),
+            this.getOptions().contentDisposeTimeout
+          );
+      })
+    ])
       .catch(err => {
         this.callErrorHandler(err);
       });
@@ -143,8 +145,10 @@ export abstract class ChildComponent extends Component {
 
   /**
    * Send data.
+   *
    * @param data The data to send.
    */
+  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
   public sendData(data: any): void{
     this.communicationHandler?.sendData(data);
   }

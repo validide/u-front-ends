@@ -17,6 +17,7 @@ export abstract class Component {
 
   /**
    * Constructor
+   *
    * @param window The reference to the window object
    * @param options The component options
    */
@@ -68,6 +69,7 @@ export abstract class Component {
     }
 
     if (!parent)
+      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
       throw new Error(`Failed to find parent "${opt.parent}".`);
 
     return parent;
@@ -84,9 +86,7 @@ export abstract class Component {
     const options = this.getOptions();
     if (options.resources && options.resources.length > 0) {
       const document = this.getDocument();
-      // tslint:disable-next-line: prefer-for-of
-      for (let index = 0; index < options.resources.length; index++) {
-        const resource = options.resources[index];
+      for (const resource of options.resources) {
         // DO NOT LOAD ALL AT ONCE AS YOU MIGHT HAVE DEPENDENCIES
         // AND A RESOURCE MIGHT LOAD BEFORE IT'S DEPENDENCY
         await loadResource(document, resource.url, resource.isScript, resource.skip, resource.attributes);
@@ -98,7 +98,7 @@ export abstract class Component {
    * Get the options data.
    */
   protected getOptions(): ComponentOptions {
-    return (this.options as ComponentOptions);
+    return (this.options );
   }
 
   /**
@@ -136,6 +136,7 @@ export abstract class Component {
 
   /**
    * Call the global error handler.
+   *
    * @param e The error object
    */
   protected callErrorHandler(e: Error): void {
@@ -159,8 +160,10 @@ export abstract class Component {
 
   /**
    * Call a specific event handler.
+   *
    * @param type The type of handler to call.
    */
+  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
   protected callHandler(type: ComponentEventType, data?: any): void {
     if (type === ComponentEventType.Error)
       throw new Error(`For calling the "${ComponentEventType.Error}" handler use the "callErrorHandler" method.`);
@@ -178,6 +181,7 @@ export abstract class Component {
           this.getParentElement(),
           null
         );
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         event.data = data;
         handler(event);
       } catch (error) {
@@ -188,13 +192,20 @@ export abstract class Component {
 
   /**
    * Logging method.
+   *
    * @param message The message.
    * @param optionalParams Optional parameters.
    */
+  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
   protected log(message?: any, ...optionalParams: any[]): void {
+    /* eslint-disable @typescript-eslint/no-unsafe-assignment */
+    /* eslint-disable @typescript-eslint/no-unsafe-member-access */
     const logMethod = (this.window as any)?.console?.log;
     if (logMethod)
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
       logMethod(message, optionalParams);
+    /* eslint-enable @typescript-eslint/no-unsafe-member-access */
+    /* eslint-enable @typescript-eslint/no-unsafe-assignment */
   }
 
   /**

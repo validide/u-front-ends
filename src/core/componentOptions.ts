@@ -22,7 +22,7 @@ export class ComponentEventHandlers {
  */
 export class ComponentOptions {
   public parent: string | HTMLElement = 'body';
-  public tag: string = 'div';
+  public tag = 'div';
   public handlers: ComponentEventHandlers = new ComponentEventHandlers();
   public resources: ResourceConfiguration[] = [];
 }

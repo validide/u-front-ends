@@ -1,15 +1,25 @@
+/* eslint-disable @typescript-eslint/restrict-template-expressions */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unused-expressions */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-return */
+/* eslint-disable no-underscore-dangle */
+/* eslint-disable @typescript-eslint/ban-types */
+/* eslint-disable @typescript-eslint/naming-convention */
+/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
+/* eslint-disable prefer-arrow/prefer-arrow-functions */
 import 'mocha';
-import { JSDOM, ResourceLoader, FetchOptions } from 'jsdom';
+import { AbortablePromise, FetchOptions, JSDOM, ResourceLoader } from 'jsdom';
 import { expect } from 'chai';
 import { Component, ComponentEvent, ComponentEventType, ResourceConfiguration } from '../../src';
 import { values_falsies, getDelayPromise } from '../utils';
 import { ComponentOptions, ComponentEventHandlers } from '../../src/core/componentOptions';
-// tslint:disable: no-unused-expression
-
 class CustomResourceLoader extends ResourceLoader {
-  fetch(url: string, options: FetchOptions) {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  fetch(url: string, options: FetchOptions): AbortablePromise<Buffer> | null {
     // return Promise.resolve(Buffer.from(`console.log('${url}');`));
-    return Promise.resolve(Buffer.from(''));
+    return Promise.resolve(Buffer.from('')) as AbortablePromise<Buffer>;
   }
 }
 
@@ -17,7 +27,7 @@ class StubComponent extends Component {
   public timesDisposedCalled: number;
   public timesInitializedCalled: number;
   public timesMountedCalled: number;
-  public throwError: boolean = false;
+  public throwError = false;
   public testError: Error = new Error('Test Error!');
   constructor(window: Window, options: ComponentOptions) {
     super(window, options);
@@ -117,13 +127,13 @@ export function test_Component() {
 
       values_falsies.forEach((f: any) => {
         it(`passing a falsie as the "window" argument throws - ${f}`, () => {
-          expect(() => new StubComponent(f as any, _options)).to.throw('Missing "window" argument.');
+          expect(() => new StubComponent(f , _options)).to.throw('Missing "window" argument.');
         });
       });
 
       values_falsies.forEach((f: any) => {
         it(`passing a falsie as the "options" argument throws - ${f}`, () => {
-          expect(() => new StubComponent(_win, f as any)).to.throw('Missing "options" argument.');
+          expect(() => new StubComponent(_win, f )).to.throw('Missing "options" argument.');
         });
       });
 
@@ -158,7 +168,7 @@ export function test_Component() {
           .throw(`For calling the "${ComponentEventType.Error}" handler use the "callErrorHandler" method.`);
       });
 
-      it('callHandler calls correct handler', async () => {
+      it('callHandler calls correct handler', () => {
         let called = false;
         const options = new ComponentOptions();
         options.handlers.beforeUpdate = (evt: ComponentEvent) => {
@@ -172,10 +182,10 @@ export function test_Component() {
         expect(called).to.be.true;
       });
 
-      it('callHandler calls error handler if other handler fails', async () => {
+      it('callHandler calls error handler if other handler fails', () => {
         let called = false;
         const options = new ComponentOptions();
-        options.handlers.beforeUpdate = (evt: ComponentEvent) => {
+        options.handlers.beforeUpdate = () => {
           throw new Error('Test Error!');
 
         };
@@ -282,10 +292,11 @@ export function test_Component() {
             let err: Error | null = null;
             let errHandlerCalled = true;
             options.parent = (f as unknown as string);
-            options.handlers.error = (e: ComponentEvent) => {
+            options.handlers.error = () => {
+              // eslint-disable-next-line @typescript-eslint/no-unused-vars
               errHandlerCalled = true;
             };
-            (_win as any).console.log = (msg: any, ...opt: any[]) => {
+            (_win as any).console.log = (msg: any) => {
               err = (msg as Error);
             };
             const comp = new StubComponent(_win, options);
@@ -478,7 +489,7 @@ export function test_Component() {
         const err = new Error('Error Handler Error');
         const comp = new StubComponent(_win, options);
         options.handlers = options.handlers || new ComponentEventHandlers();
-        options.handlers.error = (evt: ComponentEvent) => {
+        options.handlers.error = () => {
           throw err;
         };
         comp.throwError = true;
@@ -530,7 +541,7 @@ export function test_Component() {
       it('doe not fail in log method if "log" method is missing', async () => {
         const comp = new StubComponent(_win, _options);
         comp.throwError = true;
-        ((_win as any).console as any).log = undefined;
+        ((_win as any).console ).log = undefined;
 
         await comp.dispose();
 

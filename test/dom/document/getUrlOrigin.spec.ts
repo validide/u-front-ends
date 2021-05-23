@@ -1,3 +1,14 @@
+/* eslint-disable @typescript-eslint/restrict-template-expressions */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unused-expressions */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-return */
+/* eslint-disable no-underscore-dangle */
+/* eslint-disable @typescript-eslint/ban-types */
+/* eslint-disable @typescript-eslint/naming-convention */
+/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
+/* eslint-disable prefer-arrow/prefer-arrow-functions */
 import 'mocha';
 import { getUrlOrigin } from '../../../src/index';
 import { expect } from 'chai';
@@ -16,13 +27,13 @@ export function test_getUrlOrigin() {
       expect(getUrlOrigin(doc, '')).to.eq('');
     });
 
-    it('should thow an error if document is "undefined"', () => {
+    it('should throw an error if document is "undefined"', () => {
       expect(
         () => getUrlOrigin((undefined as unknown) as Document, 'some value')
       ).throws(Error, 'Cannot read property \'createElement\' of undefined');
     });
 
-    it('should thow an error if document is "null"', () => {
+    it('should throw an error if document is "null"', () => {
       expect(
         () => getUrlOrigin((null as unknown) as Document, 'some value')
       ).throws(Error, 'Cannot read property \'createElement\' of null');

@@ -1,8 +1,19 @@
+/* eslint-disable @typescript-eslint/restrict-template-expressions */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unused-expressions */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-return */
+/* eslint-disable no-underscore-dangle */
+/* eslint-disable @typescript-eslint/ban-types */
+/* eslint-disable @typescript-eslint/naming-convention */
+/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
+/* eslint-disable prefer-arrow/prefer-arrow-functions */
 import 'mocha';
 import { JSDOM } from 'jsdom';
 import { expect } from 'chai';
 import { MockCommunicationsManager } from '../../../mocks/mockCommunicationsManager';
-import { InWindowContentCommunicationHandler, noop, ContentCommunicationHandler, ContentCommunicationHandlerMethods } from '../../../../src';
+import { InWindowContentCommunicationHandler, ContentCommunicationHandler, ContentCommunicationHandlerMethods } from '../../../../src';
 
 export function test_InWindowContentCommunicationHandler() {
   describe('InWindowContentCommunicationHandler', () => {
@@ -26,14 +37,14 @@ export function test_InWindowContentCommunicationHandler() {
       _mngr.dispose();
       _win.close();
       _jsDom.window.close();
-    })
+    });
 
     it('requires a handler and methods as parameters', () => {
       expect(() => new InWindowContentCommunicationHandler(
         _mngr,
         new ContentCommunicationHandlerMethods()
       )).not.to.throw();
-    })
+    });
 
 
     it('should inherit from ContainerCommunicationHandler', () => {
@@ -42,6 +53,6 @@ export function test_InWindowContentCommunicationHandler() {
         new ContentCommunicationHandlerMethods()
       );
       expect(handler).to.be.an.instanceOf(ContentCommunicationHandler);
-    })
+    });
   });
 }

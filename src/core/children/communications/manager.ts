@@ -15,23 +15,23 @@ export abstract class CommunicationsManager {
   /**
    * Initialize the manager.
    */
-  // tslint:disable-next-line: no-empty
-  protected initializeCore(): void { }
+  protected initializeCore(): void { /* NOOP */ }
 
   /**
    * Clean any resources before the manager is disposed.
    */
-  // tslint:disable-next-line: no-empty
-  protected disposeCore(): void { }
+  protected disposeCore(): void { /* NOOP */ }
 
   /**
    * Send a message.
+   *
    * @param event The message.
    */
   public abstract send(event: CommunicationsEvent): void;
 
   /**
    * The the callback to handle any incoming messages.
+   *
    * @param callback The callback.
    */
   public abstract setEventReceivedCallback(callback: (event: CommunicationsEvent) => void): void;
@@ -72,6 +72,7 @@ export abstract class CommunicationsManagerOf<TEndpoint> extends CommunicationsM
 
   /**
    * Constructor
+   *
    * @param inboundEndpoint The endpoint for receiving messages.
    * @param inboundEventType The types of messages to receive.
    * @param outboundEndpoint The endpoint to sent messages.
@@ -94,6 +95,7 @@ export abstract class CommunicationsManagerOf<TEndpoint> extends CommunicationsM
 
   /**
    * Handle the received events.
+   *
    * @param e The received event.
    */
   private handleEvent(e: Event): void {
@@ -131,6 +133,7 @@ export abstract class CommunicationsManagerOf<TEndpoint> extends CommunicationsM
 
   /**
    * Start to receive messages
+   *
    * @param inboundEndpoint The inbound endpoint
    * @param handler The event handler
    */
@@ -138,6 +141,7 @@ export abstract class CommunicationsManagerOf<TEndpoint> extends CommunicationsM
 
   /**
    * Stop receiving messages
+   *
    * @param inboundEndpoint The inbound endpoint
    * @param handler The event handler
    */
@@ -145,11 +149,13 @@ export abstract class CommunicationsManagerOf<TEndpoint> extends CommunicationsM
 
   /**
    * Read the event and extract the message.
+   *
    * @param e
    */
   protected abstract readEvent(e: Event): CommunicationsEvent | null;
   /**
    * Send a message.
+   *
    * @param outboundEndpoint The outbound endpoint.
    * @param event The message.
    */
@@ -167,6 +173,7 @@ export abstract class CommunicationsManagerOf<TEndpoint> extends CommunicationsM
   /**
    * @inheritdoc
    */
+  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
   public setEventReceivedCallback(callback: (event: CommunicationsEvent) => void) {
     this.onEventReceived = callback;
   }

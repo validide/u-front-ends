@@ -1,18 +1,29 @@
+/* eslint-disable @typescript-eslint/restrict-template-expressions */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unused-expressions */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-return */
+/* eslint-disable no-underscore-dangle */
+/* eslint-disable @typescript-eslint/ban-types */
+/* eslint-disable @typescript-eslint/naming-convention */
+/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
+/* eslint-disable prefer-arrow/prefer-arrow-functions */
 
 import 'mocha';
 import { expect } from 'chai';
-import { JSDOM, ResourceLoader, FetchOptions, VirtualConsole } from 'jsdom';
+import { AbortablePromise, FetchOptions, JSDOM, ResourceLoader, VirtualConsole } from 'jsdom';
 import { loadResource, noop } from '../../../src';
-// tslint:disable: no-unused-expression
 
 class CustomResourceLoader extends ResourceLoader {
-  fetch(url: string, options: FetchOptions) {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  fetch(url: string, options: FetchOptions): AbortablePromise<Buffer> | null {
     // if (url.endsWith('.js') && options.element?.constructor.name !== 'HTMLScriptElement') {
     //   return Promise.reject(new Error('Requested JS with WRONG element.'));
     // }
 
     if (url.indexOf('404') !== -1) {
-      return Promise.reject(new Error('404'));
+      return Promise.reject(new Error('404')) as AbortablePromise<Buffer>;
     }
 
     if (url.endsWith('.js')) {
@@ -20,14 +31,14 @@ class CustomResourceLoader extends ResourceLoader {
       var el = window.document.createElement('div');
       el.id = 'testId';
       window.document.body.appendChild(el);
-      `));
+      `)) as AbortablePromise<Buffer>;
     }
 
     if (url.endsWith('.css')) {
-      return Promise.resolve(Buffer.from('body {color: red;}'));
+      return Promise.resolve(Buffer.from('body {color: red;}')) as AbortablePromise<Buffer>;
     }
 
-    return Promise.reject(new Error('404'));
+    return Promise.reject(new Error('404')) as AbortablePromise<Buffer>;
   }
 }
 

@@ -10,6 +10,7 @@ export class CrossWindowCommunicationsManager extends CommunicationsManagerOf<Wi
 
   /**
    * Constructor
+   *
    * @param inboundEndpoint The endpoint for receiving messages.
    * @param inboundEventType The types of messages to receive.
    * @param outboundEndpoint The endpoint to sent messages.

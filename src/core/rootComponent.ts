@@ -18,17 +18,19 @@ export class RootComponent extends Component {
   /**
    * Schedule the disposing of the child on exiting the function.
    * The dispose method is async but we do not want to wait for that.
+   *
    * @param child The child that was disposed.
    */
   private scheduleDisposeChild(child: Component): void {
     // Schedule this later
-    this.getWindow().setTimeout(() => {
-      this.disposeChildByRef(child);
+    this.getWindow().setTimeout(async () => {
+      await this.disposeChildByRef(child);
     }, 0);
   }
 
   /**
    * Dispose a child using it's reference.
+   *
    * @param child
    */
   private disposeChildByRef(child: Component): Promise<void> {
@@ -37,6 +39,7 @@ export class RootComponent extends Component {
 
   /**
    * Dispose a child by using it's id.
+   *
    * @param childId The child identifier.
    */
   private async disposeChild(childId: string | null): Promise<void> {
@@ -59,6 +62,7 @@ export class RootComponent extends Component {
 
   /**
    * Add a child component.
+   *
    * @param options Child component options.
    */
   public async addChild(options: ChildComponentOptions): Promise<string> {
@@ -82,6 +86,7 @@ export class RootComponent extends Component {
 
   /**
    * Get the child with the given identifier.
+   *
    * @param id The child identifier.
    */
   public getChild(id: string|null): Component | null {
@@ -90,6 +95,7 @@ export class RootComponent extends Component {
 
   /**
    * Remove a child component.
+   *
    * @param id The child component identifier.
    */
   public removeChild(id: string): Promise<void> {
