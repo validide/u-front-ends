@@ -127,13 +127,13 @@ export function test_Component() {
 
       values_falsies.forEach((f: any) => {
         it(`passing a falsie as the "window" argument throws - ${f}`, () => {
-          expect(() => new StubComponent(f , _options)).to.throw('Missing "window" argument.');
+          expect(() => new StubComponent(f as unknown as Window, _options)).to.throw('Missing "window" argument.');
         });
       });
 
       values_falsies.forEach((f: any) => {
         it(`passing a falsie as the "options" argument throws - ${f}`, () => {
-          expect(() => new StubComponent(_win, f )).to.throw('Missing "options" argument.');
+          expect(() => new StubComponent(_win, f as unknown as ComponentOptions)).to.throw('Missing "options" argument.');
         });
       });
 
@@ -290,6 +290,7 @@ export function test_Component() {
           it(`Throws if the parent is missing: ${f}`, async () => {
             const options = new ComponentOptions();
             let err: Error | null = null;
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
             let errHandlerCalled = true;
             options.parent = (f as unknown as string);
             options.handlers.error = () => {

@@ -42,13 +42,13 @@ export function test_RootComponent() {
 
       values_falsies.forEach((f: any) => {
         it(`passing a falsie as the "window" argument throws - ${f}`, () => {
-          expect(() => new RootComponent(f , _options)).to.throw('Missing "window" argument.');
+          expect(() => new RootComponent(f as unknown as Window, _options)).to.throw('Missing "window" argument.');
         });
       });
 
       values_falsies.forEach((f: any) => {
         it(`passing a falsie as the "options" argument throws - ${f}`, () => {
-          expect(() => new RootComponent(_win, f )).to.throw('Missing "options" argument.');
+          expect(() => new RootComponent(_win, f as unknown as RootComponentOptions)).to.throw('Missing "options" argument.');
         });
       });
 

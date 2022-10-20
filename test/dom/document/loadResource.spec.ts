@@ -76,7 +76,7 @@ export function test_loadResource() {
         await prom;
       }
       catch (e) {
-        expect(e.message).to.eq(`Script load error for url: ${url}.`);
+        expect((e as Error).message).to.eq(`Script load error for url: ${url}.`);
       }
     });
 

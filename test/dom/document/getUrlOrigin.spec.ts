@@ -30,13 +30,13 @@ export function test_getUrlOrigin() {
     it('should throw an error if document is "undefined"', () => {
       expect(
         () => getUrlOrigin((undefined as unknown) as Document, 'some value')
-      ).throws(Error, 'Cannot read property \'createElement\' of undefined');
+      ).throws(Error, 'Cannot read properties of undefined (reading \'createElement\')');
     });
 
     it('should throw an error if document is "null"', () => {
       expect(
         () => getUrlOrigin((null as unknown) as Document, 'some value')
-      ).throws(Error, 'Cannot read property \'createElement\' of null');
+      ).throws(Error, 'Cannot read properties of null (reading \'createElement\')');
     });
 
     it('should return origin', () => {

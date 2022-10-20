@@ -185,7 +185,7 @@ export abstract class Component {
         event.data = data;
         handler(event);
       } catch (error) {
-        this.callErrorHandler(error);
+        this.callErrorHandler(error as Error);
       }
     }
   }
@@ -223,7 +223,7 @@ export abstract class Component {
       this.createRootElement();
       await this.initializeCore();
     } catch (e) {
-      this.callErrorHandler(e);
+      this.callErrorHandler(e as Error);
     }
     this.callHandler(ComponentEventType.Created);
     return this;
@@ -246,7 +246,7 @@ export abstract class Component {
     try {
       await this.mountCore();
     } catch (e) {
-      this.callErrorHandler(e);
+      this.callErrorHandler(e as Error);
     }
     return this;
   }
@@ -263,7 +263,7 @@ export abstract class Component {
     try {
       await this.disposeCore();
     } catch (e) {
-      this.callErrorHandler(e);
+      this.callErrorHandler(e as Error);
     }
     this.callHandler(ComponentEventType.Destroyed);
 

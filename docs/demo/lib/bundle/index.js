@@ -2,7 +2,7 @@
     typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
     typeof define === 'function' && define.amd ? define(['exports'], factory) :
     (global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global.validide_uFrontEnds = {}));
-}(this, (function (exports) { 'use strict';
+})(this, (function (exports) { 'use strict';
 
     /* eslint-disable no-bitwise */
     /**
@@ -140,7 +140,7 @@
                 }
             }
             resource.addEventListener('load', function () { return resolve(); });
-            resource.addEventListener('error', function () { return reject(new Error("Script load error for url: " + url + ".")); });
+            resource.addEventListener('error', function () { return reject(new Error("Script load error for url: ".concat(url, "."))); });
             document.head.appendChild(resource);
         });
     }
@@ -273,7 +273,7 @@
             }
             if (!parent)
                 // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-                throw new Error("Failed to find parent \"" + opt.parent + "\".");
+                throw new Error("Failed to find parent \"".concat(opt.parent, "\"."));
             return parent;
         };
         /**
@@ -373,7 +373,7 @@
         // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
         Component.prototype.callHandler = function (type, data) {
             if (type === exports.ComponentEventType.Error)
-                throw new Error("For calling the \"" + exports.ComponentEventType.Error + "\" handler use the \"callErrorHandler\" method.");
+                throw new Error("For calling the \"".concat(exports.ComponentEventType.Error, "\" handler use the \"callErrorHandler\" method."));
             var handler = this.options.handlers
                 ? this.options.handlers[type]
                 : null;
@@ -731,7 +731,7 @@
                     }
                     break;
                 default:
-                    throw new Error("The \"" + e.kind + "\" event is not configured.");
+                    throw new Error("The \"".concat(e.kind, "\" event is not configured."));
             }
         };
         /**
@@ -1589,7 +1589,7 @@
          */
         CrossWindowChildComponent.prototype.disposeCore = function () {
             var embed = this.embeddedId
-                ? this.rootElement.querySelector("#" + this.embeddedId)
+                ? this.rootElement.querySelector("#".concat(this.embeddedId))
                 : null;
             if (embed) {
                 embed.removeEventListener('load', this.embeddedLoadHandlerRef);
@@ -1669,7 +1669,7 @@
          * @param e The error event.
          */
         CrossWindowChildComponent.prototype.embeddedErrorHandler = function (e) {
-            this.embeddedErrorRejecter(new Error("Failed to load embedded element.\nError details:\n" + JSON.stringify(e)));
+            this.embeddedErrorRejecter(new Error("Failed to load embedded element.\nError details:\n".concat(JSON.stringify(e))));
         };
         /**
          * Create the embedded element.
@@ -1692,13 +1692,13 @@
          */
         CrossWindowChildComponent.prototype.outboundEndpointAccessor = function () {
             var embed = this.embeddedId
-                ? this.rootElement.querySelector("#" + this.embeddedId)
+                ? this.rootElement.querySelector("#".concat(this.embeddedId))
                 : null;
             if (!embed)
-                throw new Error("No iframe with \"" + this.embeddedId + "\" id found.");
+                throw new Error("No iframe with \"".concat(this.embeddedId, "\" id found."));
             if (!embed.contentWindow)
                 // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-                throw new Error("The iframe with \"" + this.embeddedId + "\" id does not have a \"contentWindow\"(" + embed.contentWindow + ").");
+                throw new Error("The iframe with \"".concat(this.embeddedId, "\" id does not have a \"contentWindow\"(").concat(embed.contentWindow, ")."));
             return embed.contentWindow;
         };
         return CrossWindowChildComponent;
@@ -1915,7 +1915,7 @@
                     return new CrossWindowChildComponent(window, options, rootFacade);
                 default:
                     // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-                    throw new Error("The \"" + options.type + "\" is not configured.");
+                    throw new Error("The \"".concat(options.type, "\" is not configured."));
             }
         };
         return ChildComponentFactory;
@@ -2243,7 +2243,5 @@
     exports.loadResource = loadResource;
     exports.noop = noop;
 
-    Object.defineProperty(exports, '__esModule', { value: true });
-
-})));
+}));
 //# sourceMappingURL=index.js.map

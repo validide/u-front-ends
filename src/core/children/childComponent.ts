@@ -101,7 +101,7 @@ export abstract class ChildComponent extends Component {
       })
     ])
       .catch(err => {
-        this.callErrorHandler(err);
+        this.callErrorHandler(err as Error);
       });
   }
 
