@@ -11,12 +11,12 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
-          node-version: 18
-          check-latest: true
+          node-version: 'lts/*'
+          cache: 'npm'
       - run: npm ci
       - run: npm test
 
-  publish-pacakges:
+  publish-packages:
     needs: build
     runs-on: ubuntu-latest
     steps:
@@ -25,7 +25,8 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
-          node-version: 16
+          node-version: 'lts/*'
+          cache: 'npm'
           registry-url: https://registry.npmjs.org/
       - run: npm ci
       - run: npm run build
