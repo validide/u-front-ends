@@ -1,4 +1,4 @@
-import {HTMLElementCommunicationsManager, CommunicationsEvent} from '../../src';
+import {HTMLElementCommunicationsManager, CommunicationsEvent} from '../../src/index';
 
 export class MockHTMLElementCommunicationsManager extends HTMLElementCommunicationsManager {
   public readEvents:(CommunicationsEvent|null)[] = [];

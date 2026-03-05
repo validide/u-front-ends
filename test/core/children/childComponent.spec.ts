@@ -5,14 +5,14 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable no-underscore-dangle */
-/* eslint-disable @typescript-eslint/ban-types */
+
 /* eslint-disable @typescript-eslint/naming-convention */
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 import 'mocha';
 import { JSDOM } from 'jsdom';
 import { expect } from 'chai';
-import { ChildComponentOptions, RootComponentFacade, noop, ContainerCommunicationHandler } from '../../../src';
+import { ChildComponentOptions, RootComponentFacade, noop, ContainerCommunicationHandler } from '../../../src/index';
 import { MockChildComponent, MockContainerCommunicationHandler } from '../../mocks/mockChildComponentFactory';
 
 export function test_ChildComponent() {
@@ -117,7 +117,7 @@ export function test_ChildComponent() {
 
         mock.comunicationMethods.disposed(); // Signal the dispose
         await all;
-      } catch (error) {
+      } catch {
         // We are doing a bad thing so bad things will come to us.
       }
 

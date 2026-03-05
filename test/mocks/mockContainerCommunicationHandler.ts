@@ -1,4 +1,4 @@
-import {ContainerCommunicationHandler, CommunicationsEvent} from '../../src';
+import {ContainerCommunicationHandler, CommunicationsEvent} from '../../src/index';
 
 export class MockContainerCommunicationHandler extends ContainerCommunicationHandler {
   public handleEventCore(e: CommunicationsEvent): void {

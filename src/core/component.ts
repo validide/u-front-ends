@@ -70,7 +70,8 @@ export abstract class Component {
 
     if (!parent)
       // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-      throw new Error(`Failed to find parent "${opt.parent}".`);
+      // eslint-disable-next-line @typescript-eslint/no-base-to-string
+      throw new Error(`Failed to find parent "${String(opt.parent)}".`);
 
     return parent;
   }

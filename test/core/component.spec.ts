@@ -5,14 +5,14 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable no-underscore-dangle */
-/* eslint-disable @typescript-eslint/ban-types */
+
 /* eslint-disable @typescript-eslint/naming-convention */
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 import 'mocha';
 import { AbortablePromise, FetchOptions, JSDOM, ResourceLoader } from 'jsdom';
 import { expect } from 'chai';
-import { Component, ComponentEvent, ComponentEventType, ResourceConfiguration } from '../../src';
+import { Component, ComponentEvent, ComponentEventType, ResourceConfiguration } from '../../src/index';
 import { values_falsies, getDelayPromise } from '../utils';
 import { ComponentOptions, ComponentEventHandlers } from '../../src/core/componentOptions';
 class CustomResourceLoader extends ResourceLoader {

@@ -1,4 +1,4 @@
-import {CrossWindowChildComponent, CrossWindowChildComponentOptions, ContainerCommunicationHandlerMethods, ContainerCommunicationHandler} from '../../src';
+import {CrossWindowChildComponent, CrossWindowChildComponentOptions, ContainerCommunicationHandlerMethods, ContainerCommunicationHandler} from '../../src/index';
 
 export class MockCrossWindowChildComponent extends CrossWindowChildComponent {
   public mountCore(): Promise<void> {

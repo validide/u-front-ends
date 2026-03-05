@@ -6,14 +6,14 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable no-underscore-dangle */
-/* eslint-disable @typescript-eslint/ban-types */
+
 /* eslint-disable @typescript-eslint/naming-convention */
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 import { expect } from 'chai';
 import { JSDOM } from 'jsdom';
 import 'mocha';
-import { CommunicationsEvent, CommunicationsEventKind, ContainerCommunicationHandlerMethods, getHashCode } from '../../../../src';
+import { CommunicationsEvent, CommunicationsEventKind, ContainerCommunicationHandlerMethods, getHashCode } from '../../../../src/index';
 import { MockCrossWindowCommunicationsManager } from '../../../mocks/mockCrossWindowCommunicationsManager';
 import { MockCrossWindowContainerCommunicationHandler } from '../../../mocks/mockCrossWindowContainerCommunicationHandler';
 import { values_falsies } from '../../../utils';

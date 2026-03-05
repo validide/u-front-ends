@@ -5,13 +5,13 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable no-underscore-dangle */
-/* eslint-disable @typescript-eslint/ban-types */
+
 /* eslint-disable @typescript-eslint/naming-convention */
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 import 'mocha';
 import { expect } from 'chai';
-import { RootComponentFacade } from '../../src';
+import { RootComponentFacade } from '../../src/index';
 
 export function test_RootComponentFacade() {
   describe('RootComponentFacade', () => {

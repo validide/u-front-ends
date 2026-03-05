@@ -5,14 +5,14 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable no-underscore-dangle */
-/* eslint-disable @typescript-eslint/ban-types */
+
 /* eslint-disable @typescript-eslint/naming-convention */
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 import 'mocha';
 import { JSDOM } from 'jsdom';
 import { expect } from 'chai';
-import { RootComponent, RootComponentOptions, ChildComponentOptions } from '../../src';
+import { RootComponent, RootComponentOptions, ChildComponentOptions } from '../../src/index';
 import { values_falsies, getDelayPromise } from '../utils';
 import { MockChildComponentFactory, MockChildComponent } from '../mocks/mockChildComponentFactory';
 

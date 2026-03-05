@@ -6,14 +6,14 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable no-underscore-dangle */
-/* eslint-disable @typescript-eslint/ban-types */
+
 /* eslint-disable @typescript-eslint/naming-convention */
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 import 'mocha';
 import { AbortablePromise, FetchOptions, JSDOM, ResourceLoader, VirtualConsole } from 'jsdom';
 import { expect } from 'chai';
-import { CrossWindowChildComponent, ChildComponentOptions, RootComponentFacade, noop, ChildComponent, Component, CrossWindowChildComponentOptions, ContainerCommunicationHandlerMethods, CrossWindowContainerCommunicationHandler, ComponentEvent } from '../../../../src';
+import { CrossWindowChildComponent, ChildComponentOptions, RootComponentFacade, noop, ChildComponent, Component, CrossWindowChildComponentOptions, ContainerCommunicationHandlerMethods, CrossWindowContainerCommunicationHandler, ComponentEvent } from '../../../../src/index';
 import { MockCrossWindowChildComponent} from '../../../mocks/mockCrossWindowChildComponent';
 import { values_falsies } from '../../../utils';
 

@@ -5,7 +5,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable no-underscore-dangle */
-/* eslint-disable @typescript-eslint/ban-types */
+
 /* eslint-disable @typescript-eslint/naming-convention */
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
@@ -13,7 +13,7 @@ import 'mocha';
 import { JSDOM } from 'jsdom';
 import { expect } from 'chai';
 import { MockCrossWindowContentCommunicationHandler } from '../../../mocks/mockCrossWindowContentCommunicationHandler';
-import { CrossWindowContentCommunicationHandler, CommunicationsEvent, CommunicationsEventKind, ContentCommunicationHandlerMethods } from '../../../../src';
+import { CrossWindowContentCommunicationHandler, CommunicationsEvent, CommunicationsEventKind, ContentCommunicationHandlerMethods } from '../../../../src/index';
 import { MockCrossWindowCommunicationsManager } from '../../../mocks/mockCrossWindowCommunicationsManager';
 
 export function test_CrossWindowContentCommunicationHandler() {

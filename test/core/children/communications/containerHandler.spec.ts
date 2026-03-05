@@ -5,7 +5,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable no-underscore-dangle */
-/* eslint-disable @typescript-eslint/ban-types */
+
 /* eslint-disable @typescript-eslint/naming-convention */
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
@@ -14,7 +14,7 @@ import { JSDOM } from 'jsdom';
 import { expect } from 'chai';
 import { MockContainerCommunicationHandler } from '../../../mocks/mockContainerCommunicationHandler';
 import { MockCommunicationsManager } from '../../../mocks/mockCommunicationsManager';
-import { ContainerCommunicationHandlerMethods, CommunicationsEvent, CommunicationsEventKind } from '../../../../src';
+import { ContainerCommunicationHandlerMethods, CommunicationsEvent, CommunicationsEventKind } from '../../../../src/index';
 import { createCustomEvent } from '../../../../src/dom/document/createCustomEvent';
 import { values_falsies } from '../../../utils';
 

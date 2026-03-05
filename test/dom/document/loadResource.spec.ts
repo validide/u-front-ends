@@ -5,7 +5,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable no-underscore-dangle */
-/* eslint-disable @typescript-eslint/ban-types */
+
 /* eslint-disable @typescript-eslint/naming-convention */
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
@@ -13,7 +13,7 @@
 import 'mocha';
 import { expect } from 'chai';
 import { AbortablePromise, FetchOptions, JSDOM, ResourceLoader, VirtualConsole } from 'jsdom';
-import { loadResource, noop } from '../../../src';
+import { loadResource, noop } from '../../../src/index';
 
 class CustomResourceLoader extends ResourceLoader {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -95,7 +95,7 @@ export function test_loadResource() {
       });
       expect(_win.document.querySelectorAll(`link[href="${url}"]`).length).to.eq(1);
       await prom;
-      expect(_win.document.defaultView?.getComputedStyle(_win.document.body).color || 'null').to.eq('red');
+      expect(_win.document.defaultView?.getComputedStyle(_win.document.body).color || 'null').to.be.oneOf(['red', 'rgb(255, 0, 0)']);
     });
 
     it('should skip loading', async () => {

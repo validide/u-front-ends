@@ -1,4 +1,4 @@
-import {CrossWindowCommunicationsManager, CommunicationsEvent, CrossWindowCommunicationDataContract} from '../../src';
+import {CrossWindowCommunicationsManager, CommunicationsEvent, CrossWindowCommunicationDataContract} from '../../src/index';
 import { getDelayPromise } from '../utils';
 
 export class MockCrossWindowCommunicationsManager extends CrossWindowCommunicationsManager {

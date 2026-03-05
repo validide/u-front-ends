@@ -7,7 +7,7 @@ import {
   ContainerCommunicationHandler,
   CommunicationsEvent,
   Component
-} from '../../src';
+} from '../../src/index';
 import { MockCommunicationsManager } from './mockCommunicationsManager';
 
 export class MockChildComponentFactory extends ChildComponentFactory {

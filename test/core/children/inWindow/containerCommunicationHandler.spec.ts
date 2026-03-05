@@ -5,7 +5,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable no-underscore-dangle */
-/* eslint-disable @typescript-eslint/ban-types */
+
 /* eslint-disable @typescript-eslint/naming-convention */
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
@@ -13,7 +13,7 @@ import 'mocha';
 import { JSDOM } from 'jsdom';
 import { expect } from 'chai';
 import { MockCommunicationsManager } from '../../../mocks/mockCommunicationsManager';
-import { InWindowContainerCommunicationHandler, ContainerCommunicationHandlerMethods, ContainerCommunicationHandler } from '../../../../src';
+import { InWindowContainerCommunicationHandler, ContainerCommunicationHandlerMethods, ContainerCommunicationHandler } from '../../../../src/index';
 
 export function test_InWindowContainerCommunicationHandler() {
   describe('InWindowContainerCommunicationHandler', () => {

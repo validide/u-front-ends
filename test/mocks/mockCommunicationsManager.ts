@@ -1,4 +1,4 @@
-import { CommunicationsEvent, CommunicationsManagerOf } from '../../src';
+import { CommunicationsEvent, CommunicationsManagerOf } from '../../src/index';
 
 export class MockCommunicationsManager extends CommunicationsManagerOf<HTMLElement> {
   public receiving = false;

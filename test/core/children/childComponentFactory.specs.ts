@@ -5,14 +5,14 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable no-underscore-dangle */
-/* eslint-disable @typescript-eslint/ban-types */
+
 /* eslint-disable @typescript-eslint/naming-convention */
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 import 'mocha';
 import {JSDOM} from 'jsdom';
 import { expect } from 'chai';
-import { ChildComponentOptions, ChildComponentType, ChildComponentFactory, RootComponentFacade, noop, InWindowChildComponent, CrossWindowChildComponent } from '../../../src';
+import { ChildComponentOptions, ChildComponentType, ChildComponentFactory, RootComponentFacade, noop, InWindowChildComponent, CrossWindowChildComponent } from '../../../src/index';
 
 export function test_ChildComponentFactory() {
   describe('ChildComponentFactory', () => {
