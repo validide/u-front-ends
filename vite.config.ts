@@ -14,6 +14,7 @@ export default defineConfig({
   },
   test: {
     environment: "jsdom",
+    include: ["src/**/*.test.ts", "test/**/*.spec.ts"],
     coverage: {
       exclude: ["**/ci-cd/**", "**/{app,public,test,docs,dist}/**", "**/**.test.ts", "**/**.spec.ts", "vite.config.ts"],
       thresholds: {

@@ -5,14 +5,12 @@
     "module": "ESNext",
     "lib": ["ESNext", "DOM"],
     "skipLibCheck": true,
-
     /* Bundler mode */
     "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
     "outDir": "./dist/js/",
     "declaration": true,
-
     /* Linting */
     "strict": true,
     "noImplicitAny": true,
@@ -21,5 +19,13 @@
     "alwaysStrict": true
   },
   "include": ["src/**/*.ts"],
-  "exclude": ["coverage", "dist", "test", "node_modules", "!node_modules/@types"]
+  "exclude": [
+    "app/**",
+    "src/**/*.test.ts",
+    "test/mocks/**",
+    "vite.config.ts",
+    "dist",
+    "node_modules",
+    "!node_modules/@types"
+  ]
 }
