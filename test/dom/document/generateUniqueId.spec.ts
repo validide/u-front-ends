@@ -9,58 +9,60 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
-import 'mocha';
-import { generateUniqueId } from '../../../src/index';
-import { expect } from 'chai';
-import { JSDOM } from 'jsdom';
-import { values_falsies } from '../../utils';
 
-function getNewDocument(): Document { return new JSDOM('<!DOCTYPE html>').window.document; }
+import { JSDOM } from "jsdom";
+import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
+import { generateUniqueId } from "../../../src/index";
+import { values_falsies } from "../../utils";
 
-export function test_generateUniqueId() {
-  describe('generateUniqueId', () => {
-    let doc = getNewDocument();
-    beforeEach(() => { doc = getNewDocument(); });
+function getNewDocument(): Document {
+  return new JSDOM("<!DOCTYPE html>").window.document;
+}
 
-    it('should return an id that is unique within the DOM', () => {
-      const id = generateUniqueId(doc);
+describe("generateUniqueId", () => {
+  let doc = getNewDocument();
+  beforeEach(() => {
+    doc = getNewDocument();
+  });
 
-      expect(id.indexOf('prefix_')).to.eq(-1);
-      expect(doc.getElementById(id)).to.be.null;
-    });
+  it("should return an id that is unique within the DOM", () => {
+    const id = generateUniqueId(doc);
 
-    it('should return an id that is unique within the DOM and starts with a prefix', () => {
-      const id = generateUniqueId(doc, 'prefix_');
+    expect(id.indexOf("prefix_")).to.eq(-1);
+    expect(doc.getElementById(id)).to.be.null;
+  });
 
-      expect(id.indexOf('prefix_')).to.eq(0);
-      expect(doc.getElementById(id)).to.be.null;
-    });
+  it("should return an id that is unique within the DOM and starts with a prefix", () => {
+    const id = generateUniqueId(doc, "prefix_");
 
-    it('should not fail for falsies', () => {
-      const ids: string[] = values_falsies.map((f: any) => generateUniqueId(doc, (f as unknown) as string));
+    expect(id.indexOf("prefix_")).to.eq(0);
+    expect(doc.getElementById(id)).to.be.null;
+  });
 
-      ids.forEach((id: string, idx: number) => {
-        expect(id.length).to.be.greaterThan(0);
-        expect(ids.indexOf(id)).to.eq(idx);
-        expect(ids.lastIndexOf(id)).to.eq(idx);
-      });
-    });
+  it("should not fail for falsies", () => {
+    const ids: string[] = values_falsies.map((f: any) => generateUniqueId(doc, f as unknown as string));
 
-    it('should return an id that is unique', () => {
-      let called = 0;
-      const fake = {
-        getElementById: (): HTMLElement | null => {
-          if (called >= values_falsies.length) {
-            return doc.createElement('div');
-          }
-          called++;
-          return (values_falsies[called - 1] as unknown) as HTMLElement;
-        }
-      };
-      const id = generateUniqueId((fake as unknown) as Document, '');
-
+    ids.forEach((id: string, idx: number) => {
       expect(id.length).to.be.greaterThan(0);
-      expect(doc.getElementById(id)).to.be.null;
+      expect(ids.indexOf(id)).to.eq(idx);
+      expect(ids.lastIndexOf(id)).to.eq(idx);
     });
   });
-}
+
+  it("should return an id that is unique", () => {
+    let called = 0;
+    const fake = {
+      getElementById: (): HTMLElement | null => {
+        if (called >= values_falsies.length) {
+          return doc.createElement("div");
+        }
+        called++;
+        return values_falsies[called - 1] as unknown as HTMLElement;
+      },
+    };
+    const id = generateUniqueId(fake as unknown as Document, "");
+
+    expect(id.length).to.be.greaterThan(0);
+    expect(doc.getElementById(id)).to.be.null;
+  });
+});

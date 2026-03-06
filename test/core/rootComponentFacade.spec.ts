@@ -9,15 +9,17 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
-import 'mocha';
-import { test_getHashCode } from './getHashCode.spec';
-import { test_random } from './random.spec';
-import { test_noop } from './noop.spec';
 
-export function test_utilities() {
-  describe('UTILITIES', () => {
-    test_getHashCode();
-    test_random();
-    test_noop();
+import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
+import { RootComponentFacade } from "../../src/index";
+
+describe("RootComponentFacade", () => {
+  it("should have the following properties and default values", () => {
+    const fn = () => {
+      /* NOOP */
+    };
+    const conf = new RootComponentFacade(fn);
+    expect(conf.signalDisposed).to.not.be.null;
+    expect(conf.signalDisposed).to.eq(fn);
   });
-}
+});

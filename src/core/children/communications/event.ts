@@ -1,14 +1,14 @@
-import { getUuidV4 } from '../../../utilities/random';
+import { getUuidV4 } from "../../../utilities/random";
 /**
  * Kind of events used to communicate between content and container component.
  */
 export enum CommunicationsEventKind {
-  Mounted = 'mounted',
-  BeforeUpdate = 'beforeUpdate',
-  Updated = 'updated',
-  BeforeDispose = 'beforeDispose',
-  Disposed = 'disposed',
-  Data = 'data'
+  Mounted = "mounted",
+  BeforeUpdate = "beforeUpdate",
+  Updated = "updated",
+  BeforeDispose = "beforeDispose",
+  Disposed = "disposed",
+  Data = "data",
 }
 
 /**
@@ -18,11 +18,12 @@ export class CommunicationsEvent {
   /**
    * The type of event dispatched by the child component.
    */
-  public static readonly CONTENT_EVENT_TYPE: string = 'content_event.communication.children.validide_micro_front_ends';
+  public static readonly CONTENT_EVENT_TYPE: string = "content_event.communication.children.validide_micro_front_ends";
   /**
    * The type of event dispatched by the content.
    */
-  public static readonly CONTAINER_EVENT_TYPE: string = 'container_event.communication.children.validide_micro_front_ends';
+  public static readonly CONTAINER_EVENT_TYPE: string =
+    "container_event.communication.children.validide_micro_front_ends";
 
   /**
    * The kind of event.
@@ -54,6 +55,6 @@ export class CommunicationsEvent {
     this.kind = kind;
     this.uuid = getUuidV4();
     this.timestamp = new Date().getTime();
-    this.contentId = '';
+    this.contentId = "";
   }
 }

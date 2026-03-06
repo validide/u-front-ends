@@ -107,5 +107,14 @@ dist
 .opencode
 .sisyphus
 
-
+#Claude
 .claude/*.local.*
+
+
+# VitePress build output
+/docs/.vitepress/dist/
+/docs/.vitepress/cache/
+# TypeDoc output
+/docs/public/api-docs/
+# Generated demo bundle copied from build output
+/docs/public/demo/lib/

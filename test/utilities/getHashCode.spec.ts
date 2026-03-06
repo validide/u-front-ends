@@ -9,17 +9,14 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
-import 'mocha';
-import { getHashCode } from '../../src/index';
-import { expect } from 'chai';
 
-export function test_getHashCode() {
-  describe('getHashCode', () => {
+import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
+import { getHashCode } from "../../src/index";
 
-    it('should return same value for identical input', () => {
-      const value = 'some string';
-      expect(getHashCode(value)).to.eq(getHashCode(value));
-      expect(getHashCode('')).to.be.eq(0);
-    });
+describe("getHashCode", () => {
+  it("should return same value for identical input", () => {
+    const value = "some string";
+    expect(getHashCode(value)).to.eq(getHashCode(value));
+    expect(getHashCode("")).to.be.eq(0);
   });
-}
+});

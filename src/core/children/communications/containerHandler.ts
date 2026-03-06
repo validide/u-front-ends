@@ -1,6 +1,6 @@
-import { CommunicationsManager } from './manager';
-import { CommunicationsEventKind, CommunicationsEvent } from './event';
-import { noop } from '../../../utilities/noop';
+import { noop } from "../../../utilities/noop";
+import { CommunicationsEvent, CommunicationsEventKind } from "./event";
+import type { CommunicationsManager } from "./manager";
 
 /**
  * The communication handler methods.
@@ -46,10 +46,7 @@ export abstract class ContainerCommunicationHandler {
    * @param communicationsManager A communications manager.
    * @param handlerMethods A collection of handler methods.
    */
-  constructor(
-    communicationsManager: CommunicationsManager,
-    handlerMethods: ContainerCommunicationHandlerMethods
-  ) {
+  constructor(communicationsManager: CommunicationsManager, handlerMethods: ContainerCommunicationHandlerMethods) {
     this.communicationsManager = communicationsManager;
     this.handlerMethods = handlerMethods;
     this.communicationsManager.setEventReceivedCallback((e: CommunicationsEvent) => {
@@ -64,12 +61,10 @@ export abstract class ContainerCommunicationHandler {
    * @param e The event.
    */
   protected handleEventCore(e: CommunicationsEvent): void {
-    if (!this.handlerMethods)
-      return;
+    if (!this.handlerMethods) return;
 
     const method = this.handlerMethods[e.kind];
-    if (!method)
-      return;
+    if (!method) return;
 
     method(e.data);
   }
@@ -87,8 +82,7 @@ export abstract class ContainerCommunicationHandler {
    * Method invoked to dispose of the handler.
    */
   public dispose(): void {
-    if (this.disposed)
-      return;
+    if (this.disposed) return;
 
     this.disposed = true;
     this.communicationsManager?.dispose();
@@ -101,7 +95,7 @@ export abstract class ContainerCommunicationHandler {
    *
    * @param event The message.
    */
-  public send(event: CommunicationsEvent): void{
+  public send(event: CommunicationsEvent): void {
     this.communicationsManager?.send(event);
   }
 
@@ -111,7 +105,7 @@ export abstract class ContainerCommunicationHandler {
    * @param data The data to send.
    */
   // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-  public sendData(data: any): void{
+  public sendData(data: any): void {
     const event = new CommunicationsEvent(CommunicationsEventKind.Data);
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     event.data = data;

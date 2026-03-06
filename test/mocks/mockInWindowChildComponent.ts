@@ -1,4 +1,9 @@
-import {InWindowChildComponent, InWindowChildComponentOptions, ContainerCommunicationHandlerMethods, ContainerCommunicationHandler} from '../../src/index';
+import {
+  type ContainerCommunicationHandler,
+  type ContainerCommunicationHandlerMethods,
+  InWindowChildComponent,
+  type InWindowChildComponentOptions,
+} from "../../src/index";
 
 export class MockInWindowChildComponent extends InWindowChildComponent {
   public mountCore(): Promise<void> {

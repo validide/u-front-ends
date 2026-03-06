@@ -1,10 +1,15 @@
-import { RootComponentFacade } from '../../rootComponentFacade';
-import { ChildComponent } from '../childComponent';
-import { ContainerCommunicationHandlerMethods, ContainerCommunicationHandler, CrossWindowCommunicationsManager, CommunicationsEvent } from '../communications/index';
-import { CrossWindowChildComponentOptions } from './childComponentOptions';
-import { CrossWindowContainerCommunicationHandler } from './containerCommunicationHandler';
-import { generateUniqueId } from '../../../dom/document/generateIds';
-import { getUrlOrigin } from '../../../dom/document/getUrlOrigin';
+import { generateUniqueId } from "../../../dom/document/generateIds";
+import { getUrlOrigin } from "../../../dom/document/getUrlOrigin";
+import type { RootComponentFacade } from "../../rootComponentFacade";
+import { ChildComponent } from "../childComponent";
+import {
+  CommunicationsEvent,
+  type ContainerCommunicationHandler,
+  type ContainerCommunicationHandlerMethods,
+  CrossWindowCommunicationsManager,
+} from "../communications/index";
+import type { CrossWindowChildComponentOptions } from "./childComponentOptions";
+import { CrossWindowContainerCommunicationHandler } from "./containerCommunicationHandler";
 
 /**
  * Cross Window Child Component.
@@ -26,7 +31,7 @@ export class CrossWindowChildComponent extends ChildComponent {
    */
   constructor(window: Window, options: CrossWindowChildComponentOptions, rootFacade: RootComponentFacade) {
     super(window, options, rootFacade);
-    this.embeddedId = '';
+    this.embeddedId = "";
     this.embeddedLoadResolver = null;
     this.embeddedErrorRejecter = null;
     this.embeddedLoadPromise = new Promise((resolve, reject) => {
@@ -35,7 +40,6 @@ export class CrossWindowChildComponent extends ChildComponent {
     });
     this.embeddedLoadHandlerRef = this.embeddedLoadHandler.bind(this);
     this.embeddedErrorHandlerRef = this.embeddedErrorHandler.bind(this);
-
   }
 
   /**
@@ -46,8 +50,8 @@ export class CrossWindowChildComponent extends ChildComponent {
       ? (this.rootElement as HTMLElement).querySelector<HTMLIFrameElement>(`#${this.embeddedId}`)
       : null;
     if (embed) {
-      embed.removeEventListener('load', this.embeddedLoadHandlerRef as () => void);
-      embed.removeEventListener('error', this.embeddedErrorHandlerRef as (e: ErrorEvent) => void);
+      embed.removeEventListener("load", this.embeddedLoadHandlerRef as () => void);
+      embed.removeEventListener("error", this.embeddedErrorHandlerRef as (e: ErrorEvent) => void);
 
       // Do not remove the embedded element now as we still need it to communicate with the content.
       // The parent "rootElement" will be removed latter anyhow.
@@ -79,19 +83,18 @@ export class CrossWindowChildComponent extends ChildComponent {
     } else {
       embed = this.createEmbedElement();
     }
-    if (!embed)
-      throw new Error('Failed to create embed element!');
+    if (!embed) throw new Error("Failed to create embed element!");
 
-    const embedId = generateUniqueId(this.getDocument(), 'ufe-cross-');
+    const embedId = generateUniqueId(this.getDocument(), "ufe-cross-");
     embed.id = embedId;
     this.embeddedId = embedId;
 
-    embed.addEventListener('load', this.embeddedLoadHandlerRef as () => void);
-    embed.addEventListener('error', this.embeddedErrorHandlerRef as (e: ErrorEvent) => void);
+    embed.addEventListener("load", this.embeddedLoadHandlerRef as () => void);
+    embed.addEventListener("error", this.embeddedErrorHandlerRef as (e: ErrorEvent) => void);
 
     (this.rootElement as HTMLDivElement).appendChild(embed);
 
-    await ((this.embeddedLoadPromise) as Promise<void>);
+    await (this.embeddedLoadPromise as Promise<void>);
 
     return await super.mountCore();
   }
@@ -103,18 +106,14 @@ export class CrossWindowChildComponent extends ChildComponent {
   protected getCommunicationHandlerCore(methods: ContainerCommunicationHandlerMethods): ContainerCommunicationHandler {
     const document = this.getDocument();
     const manager = new CrossWindowCommunicationsManager(
-      (document).defaultView as Window,
+      document.defaultView as Window,
       CommunicationsEvent.CONTENT_EVENT_TYPE,
       this.outboundEndpointAccessor(),
       CommunicationsEvent.CONTAINER_EVENT_TYPE,
-      getUrlOrigin(document, this.getOptions().url)
+      getUrlOrigin(document, this.getOptions().url),
     );
     manager.initialize();
-    return new CrossWindowContainerCommunicationHandler(
-      manager,
-      this.embeddedId,
-      methods
-    );
+    return new CrossWindowContainerCommunicationHandler(manager, this.embeddedId, methods);
   }
 
   /**
@@ -132,14 +131,16 @@ export class CrossWindowChildComponent extends ChildComponent {
    * @param e The error event.
    */
   private embeddedErrorHandler(e: ErrorEvent): void {
-    (this.embeddedErrorRejecter as (e: Error) => void)(new Error(`Failed to load embedded element.\nError details:\n${JSON.stringify(e)}`));
+    (this.embeddedErrorRejecter as (e: Error) => void)(
+      new Error(`Failed to load embedded element.\nError details:\n${JSON.stringify(e)}`),
+    );
   }
 
   /**
    * Create the embedded element.
    */
   private createEmbedElement(): HTMLElement {
-    const embed = this.getDocument().createElement('iframe');
+    const embed = this.getDocument().createElement("iframe");
     const opt = this.getOptions();
     if (opt.embeddedAttributes) {
       const keys = Object.keys(opt.embeddedAttributes);
@@ -148,7 +149,7 @@ export class CrossWindowChildComponent extends ChildComponent {
       }
     }
 
-    embed.setAttribute('src', opt.url);
+    embed.setAttribute("src", opt.url);
     return embed;
   }
 
@@ -160,12 +161,13 @@ export class CrossWindowChildComponent extends ChildComponent {
       ? (this.rootElement as HTMLElement).querySelector<HTMLIFrameElement>(`#${this.embeddedId}`)
       : null;
 
-    if (!embed)
-      throw new Error(`No iframe with "${this.embeddedId}" id found.`);
+    if (!embed) throw new Error(`No iframe with "${this.embeddedId}" id found.`);
 
     if (!embed.contentWindow)
       // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-      throw new Error(`The iframe with "${this.embeddedId}" id does not have a "contentWindow"(${embed.contentWindow}).`);
+      throw new Error(
+        `The iframe with "${this.embeddedId}" id does not have a "contentWindow"(${embed.contentWindow}).`,
+      );
 
     return embed.contentWindow;
   }

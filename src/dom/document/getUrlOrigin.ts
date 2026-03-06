@@ -7,12 +7,11 @@
  */
 // eslint-disable-next-line prefer-arrow/prefer-arrow-functions
 function getUrlOrigin(document: Document, url: string): string {
-  if (!url)
-    return '';
+  if (!url) return "";
 
-  const a = document.createElement('a');
-  a.setAttribute('href', url);
-  return a.protocol + '//' + a.hostname + (a.port && ':' + a.port);
+  const a = document.createElement("a");
+  a.setAttribute("href", url);
+  return a.protocol + "//" + a.hostname + (a.port && ":" + a.port);
 }
 
 export { getUrlOrigin };

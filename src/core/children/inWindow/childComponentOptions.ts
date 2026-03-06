@@ -1,4 +1,4 @@
-import { ChildComponentOptions } from '../childComponentOptions';
+import { ChildComponentOptions } from "../childComponentOptions";
 
 /**
  * In Window Child Component Options.
@@ -14,6 +14,5 @@ export class InWindowChildComponentOptions extends ChildComponentOptions {
    */
   constructor() {
     super();
-
   }
 }

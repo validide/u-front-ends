@@ -1,12 +1,11 @@
-import { createCustomEvent } from '../../../dom/document/createCustomEvent';
-import { CommunicationsEvent } from '../communications/event';
-import { CommunicationsManagerOf } from '../communications/manager';
+import { createCustomEvent } from "../../../dom/document/createCustomEvent";
+import { CommunicationsEvent } from "../communications/event";
+import { CommunicationsManagerOf } from "../communications/manager";
 
 /**
  * @inheritdoc
  */
 export class HTMLElementCommunicationsManager extends CommunicationsManagerOf<HTMLElement> {
-
   /**
    * @inheritdoc
    */
@@ -14,7 +13,7 @@ export class HTMLElementCommunicationsManager extends CommunicationsManagerOf<HT
     inboundEndpoint: HTMLElement,
     inboundEventType: string,
     outboundEndpoint: HTMLElement,
-    outboundEventType: string
+    outboundEventType: string,
   ) {
     super(inboundEndpoint, inboundEventType, outboundEndpoint, outboundEventType);
   }
@@ -24,12 +23,9 @@ export class HTMLElementCommunicationsManager extends CommunicationsManagerOf<HT
    */
   protected readEvent(e: Event): CommunicationsEvent | null {
     const customEvent = e as CustomEvent;
-    if (!customEvent || customEvent.type !== this.inboundEventType)
-      return null;
+    if (!customEvent || customEvent.type !== this.inboundEventType) return null;
 
-    return customEvent.detail instanceof CommunicationsEvent
-      ? customEvent.detail
-      : null;
+    return customEvent.detail instanceof CommunicationsEvent ? customEvent.detail : null;
   }
 
   /**
@@ -42,7 +38,7 @@ export class HTMLElementCommunicationsManager extends CommunicationsManagerOf<HT
   /**
    * @inheritdoc
    */
-  protected stopReceiving(inboundEndpoint: HTMLElement, handler: (e: Event) => void): void{
+  protected stopReceiving(inboundEndpoint: HTMLElement, handler: (e: Event) => void): void {
     inboundEndpoint.removeEventListener(this.inboundEventType, handler);
   }
 
@@ -50,8 +46,7 @@ export class HTMLElementCommunicationsManager extends CommunicationsManagerOf<HT
    * @inheritdoc
    */
   protected sendEvent(outboundEndpoint: HTMLElement, event: CommunicationsEvent): void {
-    if (!outboundEndpoint.ownerDocument)
-      return;
+    if (!outboundEndpoint.ownerDocument) return;
 
     const evt = createCustomEvent(outboundEndpoint.ownerDocument, this.outboundEventType, { detail: event });
     outboundEndpoint.dispatchEvent(evt);

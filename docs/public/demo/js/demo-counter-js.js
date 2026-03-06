@@ -1,6 +1,4 @@
-(function (window, ufe, undefined) {
-  'use strict';
-
+((window, ufe, undefined) => {
   class MyCounterJavaScript {
     constructor(parentEl) {
       this.parentEl = parentEl;
@@ -15,26 +13,26 @@
         <span>${this.count}</span>
         <button id="inc">+</button>
       `;
-      this.buttonInc = this.parentEl.querySelector('#inc');
-      this.buttonDec = this.parentEl.querySelector('#dec');
-      this.spanValue = this.parentEl.querySelector('span');
+      this.buttonInc = this.parentEl.querySelector("#inc");
+      this.buttonDec = this.parentEl.querySelector("#dec");
+      this.spanValue = this.parentEl.querySelector("span");
 
       this.incCb = this.inc.bind(this);
       this.decCb = this.dec.bind(this);
 
-      this.buttonInc.addEventListener('click', this.incCb, false);
-      this.buttonDec.addEventListener('click', this.decCb, false);
+      this.buttonInc.addEventListener("click", this.incCb, false);
+      this.buttonDec.addEventListener("click", this.decCb, false);
     }
 
     dispose() {
-      this.buttonInc.removeEventListener('click', this.incCb, false);
-      this.buttonDec.removeEventListener('click', this.decCb, false);
+      this.buttonInc.removeEventListener("click", this.incCb, false);
+      this.buttonDec.removeEventListener("click", this.decCb, false);
       this.incCb = null;
       this.decCb = null;
       this.buttonInc = null;
       this.buttonDec = null;
       this.spanValue = null;
-      this.parentEl.innerHTML = '';
+      this.parentEl.innerHTML = "";
       this.parentEl = null;
     }
 
@@ -53,10 +51,7 @@
     }
   }
 
-
-
   class MyCounterJavaScriptWrapper extends MyCounterJavaScript {
-
     constructor(parentEl) {
       super(parentEl);
     }
@@ -68,7 +63,7 @@
         this.parentEl,
         ufe.CommunicationsEvent.CONTAINER_EVENT_TYPE,
         this.parentEl,
-        ufe.CommunicationsEvent.CONTENT_EVENT_TYPE
+        ufe.CommunicationsEvent.CONTENT_EVENT_TYPE,
       );
       manager.initialize();
       var contentMethods = new ufe.ContentCommunicationHandlerMethods();
@@ -106,7 +101,9 @@
       this.communicationHandler.dispatchBeforeDispose();
 
       // Give the root component a chance to react
-      setTimeout(() => { this.dispose(); }, 1_000)
+      setTimeout(() => {
+        this.dispose();
+      }, 1_000);
     }
 
     dispose() {
@@ -115,7 +112,7 @@
       this.communicationHandler.dispose();
       this.communicationHandler = null;
 
-      console.log('MyCounterJavaScriptWrapper Disposed. Count: ' + this.count);
+      console.log("MyCounterJavaScriptWrapper Disposed. Count: " + this.count);
       // Call the super's dispose method
       super.dispose();
     }
@@ -124,5 +121,4 @@
   window.demo_components = window.demo_components || {};
   window.demo_components.MyCounterJavaScript = MyCounterJavaScript;
   window.demo_components.MyCounterJavaScriptWrapper = MyCounterJavaScriptWrapper;
-
 })(window, window.validide_uFrontEnds, void 0);

@@ -9,40 +9,36 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
-import 'mocha';
-import { getRandomString, getUuidV4 } from '../../src/index';
-import { expect } from 'chai';
 
-export function test_random() {
-  describe('getRandomString', () => {
+import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
+import { getRandomString, getUuidV4 } from "../../src/index";
 
-    it('should return a non empty string', () => {
-      const values = new Array<string>();
-      for (let index = 0; index < 100; index++) {
-        const value = getRandomString();
-        expect(value.length).to.not.be.eq(0);
-        values.push(value);
-      }
+describe("getRandomString", () => {
+  it("should return a non empty string", () => {
+    const values: string[] = [];
+    for (let index = 0; index < 100; index++) {
+      const value = getRandomString();
+      expect(value.length).to.not.be.eq(0);
+      values.push(value);
+    }
 
-      values.forEach((v, i, arr) => {
-        expect(arr.indexOf(v)).to.be.eq(i);
-      });
+    values.forEach((v, i, arr) => {
+      expect(arr.indexOf(v)).to.be.eq(i);
     });
   });
+});
 
-  describe('getUuidV4', () => {
+describe("getUuidV4", () => {
+  it("should return a non empty string", () => {
+    const values: string[] = [];
+    for (let index = 0; index < 100; index++) {
+      const value = getUuidV4();
+      expect(value.length).to.not.be.eq(0);
+      values.push(value);
+    }
 
-    it('should return a non empty string', () => {
-      const values = new Array<string>();
-      for (let index = 0; index < 100; index++) {
-        const value = getUuidV4();
-        expect(value.length).to.not.be.eq(0);
-        values.push(value);
-      }
-
-      values.forEach((v, i, arr) => {
-        expect(arr.indexOf(v)).to.be.eq(i);
-      });
+    values.forEach((v, i, arr) => {
+      expect(arr.indexOf(v)).to.be.eq(i);
     });
   });
-}
+});

@@ -1,8 +1,8 @@
-import { ChildComponentOptions } from './childComponentOptions';
-import { Component } from '../component';
-import { RootComponentFacade } from '../rootComponentFacade';
-import { ComponentEventType } from '../componentEvent';
-import { ContainerCommunicationHandler, ContainerCommunicationHandlerMethods } from './communications/index';
+import { Component } from "../component";
+import { ComponentEventType } from "../componentEvent";
+import type { RootComponentFacade } from "../rootComponentFacade";
+import type { ChildComponentOptions } from "./childComponentOptions";
+import { type ContainerCommunicationHandler, ContainerCommunicationHandlerMethods } from "./communications/index";
 
 /**
  * Child component base class.
@@ -34,7 +34,9 @@ export abstract class ChildComponent extends Component {
    *
    * @param methods
    */
-  protected abstract getCommunicationHandlerCore(methods: ContainerCommunicationHandlerMethods): ContainerCommunicationHandler;
+  protected abstract getCommunicationHandlerCore(
+    methods: ContainerCommunicationHandlerMethods,
+  ): ContainerCommunicationHandler;
 
   /**
    * Get the communication handler.
@@ -61,8 +63,7 @@ export abstract class ChildComponent extends Component {
    * Handler for the signal that the component started to dispose.
    */
   private contentBeginDisposed(): void {
-    if (this.contentDisposePromise !== null)
-      return; // Dispose has already started.
+    if (this.contentDisposePromise !== null) return; // Dispose has already started.
 
     this.setContentDisposePromise();
     // Inform parent the content is being disposed.
@@ -73,8 +74,7 @@ export abstract class ChildComponent extends Component {
    * Signal the content that it will be disposed.
    */
   private startDisposingContent(): void {
-    if (this.contentDisposePromise !== null)
-      return; // Dispose has already started.
+    if (this.contentDisposePromise !== null) return; // Dispose has already started.
 
     this.setContentDisposePromise();
 
@@ -86,23 +86,19 @@ export abstract class ChildComponent extends Component {
    * Set the promise that is used fof the disposing of the component.
    */
   private setContentDisposePromise(): void {
-    this.contentDisposePromise = Promise
-      .race<void>([
-      new Promise<void>(resolver => {
+    this.contentDisposePromise = Promise.race<void>([
+      new Promise<void>((resolver) => {
         this.contentDisposePromiseResolver = resolver;
       }),
       new Promise<void>((resolveTimeout, rejectTimeout) => {
-        this
-          .getWindow()
-          .setTimeout(
-            () => rejectTimeout(new Error('Child dispose timeout.')),
-            this.getOptions().contentDisposeTimeout
-          );
-      })
-    ])
-      .catch(err => {
-        this.callErrorHandler(err as Error);
-      });
+        this.getWindow().setTimeout(
+          () => rejectTimeout(new Error("Child dispose timeout.")),
+          this.getOptions().contentDisposeTimeout,
+        );
+      }),
+    ]).catch((err) => {
+      this.callErrorHandler(err as Error);
+    });
   }
 
   /**
@@ -117,7 +113,6 @@ export abstract class ChildComponent extends Component {
       this.contentDisposePromiseResolver();
     }
   }
-
 
   /**
    * @@inheritdoc
@@ -149,7 +144,7 @@ export abstract class ChildComponent extends Component {
    * @param data The data to send.
    */
   // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-  public sendData(data: any): void{
+  public sendData(data: any): void {
     this.communicationHandler?.sendData(data);
   }
 }

@@ -9,20 +9,18 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
-import 'mocha';
-import { expect } from 'chai';
-import { RootComponentOptions } from '../../src/index';
 
-export function test_RootComponentOptions() {
-  describe('RootComponentOptions', () => {
-    it('should have the following properties and default values', () => {
-      const conf = new RootComponentOptions();
-      expect(conf.childFactory).to.not.be.null;
-      expect(conf.handlers).to.not.be.null;
-      expect(conf.resources).to.not.be.null;
-      expect(conf.resources.length).to.eq(0);
-      expect(conf.tag).to.eq('script');
-      expect(conf.parent).to.eq('body');
-    });
+import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
+import { RootComponentOptions } from "../../src/index";
+
+describe("RootComponentOptions", () => {
+  it("should have the following properties and default values", () => {
+    const conf = new RootComponentOptions();
+    expect(conf.childFactory).to.not.be.null;
+    expect(conf.handlers).to.not.be.null;
+    expect(conf.resources).to.not.be.null;
+    expect(conf.resources.length).to.eq(0);
+    expect(conf.tag).to.eq("script");
+    expect(conf.parent).to.eq("body");
   });
-}
+});

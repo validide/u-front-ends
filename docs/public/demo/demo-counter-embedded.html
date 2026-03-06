@@ -38,7 +38,7 @@
   <script src="./js/boilerplate.js"></script>
   <script src="./js/demo-counter-js.js"></script>
   <script>
-    (function (window, boilerplate, ufe, undefined) {
+    ((window, boilerplate, ufe, undefined) => {
       var counter = null;
       var communicationHandler = null;
 
@@ -53,7 +53,7 @@
         );
         manager.initialize();
         var contentMethods = new ufe.ContentCommunicationHandlerMethods();
-        contentMethods.dispose = function() { dispose(); };
+        contentMethods.dispose = () => { dispose(); };
         communicationHandler = new ufe.CrossWindowContentCommunicationHandler(
           manager,
           contentMethods
@@ -94,7 +94,7 @@
         }
       }
 
-      boilerplate.ready(function () {
+      boilerplate.ready(() => {
         intiActions();
       });
     })(window, window.__boilerplate, window.validide_uFrontEnds, void (0))

@@ -5,9 +5,9 @@ export enum ChildComponentType {
   /**
    * In window component(JavaScript or WebComponent Custom Element)
    */
-  InWindow = 'inWindow',
+  InWindow = "inWindow",
   /**
    * Cross window component(loaded in an emendable element - Iframe)
    */
-  CrossWindow = 'crossWindow'
+  CrossWindow = "crossWindow",
 }

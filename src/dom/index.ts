@@ -1,1 +1,1 @@
-export * from './document/index';
+export * from "./document/index";

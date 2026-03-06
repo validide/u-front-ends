@@ -5,7 +5,7 @@
   overflow: hidden;
 }
 .loading:before {
-  content: ' ';
+  content: " ";
   position: absolute;
   box-sizing: border-box;
   display: flex;
@@ -15,10 +15,9 @@
   left: 0;
   width: 110%;
   height: 110%;
-  background-color: rgba(255, 255, 255, .8);
+  background-color: rgba(255, 255, 255, 0.8);
   z-index: 2000;
 }
-
 
 .embedded-nav-bar iframe {
   box-sizing: content-box;

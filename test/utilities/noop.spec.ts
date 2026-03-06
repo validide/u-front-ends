@@ -9,15 +9,12 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
-import 'mocha';
-import { expect } from 'chai';
-import { noop } from '../../src/utilities/noop';
 
-export function test_noop() {
-  describe('noop', () => {
+import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
+import { noop } from "../../src/utilities/noop";
 
-    it('should return void', () => {
-      expect(noop()).to.be.undefined;
-    });
+describe("noop", () => {
+  it("should return void", () => {
+    expect(noop()).to.be.undefined;
   });
-}
+});

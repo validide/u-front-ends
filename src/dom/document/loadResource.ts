@@ -13,21 +13,20 @@ export function loadResource(
   url: string,
   isScript = true,
   skipLoading?: () => boolean,
-  attributes?: { [key: string]: string }
+  attributes?: { [key: string]: string },
 ): Promise<void> {
-  if (skipLoading && skipLoading())
-    return Promise.resolve();
+  if (skipLoading && skipLoading()) return Promise.resolve();
 
   return new Promise<void>((resolve, reject) => {
     let resource: HTMLScriptElement | HTMLLinkElement;
 
     if (isScript) {
-      resource = document.createElement('script');
-      (resource ).src = url;
+      resource = document.createElement("script");
+      resource.src = url;
     } else {
-      resource = document.createElement('link');
-      (resource ).href = url;
-      (resource ).rel = 'stylesheet';
+      resource = document.createElement("link");
+      resource.href = url;
+      resource.rel = "stylesheet";
     }
 
     if (attributes) {
@@ -36,8 +35,8 @@ export function loadResource(
         resource.setAttribute(key, attributes[key]);
       }
     }
-    resource.addEventListener('load', () => resolve());
-    resource.addEventListener('error', () => reject(new Error(`Script load error for url: ${url}.`)));
+    resource.addEventListener("load", () => resolve());
+    resource.addEventListener("error", () => reject(new Error(`Script load error for url: ${url}.`)));
     document.head.appendChild(resource);
   });
 }

@@ -1,11 +1,10 @@
-import { CommunicationsEvent, CommunicationsManagerOf } from '../../src/index';
+import { type CommunicationsEvent, CommunicationsManagerOf } from "../../src/index";
 
 export class MockCommunicationsManager extends CommunicationsManagerOf<HTMLElement> {
   public receiving = false;
   public sentEvents: CommunicationsEvent[] = [];
   public receivedEvents: CommunicationsEvent[] = [];
   private handler: ((e: Event) => void) | null = null;
-
 
   protected startReceiving(inboundEndpoint: HTMLElement, handler: (e: Event) => void): void {
     this.handler = handler;
@@ -28,5 +27,4 @@ export class MockCommunicationsManager extends CommunicationsManagerOf<HTMLEleme
   public callEventReceivedCallback(e: Event): void {
     return this.handler ? this.handler(e) : void 0;
   }
-
 }

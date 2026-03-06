@@ -1,0 +1,57 @@
+name: Publish Package
+
+on:
+  release:
+    types: [created]
+
+permissions:
+  id-token: write  # Required for OIDC
+  contents: read
+
+jobs:
+  publish-packages:
+    runs-on: ubuntu-latest
+    steps:
+
+      # checkout the repo
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+          registry-url: https://registry.npmjs.org/
+      - run: npm install -g npm@latest
+      - run: npm ci
+      - run: npm run build
+
+      # extract tag name
+      - id: branch_name
+        name: Get branch name
+        run: |
+          echo "SOURCE_NAME=${GITHUB_REF#refs/*/}" >> $GITHUB_OUTPUT
+          echo "SOURCE_BRANCH=${GITHUB_REF#refs/heads/}" >> $GITHUB_OUTPUT
+          echo "SOURCE_TAG=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+          echo "SOURCE_TAG_TRIMMED=$(echo ${GITHUB_REF#refs/tags/} | sed 's/v//')" >> $GITHUB_OUTPUT
+
+      # update version
+      - id: update_version
+        name: Update version
+        run: |
+          echo $SOURCE_NAME
+          echo $SOURCE_BRANCH
+          echo $SOURCE_TAG
+          npm --no-git-tag-version version $SOURCE_TAG
+        env:
+          SOURCE_NAME: ${{ steps.branch_name.outputs.SOURCE_NAME }}
+          SOURCE_BRANCH: ${{ steps.branch_name.outputs.SOURCE_BRANCH }}
+          SOURCE_TAG: ${{ steps.branch_name.outputs.SOURCE_TAG }}
+
+      # publish to NPM.JS
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+          registry-url: https://registry.npmjs.org/
+          scope: '@validide'
+      - run: |
+          npm publish

@@ -1,4 +1,8 @@
-import { CommunicationsManager, ContentCommunicationHandler, ContentCommunicationHandlerMethods } from '../communications/index';
+import {
+  type CommunicationsManager,
+  ContentCommunicationHandler,
+  type ContentCommunicationHandlerMethods,
+} from "../communications/index";
 
 /**
  * @inheritdoc

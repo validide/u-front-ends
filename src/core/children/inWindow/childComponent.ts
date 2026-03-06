@@ -1,8 +1,13 @@
-import { ChildComponent } from '../childComponent';
-import { RootComponentFacade } from '../../rootComponentFacade';
-import { ContainerCommunicationHandlerMethods, ContainerCommunicationHandler, CommunicationsEvent, HTMLElementCommunicationsManager } from '../communications/index';
-import { InWindowChildComponentOptions } from './childComponentOptions';
-import { InWindowContainerCommunicationHandler } from './containerCommunicationHandler';
+import type { RootComponentFacade } from "../../rootComponentFacade";
+import { ChildComponent } from "../childComponent";
+import {
+  CommunicationsEvent,
+  type ContainerCommunicationHandler,
+  type ContainerCommunicationHandlerMethods,
+  HTMLElementCommunicationsManager,
+} from "../communications/index";
+import type { InWindowChildComponentOptions } from "./childComponentOptions";
+import { InWindowContainerCommunicationHandler } from "./containerCommunicationHandler";
 
 /**
  * In Window Child Component.
@@ -28,7 +33,7 @@ export class InWindowChildComponent extends ChildComponent {
       endpoint,
       CommunicationsEvent.CONTENT_EVENT_TYPE,
       endpoint,
-      CommunicationsEvent.CONTAINER_EVENT_TYPE
+      CommunicationsEvent.CONTAINER_EVENT_TYPE,
     );
     manager.initialize();
     return new InWindowContainerCommunicationHandler(manager, methods);
@@ -47,7 +52,7 @@ export class InWindowChildComponent extends ChildComponent {
   protected async mountCore(): Promise<void> {
     const injectionFunction = this.getOptions().inject;
     if (!injectionFunction) {
-      throw new Error('Inject method not defined!');
+      throw new Error("Inject method not defined!");
     }
     injectionFunction(this.rootElement as HTMLElement);
     await super.mountCore();

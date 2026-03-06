@@ -1,4 +1,4 @@
-import { Component } from './index';
+import type { Component } from "./index";
 
 /**
  * Facade to interface with the the root component.
@@ -14,9 +14,7 @@ export class RootComponentFacade {
    *
    * @param signalDisposed The function to invoke to signal that the child was disposed.
    */
-  constructor(
-    signalDisposed: (child: Component) => void
-  ) {
+  constructor(signalDisposed: (child: Component) => void) {
     this.signalDisposed = signalDisposed;
   }
 }

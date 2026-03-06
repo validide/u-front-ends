@@ -1,6 +1,6 @@
-import { CommunicationsManager } from './manager';
-import { CommunicationsEventKind, CommunicationsEvent } from './event';
-import { noop } from '../../../utilities/noop';
+import { noop } from "../../../utilities/noop";
+import { CommunicationsEvent, CommunicationsEventKind } from "./event";
+import type { CommunicationsManager } from "./manager";
 
 /**
  * Content communications handler methods
@@ -30,10 +30,7 @@ export abstract class ContentCommunicationHandler {
    * @param communicationsManager A communications manager
    * @param methods The callback to dispose the content.
    */
-  constructor(
-    communicationsManager: CommunicationsManager,
-    methods: ContentCommunicationHandlerMethods
-  ) {
+  constructor(communicationsManager: CommunicationsManager, methods: ContentCommunicationHandlerMethods) {
     this.communicationsManager = communicationsManager;
     this.methods = methods;
     this.communicationsManager.setEventReceivedCallback((e: CommunicationsEvent) => {
@@ -78,14 +75,16 @@ export abstract class ContentCommunicationHandler {
    * Core dispose function.
    * Any component derived should override this to add clean-up after itself.
    */
-  protected disposeCore(): void { /* NOOP */ }
+  protected disposeCore(): void {
+    /* NOOP */
+  }
 
   /**
    * Send a message.
    *
    * @param event The message.
    */
-  public send(event: CommunicationsEvent): void{
+  public send(event: CommunicationsEvent): void {
     this.communicationsManager?.send(event);
   }
 
@@ -139,8 +138,7 @@ export abstract class ContentCommunicationHandler {
    * Method invoked to dispose of the handler.
    */
   public dispose(): void {
-    if (this.disposed)
-      return;
+    if (this.disposed) return;
 
     this.disposed = true;
     this.disposeCore();

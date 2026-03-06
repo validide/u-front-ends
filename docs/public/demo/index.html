@@ -47,8 +47,8 @@
     </div>
   </div>
   <script>
-    (function() {
-      var handleBrowser = function(modernBrowser) {
+    (() => {
+      var handleBrowser = (modernBrowser) => {
         if (modernBrowser){
           var alertEl = window.document.getElementById('old-browser');
           if (alertEl) {
@@ -57,10 +57,10 @@
         }
       }
       try {
-        let a = true;
+        const a = true;
         eval('"use strict"; class foo {}');
         const func = () => {
-          console.log(`Q: Modern browser?\nA:😀`);
+          console.log("Q: Modern browser?\nA:😀");
           handleBrowser(true);
         };
         func();
@@ -74,7 +74,7 @@
   <script src="./js/boilerplate.js"></script>
   <script src="./js/demo.js"></script>
   <script>
-    window.__boilerplate.ready(function () {
+    window.__boilerplate.ready(() => {
       window.__boilerplate.init();
       window.app.init();
     });

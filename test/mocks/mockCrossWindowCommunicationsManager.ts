@@ -1,8 +1,12 @@
-import {CrossWindowCommunicationsManager, CommunicationsEvent, CrossWindowCommunicationDataContract} from '../../src/index';
-import { getDelayPromise } from '../utils';
+import {
+  type CommunicationsEvent,
+  CrossWindowCommunicationDataContract,
+  CrossWindowCommunicationsManager,
+} from "../../src/index";
+import { getDelayPromise } from "../utils";
 
 export class MockCrossWindowCommunicationsManager extends CrossWindowCommunicationsManager {
-  public readEvents:(CommunicationsEvent|null)[] = [];
+  public readEvents: (CommunicationsEvent | null)[] = [];
   public handler: ((e: Event) => void) | null = null;
   private inboundEndpointRef: Window | null = null;
   public sentEvents: CommunicationsEvent[] = [];
@@ -20,7 +24,7 @@ export class MockCrossWindowCommunicationsManager extends CrossWindowCommunicati
     return super.startReceiving(inboundEndpoint, handler);
   }
 
-  public stopReceiving(inboundEndpoint: Window, handler: (e: Event) => void): void{
+  public stopReceiving(inboundEndpoint: Window, handler: (e: Event) => void): void {
     this.handler = null;
     this.inboundEndpointRef = null;
     return super.stopReceiving(inboundEndpoint, handler);
@@ -32,27 +36,23 @@ export class MockCrossWindowCommunicationsManager extends CrossWindowCommunicati
   }
 
   public simulateReceiveEvent(e: Event): Promise<void> {
-    if(this.handler) {
+    if (this.handler) {
       this.handler(e);
     }
     return getDelayPromise(1);
   }
 
   public wrapEvent(e: CommunicationsEvent, type: string): MessageEvent {
-    const data = new CrossWindowCommunicationDataContract<CommunicationsEvent>(
-      type,
-      e
-    );
+    const data = new CrossWindowCommunicationDataContract<CommunicationsEvent>(type, e);
 
-
-    const message = (this.inboundEndpointRef as Window).document.createEvent('MessageEvent');
-    Object.defineProperty(message, 'origin', {
+    const message = (this.inboundEndpointRef as Window).document.createEvent("MessageEvent");
+    Object.defineProperty(message, "origin", {
       value: (this.inboundEndpointRef as Window).origin,
-      writable: false
+      writable: false,
     });
-    Object.defineProperty(message, 'data', {
+    Object.defineProperty(message, "data", {
       value: data,
-      writable: false
+      writable: false,
     });
 
     return message;

@@ -1,8 +1,8 @@
-import { RootComponentOptions } from './rootComponentOptions';
-import { RootComponentFacade } from './rootComponentFacade';
-import { Component } from './component';
-import { ComponentEventType } from './componentEvent';
-import { ChildComponentOptions } from './children/index';
+import type { ChildComponentOptions } from "./children/index";
+import { Component } from "./component";
+import { ComponentEventType } from "./componentEvent";
+import { RootComponentFacade } from "./rootComponentFacade";
+import type { RootComponentOptions } from "./rootComponentOptions";
 
 /**
  * The root component to host the rest of the components.
@@ -45,11 +45,10 @@ export class RootComponent extends Component {
   private async disposeChild(childId: string | null): Promise<void> {
     const child = this.getChild(childId);
 
-    if (!child)
-      return Promise.resolve();
+    if (!child) return Promise.resolve();
 
     await child.dispose();
-    this.children[(childId as string)] = null;
+    this.children[childId as string] = null;
   }
 
   /**
@@ -66,16 +65,14 @@ export class RootComponent extends Component {
    * @param options Child component options.
    */
   public async addChild(options: ChildComponentOptions): Promise<string> {
-    if (!this.isInitialized)
-      throw new Error('Wait for the component to initialize before starting to add children.');
+    if (!this.isInitialized) throw new Error("Wait for the component to initialize before starting to add children.");
 
-    if (!this.isMounted)
-      throw new Error('Wait for the component to mount before starting to add children.');
+    if (!this.isMounted) throw new Error("Wait for the component to mount before starting to add children.");
 
     const child = (this.options as RootComponentOptions).childFactory.createComponent(
       this.getWindow(),
       options,
-      new RootComponentFacade(this.scheduleDisposeChild.bind(this))
+      new RootComponentFacade(this.scheduleDisposeChild.bind(this)),
     );
 
     const id = (await child.initialize()).id;
@@ -89,8 +86,8 @@ export class RootComponent extends Component {
    *
    * @param id The child identifier.
    */
-  public getChild(id: string|null): Component | null {
-    return id ? (this.children[id] || null) : null;
+  public getChild(id: string | null): Component | null {
+    return id ? this.children[id] || null : null;
   }
 
   /**

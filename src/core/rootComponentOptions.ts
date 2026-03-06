@@ -1,5 +1,5 @@
-import { ComponentOptions } from './componentOptions';
-import { ChildComponentFactory } from './children/childComponentFactory';
+import { ChildComponentFactory } from "./children/childComponentFactory";
+import { ComponentOptions } from "./componentOptions";
 
 /**
  * Options for the root component.
@@ -11,7 +11,7 @@ export class RootComponentOptions extends ComponentOptions {
   public childFactory: ChildComponentFactory;
   constructor() {
     super();
-    this.tag = 'script';
+    this.tag = "script";
     this.childFactory = new ChildComponentFactory();
   }
 }

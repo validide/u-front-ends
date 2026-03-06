@@ -1,5 +1,3 @@
-import { CrossWindowContainerCommunicationHandler } from '../../src/index';
+import { CrossWindowContainerCommunicationHandler } from "../../src/index";
 
-export class MockCrossWindowContainerCommunicationHandler extends CrossWindowContainerCommunicationHandler {
-
-}
+export class MockCrossWindowContainerCommunicationHandler extends CrossWindowContainerCommunicationHandler {}

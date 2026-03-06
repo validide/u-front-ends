@@ -1,6 +1,4 @@
-(function (window, ufe, undefined) {
-  'use strict';
-
+((window, ufe, undefined) => {
   // https://webcomponents.dev/blog/all-the-ways-to-make-a-web-component/
   class MyCounterElement extends HTMLElement {
     constructor() {
@@ -34,7 +32,7 @@
       <button id="inc">+</button>
     `;
 
-      this.attachShadow({ mode: 'open' });
+      this.attachShadow({ mode: "open" });
       this.shadowRoot.innerHTML = `
     <style>
       ${style}
@@ -42,9 +40,9 @@
     ${html}
     `;
 
-      this.buttonInc = this.shadowRoot.getElementById('inc');
-      this.buttonDec = this.shadowRoot.getElementById('dec');
-      this.spanValue = this.shadowRoot.querySelector('span');
+      this.buttonInc = this.shadowRoot.getElementById("inc");
+      this.buttonDec = this.shadowRoot.getElementById("dec");
+      this.spanValue = this.shadowRoot.querySelector("span");
 
       this.inc = this.inc.bind(this);
       this.dec = this.dec.bind(this);
@@ -65,21 +63,19 @@
     }
 
     connectedCallback() {
-      this.buttonInc.addEventListener('click', this.inc);
-      this.buttonDec.addEventListener('click', this.dec);
+      this.buttonInc.addEventListener("click", this.inc);
+      this.buttonDec.addEventListener("click", this.dec);
     }
 
     disconnectedCallback() {
-      this.buttonInc.removeEventListener('click', this.inc);
-      this.buttonDec.removeEventListener('click', this.dec);
+      this.buttonInc.removeEventListener("click", this.inc);
+      this.buttonDec.removeEventListener("click", this.dec);
     }
   }
 
-  window.customElements.define('my-counter', MyCounterElement);
-
+  window.customElements.define("my-counter", MyCounterElement);
 
   class MyCounterElementWrapper extends MyCounterElement {
-
     constructor() {
       super();
       this.communicationHandler = null;
@@ -93,7 +89,7 @@
         this,
         ufe.CommunicationsEvent.CONTAINER_EVENT_TYPE,
         this,
-        ufe.CommunicationsEvent.CONTENT_EVENT_TYPE
+        ufe.CommunicationsEvent.CONTENT_EVENT_TYPE,
       );
       manager.initialize();
       var contentMethods = new ufe.ContentCommunicationHandlerMethods();
@@ -104,7 +100,6 @@
       window.setTimeout(() => {
         this.communicationHandler.dispatchMounted(); // Signal to the parent that the component has finished mounting
       }, 1_000);
-
     }
 
     inc() {
@@ -132,7 +127,9 @@
       this.communicationHandler.dispatchBeforeDispose();
 
       // Give the root component a chance to react
-      setTimeout(() => { this.disposeComponent(); }, 1_000)
+      setTimeout(() => {
+        this.disposeComponent();
+      }, 1_000);
     }
 
     disposeComponent() {
@@ -141,7 +138,7 @@
       this.communicationHandler.dispose();
       this.communicationHandler = null;
 
-      console.log('MyCounterElementWrapper Disposed. Count: ' + this.count);
+      console.log("MyCounterElementWrapper Disposed. Count: " + this.count);
       // Call the super's dispose method if you have one
       // super.dispose();
     }
@@ -150,24 +147,22 @@
       // We are moving the element after creating it so we need to:
       // - delay the connect actions a bit
 
-      window.setTimeout(()=> {
+      window.setTimeout(() => {
         super.connectedCallback();
       }, 5);
     }
 
     disconnectedCallback() {
-
       // We are moving the element after creating it so we need to:
       // - delay the disconnect actions a bit
       // - execute the actions only if we were not re-connected
       window.setTimeout(() => {
         if (!this.isConnected) {
-          super.disconnectedCallback()
+          super.disconnectedCallback();
         }
-      }, 5)
+      }, 5);
     }
   }
 
-  window.customElements.define('my-counter-wrapper', MyCounterElementWrapper);
-
+  window.customElements.define("my-counter-wrapper", MyCounterElementWrapper);
 })(window, window.validide_uFrontEnds, void 0);

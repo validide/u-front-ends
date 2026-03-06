@@ -10,12 +10,11 @@ function getHashCode(value: string): number {
   const length = value.length;
   let char;
   let index = 0;
-  if (length === 0)
-    return hash;
+  if (length === 0) return hash;
 
   while (index < length) {
     char = value.charCodeAt(index);
-    hash = ((hash << 5) - hash) + char;
+    hash = (hash << 5) - hash + char;
     hash |= 0; // Convert to 32bit integer
 
     index++;
@@ -23,6 +22,5 @@ function getHashCode(value: string): number {
 
   return hash;
 }
-
 
 export { getHashCode };

@@ -1,6 +1,11 @@
-import { ContainerCommunicationHandlerMethods, CommunicationsEvent, ContainerCommunicationHandler, CommunicationsEventKind } from '../communications/index';
-import { getHashCode } from '../../../utilities/getHashCode';
-import { CrossWindowCommunicationsManager } from '../communications/crossWindowManager';
+import { getHashCode } from "../../../utilities/getHashCode";
+import type { CrossWindowCommunicationsManager } from "../communications/crossWindowManager";
+import {
+  CommunicationsEvent,
+  CommunicationsEventKind,
+  ContainerCommunicationHandler,
+  type ContainerCommunicationHandlerMethods,
+} from "../communications/index";
 
 /**
  * @inheritdoc
@@ -18,7 +23,7 @@ export class CrossWindowContainerCommunicationHandler extends ContainerCommunica
   constructor(
     communicationsManager: CrossWindowCommunicationsManager,
     embedId: string,
-    containerMethods: ContainerCommunicationHandlerMethods
+    containerMethods: ContainerCommunicationHandlerMethods,
   ) {
     super(communicationsManager, containerMethods);
     this.embedId = embedId;
@@ -28,16 +33,14 @@ export class CrossWindowContainerCommunicationHandler extends ContainerCommunica
    * @inheritdoc
    */
   protected handleEventCore(e: CommunicationsEvent): void {
-    if (!this.embedId)
-      return;
+    if (!this.embedId) return;
 
     if (!e.contentId && e.kind === CommunicationsEventKind.Mounted) {
       this.attemptHandShake(e);
       return;
     }
 
-    if (this.embedId !== e.contentId)
-      return;
+    if (this.embedId !== e.contentId) return;
 
     super.handleEventCore(e);
   }
@@ -45,7 +48,7 @@ export class CrossWindowContainerCommunicationHandler extends ContainerCommunica
   /**
    * Attempt a handshake with the content.
    */
-  private attemptHandShake(e: CommunicationsEvent): void{
+  private attemptHandShake(e: CommunicationsEvent): void {
     const hash = getHashCode(this.embedId).toString(10);
     const response = new CommunicationsEvent(CommunicationsEventKind.Mounted);
 

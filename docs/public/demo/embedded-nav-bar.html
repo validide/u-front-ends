@@ -50,7 +50,7 @@
   <script src="./lib/bundle/index.js"></script>
   <script src="./js/boilerplate.js"></script>
   <script>
-    (function (window, boilerplate, ufe, undefined) {
+    ((window, boilerplate, ufe, undefined) => {
 
       var communicationHandler = null;
       if (window.parent !== window) {
@@ -63,8 +63,8 @@
         );
         manager.initialize();
         var contentMethods = new ufe.ContentCommunicationHandlerMethods();
-        contentMethods.dispose = function() { dispose(); };
-        contentMethods.handleDataEvent = function(data) {
+        contentMethods.dispose = () => { dispose(); };
+        contentMethods.handleDataEvent = (data) => {
           console.log('Iframe received data: \n\n' + JSON.stringify(data));
          };
         communicationHandler = new ufe.CrossWindowContentCommunicationHandler(
@@ -132,7 +132,7 @@
         }
       }
 
-      boilerplate.ready(function () {
+      boilerplate.ready(() => {
         intiActions();
       });
     })(window, window.__boilerplate, window.validide_uFrontEnds, void (0))

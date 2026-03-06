@@ -1,7 +1,7 @@
-import {HTMLElementCommunicationsManager, CommunicationsEvent} from '../../src/index';
+import { type CommunicationsEvent, HTMLElementCommunicationsManager } from "../../src/index";
 
 export class MockHTMLElementCommunicationsManager extends HTMLElementCommunicationsManager {
-  public readEvents:(CommunicationsEvent|null)[] = [];
+  public readEvents: (CommunicationsEvent | null)[] = [];
 
   public readEvent(e: Event): CommunicationsEvent | null {
     const evt = super.readEvent(e);
@@ -14,7 +14,7 @@ export class MockHTMLElementCommunicationsManager extends HTMLElementCommunicati
     return super.startReceiving(inboundEndpoint, handler);
   }
 
-  public stopReceiving(inboundEndpoint: HTMLElement, handler: (e: Event) => void): void{
+  public stopReceiving(inboundEndpoint: HTMLElement, handler: (e: Event) => void): void {
     return super.stopReceiving(inboundEndpoint, handler);
   }
 

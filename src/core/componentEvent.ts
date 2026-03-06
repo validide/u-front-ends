@@ -2,16 +2,16 @@
  * Lifecycle event types.
  */
 export enum ComponentEventType {
-  BeforeCreate = 'beforeCreate',
-  Created = 'created',
-  BeforeMount = 'beforeMount',
-  Mounted = 'mounted',
-  BeforeUpdate = 'beforeUpdate',
-  Updated = 'updated',
-  BeforeDestroy = 'beforeDestroy',
-  Destroyed = 'destroyed',
-  Error = 'error',
-  Data = 'data'
+  BeforeCreate = "beforeCreate",
+  Created = "created",
+  BeforeMount = "beforeMount",
+  Mounted = "mounted",
+  BeforeUpdate = "beforeUpdate",
+  Updated = "updated",
+  BeforeDestroy = "beforeDestroy",
+  Destroyed = "destroyed",
+  Error = "error",
+  Data = "data",
 }
 
 /**
@@ -45,7 +45,7 @@ export class ComponentEvent {
     type: ComponentEventType,
     el: HTMLElement | null,
     parentEl: HTMLElement,
-    error: Error | null
+    error: Error | null,
   ) {
     this.id = id;
     this.type = type;

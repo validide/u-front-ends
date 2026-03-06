@@ -1,4 +1,4 @@
-import { CommunicationsEvent } from './event';
+import type { CommunicationsEvent } from "./event";
 
 export abstract class CommunicationsManager {
   private initialized: boolean;
@@ -15,12 +15,16 @@ export abstract class CommunicationsManager {
   /**
    * Initialize the manager.
    */
-  protected initializeCore(): void { /* NOOP */ }
+  protected initializeCore(): void {
+    /* NOOP */
+  }
 
   /**
    * Clean any resources before the manager is disposed.
    */
-  protected disposeCore(): void { /* NOOP */ }
+  protected disposeCore(): void {
+    /* NOOP */
+  }
 
   /**
    * Send a message.
@@ -40,8 +44,7 @@ export abstract class CommunicationsManager {
    * Initialize the manager.
    */
   public initialize(): void {
-    if (this.initialized)
-      return;
+    if (this.initialized) return;
 
     this.initialized = true;
     this.initializeCore();
@@ -51,8 +54,7 @@ export abstract class CommunicationsManager {
    * Dispose of the manager.
    */
   public dispose(): void {
-    if (this.disposed)
-      return;
+    if (this.disposed) return;
 
     this.disposed = true;
     this.disposeCore();
@@ -82,7 +84,7 @@ export abstract class CommunicationsManagerOf<TEndpoint> extends CommunicationsM
     inboundEndpoint: TEndpoint,
     inboundEventType: string,
     outboundEndpoint: TEndpoint,
-    outboundEventType: string
+    outboundEventType: string,
   ) {
     super();
     this.inboundEndpoint = inboundEndpoint;
@@ -90,7 +92,9 @@ export abstract class CommunicationsManagerOf<TEndpoint> extends CommunicationsM
     this.outboundEndpoint = outboundEndpoint;
     this.outboundEventType = outboundEventType;
     this.onEventReceived = null;
-    this.eventHandler = (e: Event) => { this.handleEvent(e); };
+    this.eventHandler = (e: Event) => {
+      this.handleEvent(e);
+    };
   }
 
   /**
@@ -99,8 +103,7 @@ export abstract class CommunicationsManagerOf<TEndpoint> extends CommunicationsM
    * @param e The received event.
    */
   private handleEvent(e: Event): void {
-    if (!this.onEventReceived)
-      return;
+    if (!this.onEventReceived) return;
 
     const evt = this.readEvent(e);
     if (evt) {

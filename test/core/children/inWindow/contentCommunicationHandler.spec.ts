@@ -9,50 +9,46 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
-import 'mocha';
-import { JSDOM } from 'jsdom';
-import { expect } from 'chai';
-import { MockCommunicationsManager } from '../../../mocks/mockCommunicationsManager';
-import { InWindowContentCommunicationHandler, ContentCommunicationHandler, ContentCommunicationHandlerMethods } from '../../../../src/index';
 
-export function test_InWindowContentCommunicationHandler() {
-  describe('InWindowContentCommunicationHandler', () => {
-    let _jsDom: JSDOM;
-    let _win: Window;
-    let _mngr: MockCommunicationsManager;
-    const _eventType = 'some_event_type';
+import { JSDOM } from "jsdom";
+import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
+import {
+  ContentCommunicationHandler,
+  ContentCommunicationHandlerMethods,
+  InWindowContentCommunicationHandler,
+} from "../../../../src/index";
+import { MockCommunicationsManager } from "../../../mocks/mockCommunicationsManager";
 
-    beforeEach(() => {
-      _jsDom = new JSDOM(undefined, {
-        url: 'http://localhost:8080/',
-        runScripts: 'dangerously'
-      });
-      if (!_jsDom.window?.document?.defaultView)
-        throw new Error('Setup failure!');
-      _win = _jsDom.window.document.defaultView;
-      _mngr = new MockCommunicationsManager(_win.document.body, _eventType, _win.document.body, _eventType);
+describe("InWindowContentCommunicationHandler", () => {
+  let _jsDom: JSDOM;
+  let _win: Window;
+  let _mngr: MockCommunicationsManager;
+  const _eventType = "some_event_type";
+
+  beforeEach(() => {
+    _jsDom = new JSDOM(undefined, {
+      url: "http://localhost:8080/",
+      runScripts: "dangerously",
     });
-
-    afterEach(() => {
-      _mngr.dispose();
-      _win.close();
-      _jsDom.window.close();
-    });
-
-    it('requires a handler and methods as parameters', () => {
-      expect(() => new InWindowContentCommunicationHandler(
-        _mngr,
-        new ContentCommunicationHandlerMethods()
-      )).not.to.throw();
-    });
-
-
-    it('should inherit from ContainerCommunicationHandler', () => {
-      const handler = new InWindowContentCommunicationHandler(
-        _mngr,
-        new ContentCommunicationHandlerMethods()
-      );
-      expect(handler).to.be.an.instanceOf(ContentCommunicationHandler);
-    });
+    if (!_jsDom.window?.document?.defaultView) throw new Error("Setup failure!");
+    _win = _jsDom.window.document.defaultView;
+    _mngr = new MockCommunicationsManager(_win.document.body, _eventType, _win.document.body, _eventType);
   });
-}
+
+  afterEach(() => {
+    _mngr.dispose();
+    _win.close();
+    _jsDom.window.close();
+  });
+
+  it("requires a handler and methods as parameters", () => {
+    expect(
+      () => new InWindowContentCommunicationHandler(_mngr, new ContentCommunicationHandlerMethods()),
+    ).not.to.throw();
+  });
+
+  it("should inherit from ContainerCommunicationHandler", () => {
+    const handler = new InWindowContentCommunicationHandler(_mngr, new ContentCommunicationHandlerMethods());
+    expect(handler).to.be.an.instanceOf(ContentCommunicationHandler);
+  });
+});

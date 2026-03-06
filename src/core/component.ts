@@ -1,6 +1,6 @@
-import { generateUniqueId, loadResource } from '../dom/index';
-import { ComponentEvent, ComponentEventType } from './componentEvent';
-import { ComponentOptions } from './componentOptions';
+import { generateUniqueId, loadResource } from "../dom/index";
+import { ComponentEvent, ComponentEventType } from "./componentEvent";
+import type { ComponentOptions } from "./componentOptions";
 
 /**
  * Base class for all components.
@@ -22,16 +22,13 @@ export abstract class Component {
    * @param options The component options
    */
   constructor(window: Window, options: ComponentOptions) {
-    if (!window)
-      throw new Error('Missing "window" argument.');
-    if (!options)
-      throw new Error('Missing "options" argument.');
-
+    if (!window) throw new Error('Missing "window" argument.');
+    if (!options) throw new Error('Missing "options" argument.');
 
     this.isInitialized = false;
     this.isMounted = false;
     this.resourcesLoaded = false;
-    this.id = '';
+    this.id = "";
     this.rootElement = null;
     this.window = window;
     this.options = options;
@@ -42,12 +39,11 @@ export abstract class Component {
    * Create the root element hat will "encapsulate" the rest of the elements.
    */
   private createRootElement(): void {
-    if (this.rootElement)
-      return;
+    if (this.rootElement) return;
 
     const parent = this.getParentElement();
     this.rootElement = this.getDocument().createElement(this.getOptions().tag);
-    this.id = generateUniqueId(this.getDocument(), 'ufe-');
+    this.id = generateUniqueId(this.getDocument(), "ufe-");
     this.rootElement.id = this.id;
     parent.appendChild(this.rootElement);
   }
@@ -60,10 +56,9 @@ export abstract class Component {
 
     const opt = this.getOptions();
     if (opt.parent) {
-      if (typeof opt.parent === 'string') {
+      if (typeof opt.parent === "string") {
         parent = this.getDocument().querySelector(opt.parent);
-      }
-      else {
+      } else {
         parent = opt.parent;
       }
     }
@@ -80,8 +75,7 @@ export abstract class Component {
    * Load the resources required by the component.
    */
   protected async loadResources(): Promise<void> {
-    if (this.resourcesLoaded)
-      return;
+    if (this.resourcesLoaded) return;
 
     this.resourcesLoaded = true;
     const options = this.getOptions();
@@ -99,24 +93,30 @@ export abstract class Component {
    * Get the options data.
    */
   protected getOptions(): ComponentOptions {
-    return (this.options );
+    return this.options;
   }
 
   /**
    * Get the window reference.
    */
-  protected getWindow(): Window { return this.window as Window; }
+  protected getWindow(): Window {
+    return this.window as Window;
+  }
 
   /**
    * Get the document reference.
    */
-  protected getDocument(): Document { return this.getWindow().document; }
+  protected getDocument(): Document {
+    return this.getWindow().document;
+  }
 
   /**
    * Core initialization function.
    * Any component derived should override this to add extra functionality.
    */
-  protected initializeCore(): Promise<void> { return Promise.resolve(); }
+  protected initializeCore(): Promise<void> {
+    return Promise.resolve();
+  }
 
   /**
    * Core mount function.
@@ -128,12 +128,13 @@ export abstract class Component {
     return Promise.resolve();
   }
 
-
   /**
    * Core dispose function.
    * Any component derived should override this to add clean-up after itself.
    */
-  protected disposeCore(): Promise<void> { return Promise.resolve(); }
+  protected disposeCore(): Promise<void> {
+    return Promise.resolve();
+  }
 
   /**
    * Call the global error handler.
@@ -144,13 +145,7 @@ export abstract class Component {
     const handler = this.options.handlers?.error;
     if (handler) {
       try {
-        handler(new ComponentEvent(
-          this.id,
-          ComponentEventType.Error,
-          this.rootElement,
-          this.getParentElement(),
-          e
-        ));
+        handler(new ComponentEvent(this.id, ComponentEventType.Error, this.rootElement, this.getParentElement(), e));
       } catch (error) {
         this.log(error);
       }
@@ -169,19 +164,11 @@ export abstract class Component {
     if (type === ComponentEventType.Error)
       throw new Error(`For calling the "${ComponentEventType.Error}" handler use the "callErrorHandler" method.`);
 
-    const handler = this.options.handlers
-      ? this.options.handlers[type]
-      : null;
+    const handler = this.options.handlers ? this.options.handlers[type] : null;
 
     if (handler) {
       try {
-        const event = new ComponentEvent(
-          this.id,
-          type,
-          this.rootElement,
-          this.getParentElement(),
-          null
-        );
+        const event = new ComponentEvent(this.id, type, this.rootElement, this.getParentElement(), null);
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         event.data = data;
         handler(event);
@@ -214,8 +201,7 @@ export abstract class Component {
    * It should create the root element and any base dependencies.
    */
   public async initialize(): Promise<Component> {
-    if (this.isInitialized)
-      return this;
+    if (this.isInitialized) return this;
 
     this.callHandler(ComponentEventType.BeforeCreate);
     this.isInitialized = true;
@@ -239,8 +225,7 @@ export abstract class Component {
       return this;
     }
 
-    if (this.isMounted)
-      return this;
+    if (this.isMounted) return this;
 
     this.callHandler(ComponentEventType.BeforeMount);
     this.isMounted = true;
@@ -256,8 +241,7 @@ export abstract class Component {
    * Method invoked to dispose of the component.
    */
   public async dispose(): Promise<void> {
-    if (this.disposed)
-      return;
+    if (this.disposed) return;
 
     this.callHandler(ComponentEventType.BeforeDestroy);
     this.disposed = true;
@@ -268,7 +252,7 @@ export abstract class Component {
     }
     this.callHandler(ComponentEventType.Destroyed);
 
-    this.id = '';
+    this.id = "";
     this.isInitialized = false;
     this.isMounted = false;
     this.resourcesLoaded = false;

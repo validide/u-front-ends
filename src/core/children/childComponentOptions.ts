@@ -1,5 +1,5 @@
-import { ChildComponentType } from './childComponentType';
-import { ComponentOptions } from '../componentOptions';
+import { ComponentOptions } from "../componentOptions";
+import { ChildComponentType } from "./childComponentType";
 
 /**
  * Child component options.

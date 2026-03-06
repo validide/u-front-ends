@@ -1,4 +1,8 @@
-import { CommunicationsManager, ContainerCommunicationHandler, ContainerCommunicationHandlerMethods } from '../communications/index';
+import {
+  type CommunicationsManager,
+  ContainerCommunicationHandler,
+  type ContainerCommunicationHandlerMethods,
+} from "../communications/index";
 
 /**
  * @inheritdoc

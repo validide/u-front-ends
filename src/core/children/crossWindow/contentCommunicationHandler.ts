@@ -1,4 +1,10 @@
-import { CommunicationsEvent, CommunicationsEventKind, ContentCommunicationHandler, CommunicationsManager, ContentCommunicationHandlerMethods } from '../communications/index';
+import {
+  CommunicationsEvent,
+  CommunicationsEventKind,
+  type CommunicationsManager,
+  ContentCommunicationHandler,
+  type ContentCommunicationHandlerMethods,
+} from "../communications/index";
 
 /**
  * @inheritdoc
@@ -16,7 +22,7 @@ export class CrossWindowContentCommunicationHandler extends ContentCommunication
   constructor(communicationsManager: CommunicationsManager, methods: ContentCommunicationHandlerMethods) {
     super(communicationsManager, methods);
 
-    this.iframeId = '';
+    this.iframeId = "";
     this.messageQueue = [];
   }
 
@@ -74,8 +80,7 @@ export class CrossWindowContentCommunicationHandler extends ContentCommunication
 
       // Send the previously queued messages.
       this.flushMessages();
-    }
-    else {
+    } else {
       // Phase 1 of the handshake - we got the hash so send it back.
       const response = new CommunicationsEvent(CommunicationsEventKind.Mounted);
       response.contentId = this.iframeId;

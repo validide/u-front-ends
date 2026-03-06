@@ -1,21 +1,20 @@
 import {
-  ChildComponentFactory,
-  ChildComponentOptions,
-  RootComponentFacade,
   ChildComponent,
-  ContainerCommunicationHandlerMethods,
-  ContainerCommunicationHandler,
+  ChildComponentFactory,
+  type ChildComponentOptions,
   CommunicationsEvent,
-  Component
-} from '../../src/index';
-import { MockCommunicationsManager } from './mockCommunicationsManager';
+  type Component,
+  ContainerCommunicationHandler,
+  ContainerCommunicationHandlerMethods,
+  type RootComponentFacade,
+} from "../../src/index";
+import { MockCommunicationsManager } from "./mockCommunicationsManager";
 
 export class MockChildComponentFactory extends ChildComponentFactory {
   public createComponent(window: Window, options: ChildComponentOptions, rootFacade: RootComponentFacade): Component {
     return new MockChildComponent(window, options, rootFacade);
   }
 }
-
 
 export class MockChildComponent extends ChildComponent {
   _rootFacade: RootComponentFacade;
@@ -32,7 +31,7 @@ export class MockChildComponent extends ChildComponent {
     this.callsTo_getCommunicationHandlerCore++;
     this.comunicationMethods = methods;
 
-    if ((this.rootElement as HTMLElement).tagName.toLowerCase() === 'ce-dipose-tests-null-handler') {
+    if ((this.rootElement as HTMLElement).tagName.toLowerCase() === "ce-dipose-tests-null-handler") {
       return null as unknown as ContainerCommunicationHandler;
     }
 
@@ -41,15 +40,15 @@ export class MockChildComponent extends ChildComponent {
         this.rootElement as HTMLElement,
         CommunicationsEvent.CONTENT_EVENT_TYPE,
         this.rootElement as HTMLElement,
-        CommunicationsEvent.CONTAINER_EVENT_TYPE
+        CommunicationsEvent.CONTAINER_EVENT_TYPE,
       ),
-      methods
+      methods,
     );
     return this.public_containerCommunicationHandler;
   }
 
   public disposeCore(): Promise<void> {
-    if ((this.rootElement as HTMLElement).tagName.toLowerCase() === 'ce-dipose-tests') {
+    if ((this.rootElement as HTMLElement).tagName.toLowerCase() === "ce-dipose-tests") {
       return super.disposeCore();
     }
     return Promise.resolve();

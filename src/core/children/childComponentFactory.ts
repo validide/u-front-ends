@@ -1,9 +1,9 @@
-import { RootComponentFacade } from '../rootComponentFacade';
-import { ChildComponentOptions } from './childComponentOptions';
-import { ChildComponentType } from './childComponentType';
-import { InWindowChildComponent } from './inWindow/childComponent';
-import { CrossWindowChildComponent, CrossWindowChildComponentOptions } from './crossWindow/index';
-import { Component } from '../component';
+import type { Component } from "../component";
+import type { RootComponentFacade } from "../rootComponentFacade";
+import type { ChildComponentOptions } from "./childComponentOptions";
+import { ChildComponentType } from "./childComponentType";
+import { CrossWindowChildComponent, type CrossWindowChildComponentOptions } from "./crossWindow/index";
+import { InWindowChildComponent } from "./inWindow/childComponent";
 
 /**
  * Factory to create child components.

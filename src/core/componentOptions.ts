@@ -1,5 +1,5 @@
-import { ComponentEventHandler, ComponentEventType } from './componentEvent';
-import { ResourceConfiguration } from './resourceConfiguration';
+import { type ComponentEventHandler, ComponentEventType } from "./componentEvent";
+import type { ResourceConfiguration } from "./resourceConfiguration";
 
 /**
  * Configuration object for the event handlers.
@@ -21,8 +21,8 @@ export class ComponentEventHandlers {
  * Component configuration options.
  */
 export class ComponentOptions {
-  public parent: string | HTMLElement = 'body';
-  public tag = 'div';
+  public parent: string | HTMLElement = "body";
+  public tag = "div";
   public handlers: ComponentEventHandlers = new ComponentEventHandlers();
   public resources: ResourceConfiguration[] = [];
 }
