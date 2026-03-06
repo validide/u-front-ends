@@ -1,54 +1,42 @@
-import { type AbortablePromise, type FetchOptions, JSDOM, ResourceLoader, VirtualConsole } from "jsdom";
+import { JSDOM, VirtualConsole } from "jsdom";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { loadResource, noop } from "../../../src/index";
+import { type ExtendedGlobalThis, installResourceSimulation } from "../../helpers/simulateResourceLoading";
 
-class CustomResourceLoader extends ResourceLoader {
-  fetch(url: string, _options: FetchOptions): AbortablePromise<Buffer> | null {
-    // if (url.endsWith('.js') && options.element?.constructor.name !== 'HTMLScriptElement') {
-    //   return Promise.reject(new Error('Requested JS with WRONG element.'));
-    // }
-
-    if (url.indexOf("404") !== -1) {
-      return Promise.reject(new Error("404")) as AbortablePromise<Buffer>;
-    }
-
-    if (url.endsWith(".js")) {
-      return Promise.resolve(
-        Buffer.from(`
-      var el = window.document.createElement('div');
-      el.id = 'testId';
-      window.document.body.appendChild(el);
-      `),
-      ) as AbortablePromise<Buffer>;
-    }
-
-    if (url.endsWith(".css")) {
-      return Promise.resolve(Buffer.from("body {color: red;}")) as AbortablePromise<Buffer>;
-    }
-
-    return Promise.reject(new Error("404")) as AbortablePromise<Buffer>;
-  }
-}
+// We simulate resource loading by intercepting head.appendChild so tests don't
+// depend on jsdom internal resource loader API which changed in v28.
 
 describe("loadResource", () => {
   let _jsDom: JSDOM;
-  let _win: Window;
+  let _win: Window & typeof globalThis;
 
   beforeEach(() => {
-    const loader = new CustomResourceLoader();
     const virtualConsole = new VirtualConsole();
     virtualConsole.on("jsdomError", noop);
     _jsDom = new JSDOM(undefined, {
       url: "http://localhost:8080/",
       runScripts: "dangerously",
-      resources: loader,
       virtualConsole: virtualConsole,
     });
     if (!_jsDom.window?.document?.defaultView) throw new Error("Setup failure!");
     _win = _jsDom.window.document.defaultView;
+    const uninstall = installResourceSimulation(_win);
+    // store uninstall so afterEach can call it
+    (globalThis as unknown as ExtendedGlobalThis).__test_uninstall_resource_simulation = uninstall;
   });
 
   afterEach(() => {
+    try {
+      const uninstall = (globalThis as unknown as ExtendedGlobalThis).__test_uninstall_resource_simulation as
+        | (() => void)
+        | undefined;
+      if (uninstall) {
+        uninstall();
+        delete (globalThis as unknown as ExtendedGlobalThis).__test_uninstall_resource_simulation;
+      }
+    } catch {
+      // ignore
+    }
     _win?.close();
     _jsDom.window.close();
   });

@@ -15,11 +15,11 @@
   },
   "devDependencies": {
     "@biomejs/biome": "2.4.6",
-    "@types/jsdom": "21.1.7",
+    "@types/jsdom": "28.0.0",
     "@types/node": "25.3.5",
     "@vitest/coverage-v8": "4.0.18",
     "glob": "13.0.6",
-    "jsdom": "22.1.0",
+    "jsdom": "28.1.0",
     "typedoc": "0.28.17",
     "typescript": "5.9.3",
     "vite": "7.3.1",
@@ -34,7 +34,8 @@
     "docs:dev": "npm run build && node -e \"require('fs').cpSync('dist/bundle', 'docs/public/demo/lib/bundle', {recursive: true, force: true})\" && typedoc && vitepress dev docs",
     "docs:build": "npm run build && node -e \"require('fs').cpSync('dist/bundle', 'docs/public/demo/lib/bundle', {recursive: true, force: true})\" && typedoc && vitepress build docs",
     "docs:preview": "vitepress preview docs",
-    "lint": "biome check --write ./"
+    "lint": "biome check --write ./",
+    "check": "tsc -p tsconfig.dev.json --noEmit && npm run lint && npm test"
   },
   "repository": {
     "type": "git",

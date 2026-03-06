@@ -1,4 +1,4 @@
-import { type AbortablePromise, type FetchOptions, JSDOM, ResourceLoader, VirtualConsole } from "jsdom";
+import { JSDOM, VirtualConsole } from "jsdom";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import {
   ChildComponent,
@@ -12,20 +12,13 @@ import {
   noop,
   RootComponentFacade,
 } from "../../../../src/index";
+import { type ExtendedGlobalThis, installResourceSimulation } from "../../../helpers/simulateResourceLoading";
 import { MockCrossWindowChildComponent } from "../../../mocks/mockCrossWindowChildComponent";
 import { values_falsies } from "../../../utils";
 
-class CustomResourceLoader extends ResourceLoader {
-  fetch(url: string, _options: FetchOptions): AbortablePromise<Buffer> | null {
-    return url.indexOf("error") !== -1
-      ? (Promise.reject(new Error("Some network error")) as AbortablePromise<Buffer>)
-      : (Promise.resolve(Buffer.from("")) as AbortablePromise<Buffer>);
-  }
-}
-
 describe("CrossWindowChildComponent", () => {
   let _jsDom: JSDOM;
-  let _win: Window;
+  let _win: Window & typeof globalThis;
   let _opt: CrossWindowChildComponentOptions;
   let _rootFacade: RootComponentFacade;
   let _child: MockCrossWindowChildComponent;
@@ -36,11 +29,15 @@ describe("CrossWindowChildComponent", () => {
     _jsDom = new JSDOM(undefined, {
       url: "http://localhost:8080/",
       runScripts: "dangerously",
-      resources: new CustomResourceLoader(),
       virtualConsole: virtualConsole,
     });
     if (!_jsDom.window?.document?.defaultView) throw new Error("Setup failure!");
     _win = _jsDom.window.document.defaultView;
+    // Install shared resource simulation for this JSDOM instance so script/link
+    // elements appended by the code under test will dispatch load/error and
+    // produce expected side-effects.
+    (globalThis as unknown as ExtendedGlobalThis).__test_uninstall_resource_simulation =
+      installResourceSimulation(_win);
     _opt = new CrossWindowChildComponentOptions();
     _rootFacade = new RootComponentFacade(noop);
     _child = new MockCrossWindowChildComponent(_win, _opt, _rootFacade);
@@ -49,6 +46,14 @@ describe("CrossWindowChildComponent", () => {
   afterEach(() => {
     _child = null as unknown as MockCrossWindowChildComponent;
     try {
+      try {
+        const uninstall = (globalThis as unknown as ExtendedGlobalThis).__test_uninstall_resource_simulation as
+          | (() => void)
+          | undefined;
+        if (uninstall) uninstall();
+      } catch {
+        // ignore
+      }
       _win.close();
       _jsDom.window.close();
     } catch {

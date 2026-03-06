@@ -1,15 +1,9 @@
-import { type AbortablePromise, type FetchOptions, JSDOM, ResourceLoader } from "jsdom";
+import { JSDOM } from "jsdom";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { ComponentEventHandlers, ComponentOptions } from "../../src/core/componentOptions";
 import { Component, type ComponentEvent, ComponentEventType, ResourceConfiguration } from "../../src/index";
+import { type ExtendedGlobalThis, installResourceSimulation } from "../helpers/simulateResourceLoading";
 import { getDelayPromise, values_falsies } from "../utils";
-
-class CustomResourceLoader extends ResourceLoader {
-  fetch(_url: string, _options: FetchOptions): AbortablePromise<Buffer> | null {
-    // return Promise.resolve(Buffer.from(`console.log('${url}');`));
-    return Promise.resolve(Buffer.from("")) as AbortablePromise<Buffer>;
-  }
-}
 
 class StubComponent extends Component {
   public timesDisposedCalled: number;
@@ -87,21 +81,31 @@ class StubComponent extends Component {
 
 describe("Component", () => {
   let _jsDom: JSDOM;
-  let _win: Window;
+  let _win: Window & typeof globalThis;
   const _options: ComponentOptions = new ComponentOptions();
 
   beforeEach(() => {
-    const loader = new CustomResourceLoader();
     _jsDom = new JSDOM(undefined, {
       url: "http://localhost:8080/",
       runScripts: "dangerously",
-      resources: loader,
     });
     if (!_jsDom.window?.document?.defaultView) throw new Error("Setup failure!");
     _win = _jsDom.window.document.defaultView;
+    // Install shared resource simulation so appended scripts/links fire load/error
+    // and produce the expected side effects used by tests.
+    (globalThis as unknown as ExtendedGlobalThis).__test_uninstall_resource_simulation =
+      installResourceSimulation(_win);
   });
 
   afterEach(() => {
+    try {
+      const uninstall = (globalThis as unknown as ExtendedGlobalThis).__test_uninstall_resource_simulation as
+        | (() => void)
+        | undefined;
+      if (uninstall) uninstall();
+    } catch {
+      // ignore
+    }
     _win?.close();
     _jsDom.window.close();
   });
