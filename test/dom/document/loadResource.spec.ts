@@ -1,22 +1,9 @@
-/* eslint-disable @typescript-eslint/restrict-template-expressions */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unused-expressions */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-return */
-/* eslint-disable no-underscore-dangle */
-
-/* eslint-disable @typescript-eslint/naming-convention */
-/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
-/* eslint-disable prefer-arrow/prefer-arrow-functions */
-
 import { type AbortablePromise, type FetchOptions, JSDOM, ResourceLoader, VirtualConsole } from "jsdom";
-import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { loadResource, noop } from "../../../src/index";
 
 class CustomResourceLoader extends ResourceLoader {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  fetch(url: string, options: FetchOptions): AbortablePromise<Buffer> | null {
+  fetch(url: string, _options: FetchOptions): AbortablePromise<Buffer> | null {
     // if (url.endsWith('.js') && options.element?.constructor.name !== 'HTMLScriptElement') {
     //   return Promise.reject(new Error('Requested JS with WRONG element.'));
     // }

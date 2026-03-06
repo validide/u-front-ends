@@ -20,11 +20,11 @@ export class MockCommunicationsManager extends CommunicationsManagerOf<HTMLEleme
     this.receivedEvents.push(evt);
     return evt;
   }
-  protected sendEvent(outboundEndpoint: HTMLElement, event: CommunicationsEvent): void {
+  protected sendEvent(_outboundEndpoint: HTMLElement, event: CommunicationsEvent): void {
     this.sentEvents.push(event);
   }
 
   public callEventReceivedCallback(e: Event): void {
-    return this.handler ? this.handler(e) : void 0;
+    if (this.handler) this.handler(e);
   }
 }

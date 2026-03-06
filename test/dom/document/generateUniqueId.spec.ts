@@ -1,17 +1,5 @@
-/* eslint-disable @typescript-eslint/restrict-template-expressions */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unused-expressions */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-return */
-/* eslint-disable no-underscore-dangle */
-
-/* eslint-disable @typescript-eslint/naming-convention */
-/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
-/* eslint-disable prefer-arrow/prefer-arrow-functions */
-
 import { JSDOM } from "jsdom";
-import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it } from "vitest";
 import { generateUniqueId } from "../../../src/index";
 import { values_falsies } from "../../utils";
 
@@ -40,7 +28,7 @@ describe("generateUniqueId", () => {
   });
 
   it("should not fail for falsies", () => {
-    const ids: string[] = values_falsies.map((f: any) => generateUniqueId(doc, f as unknown as string));
+    const ids: string[] = values_falsies.map((f: unknown) => generateUniqueId(doc, f as unknown as string));
 
     ids.forEach((id: string, idx: number) => {
       expect(id.length).to.be.greaterThan(0);

@@ -1,9 +1,5 @@
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-return */
-/* eslint-disable prefer-arrow/prefer-arrow-functions */
 function customEventPolyfill<T>(
-  this: any,
+  this: Document,
   document: Document,
   typeArg: string,
   eventInitDict?: CustomEventInit<T>,
@@ -19,12 +15,25 @@ export function createCustomEvent<T>(
   typeArg: string,
   eventInitDict?: CustomEventInit<T>,
 ): CustomEvent<T> {
-  const win: any = document?.defaultView;
+  const win = document?.defaultView as Window | undefined;
   if (!win) throw new Error("Document does not have a default view.");
 
-  if (typeof win.CustomEvent !== "function") {
-    return new (customEventPolyfill as any)(document, typeArg, eventInitDict);
+  const anyWin = win as unknown as { CustomEvent?: unknown } & Record<string, unknown>;
+
+  if (typeof (anyWin.CustomEvent as unknown) !== "function") {
+    return new (
+      customEventPolyfill as unknown as new (
+        d: Document,
+        t: string,
+        e?: CustomEventInit<T>,
+      ) => CustomEvent<T>
+    )(document, typeArg, eventInitDict);
   }
 
-  return new win.CustomEvent(typeArg, eventInitDict);
+  return new (
+    anyWin.CustomEvent as unknown as new (
+      type: string,
+      eventInitDict?: CustomEventInit<T>,
+    ) => CustomEvent<T>
+  )(typeArg, eventInitDict);
 }

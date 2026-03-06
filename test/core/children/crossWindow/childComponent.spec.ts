@@ -1,18 +1,5 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable @typescript-eslint/restrict-template-expressions */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unused-expressions */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-return */
-/* eslint-disable no-underscore-dangle */
-
-/* eslint-disable @typescript-eslint/naming-convention */
-/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
-/* eslint-disable prefer-arrow/prefer-arrow-functions */
-
 import { type AbortablePromise, type FetchOptions, JSDOM, ResourceLoader, VirtualConsole } from "jsdom";
-import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import {
   ChildComponent,
   ChildComponentOptions,
@@ -29,7 +16,7 @@ import { MockCrossWindowChildComponent } from "../../../mocks/mockCrossWindowChi
 import { values_falsies } from "../../../utils";
 
 class CustomResourceLoader extends ResourceLoader {
-  fetch(url: string, options: FetchOptions): AbortablePromise<Buffer> | null {
+  fetch(url: string, _options: FetchOptions): AbortablePromise<Buffer> | null {
     return url.indexOf("error") !== -1
       ? (Promise.reject(new Error("Some network error")) as AbortablePromise<Buffer>)
       : (Promise.resolve(Buffer.from("")) as AbortablePromise<Buffer>);
@@ -82,7 +69,7 @@ describe("CrossWindowChildComponent", () => {
 
   it("should return a communication handler that is of type InWindowContainerCommunicationHandler", async () => {
     await _child.initialize();
-    const mountProm = _child.mount();
+    const _mountProm = _child.mount();
     expect(_child.getCommunicationHandlerCore(new ContainerCommunicationHandlerMethods())).to.be.an.instanceof(
       CrossWindowContainerCommunicationHandler,
     );
@@ -100,11 +87,11 @@ describe("CrossWindowChildComponent", () => {
   values_falsies.forEach((f) => {
     it("should throw if getCommunicationHandlerCore can not access the contentWindow", async () => {
       let embededId = "";
-      let originalContentWindow: any = null;
+      let originalContentWindow: Window | null = null;
       let embed: HTMLIFrameElement | null = null;
       try {
         await _child.initialize();
-        const mountProm = _child.mount();
+        const _mountProm = _child.mount();
         embed = _child.getRootEl().querySelector("iframe") as HTMLIFrameElement;
         originalContentWindow = embed.contentWindow;
         Object.defineProperty(embed, "contentWindow", {
@@ -134,7 +121,7 @@ describe("CrossWindowChildComponent", () => {
       "data-cutom-attribute": "my-custom-attribute",
     };
     await _child.initialize();
-    const mountProm = _child.mount();
+    const _mountProm = _child.mount();
 
     const iframe = _win.document.querySelector<HTMLIFrameElement>(
       '[data-cutom-attribute="my-custom-attribute"]',
@@ -164,7 +151,7 @@ describe("CrossWindowChildComponent", () => {
         error = event.error;
       }
     };
-    _opt.createEmbedElement = (el: HTMLElement) => {
+    _opt.createEmbedElement = (_el: HTMLElement) => {
       return undefined as unknown as HTMLElement;
     };
     await _child.initialize();
@@ -190,9 +177,11 @@ describe("CrossWindowChildComponent", () => {
       _opt.contentDisposeTimeout = 10;
       await _child.dispose();
       await _child.dispose();
-      (_child as any).disposed = false;
+      // Access internal disposed flag for testing
+      // test-only access to internal disposed flag
+      (_child as unknown as { disposed?: boolean }).disposed = false;
       await _child.dispose();
-    } catch (e) {
+    } catch (_e) {
       expect(true).to.be.false; // We should not reach this point.
     }
 

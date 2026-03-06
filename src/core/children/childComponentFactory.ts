@@ -23,7 +23,6 @@ export class ChildComponentFactory {
       case ChildComponentType.CrossWindow:
         return new CrossWindowChildComponent(window, options as CrossWindowChildComponentOptions, rootFacade);
       default:
-        // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
         throw new Error(`The "${options.type}" is not configured.`);
     }
   }

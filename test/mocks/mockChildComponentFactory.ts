@@ -54,7 +54,6 @@ export class MockChildComponent extends ChildComponent {
     return Promise.resolve();
   }
 
-  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
   public signalDisposeToParent() {
     this._rootFacade.signalDisposed(this);
   }
@@ -62,7 +61,7 @@ export class MockChildComponent extends ChildComponent {
 
 export class MockContainerCommunicationHandler extends ContainerCommunicationHandler {
   public calls_requestContentDispose = 0;
-  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+
   public requestContentDispose() {
     this.calls_requestContentDispose++;
     super.requestContentDispose();

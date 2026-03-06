@@ -29,7 +29,7 @@ export class ContainerCommunicationHandlerMethods {
   /**
    * Call the container to signal the component has disposed(almost).
    */
-  public [CommunicationsEventKind.Data]: (data: any) => void = noop;
+  public [CommunicationsEventKind.Data]: (data: unknown) => void = noop;
 }
 
 /**
@@ -104,10 +104,10 @@ export abstract class ContainerCommunicationHandler {
    *
    * @param data The data to send.
    */
-  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-  public sendData(data: any): void {
+
+  public sendData(data: unknown): void {
     const event = new CommunicationsEvent(CommunicationsEventKind.Data);
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+
     event.data = data;
     this.communicationsManager?.send(event);
   }

@@ -6,17 +6,7 @@ import { CommunicationsManagerOf } from "../communications/manager";
  * @inheritdoc
  */
 export class HTMLElementCommunicationsManager extends CommunicationsManagerOf<HTMLElement> {
-  /**
-   * @inheritdoc
-   */
-  constructor(
-    inboundEndpoint: HTMLElement,
-    inboundEventType: string,
-    outboundEndpoint: HTMLElement,
-    outboundEventType: string,
-  ) {
-    super(inboundEndpoint, inboundEventType, outboundEndpoint, outboundEventType);
-  }
+  // constructor is intentionally omitted — base class constructor is sufficient
 
   /**
    * @inheritdoc

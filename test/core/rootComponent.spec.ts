@@ -1,17 +1,5 @@
-/* eslint-disable @typescript-eslint/restrict-template-expressions */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unused-expressions */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-return */
-/* eslint-disable no-underscore-dangle */
-
-/* eslint-disable @typescript-eslint/naming-convention */
-/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
-/* eslint-disable prefer-arrow/prefer-arrow-functions */
-
 import { JSDOM } from "jsdom";
-import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { ChildComponentOptions, RootComponent, RootComponentOptions } from "../../src/index";
 import { type MockChildComponent, MockChildComponentFactory } from "../mocks/mockChildComponentFactory";
 import { getDelayPromise, values_falsies } from "../utils";
@@ -37,13 +25,13 @@ describe("RootComponent", () => {
   });
 
   describe("Constructor", () => {
-    values_falsies.forEach((f: any) => {
+    values_falsies.forEach((f: unknown) => {
       it(`passing a falsie as the "window" argument throws - ${f}`, () => {
         expect(() => new RootComponent(f as unknown as Window, _options)).to.throw('Missing "window" argument.');
       });
     });
 
-    values_falsies.forEach((f: any) => {
+    values_falsies.forEach((f: unknown) => {
       it(`passing a falsie as the "options" argument throws - ${f}`, () => {
         expect(() => new RootComponent(_win, f as unknown as RootComponentOptions)).to.throw(
           'Missing "options" argument.',

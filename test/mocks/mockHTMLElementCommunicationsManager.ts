@@ -11,14 +11,14 @@ export class MockHTMLElementCommunicationsManager extends HTMLElementCommunicati
   }
 
   public startReceiving(inboundEndpoint: HTMLElement, handler: (e: Event) => void): void {
-    return super.startReceiving(inboundEndpoint, handler);
+    super.startReceiving(inboundEndpoint, handler);
   }
 
   public stopReceiving(inboundEndpoint: HTMLElement, handler: (e: Event) => void): void {
-    return super.stopReceiving(inboundEndpoint, handler);
+    super.stopReceiving(inboundEndpoint, handler);
   }
 
   public sendEvent(outboundEndpoint: HTMLElement, event: CommunicationsEvent): void {
-    return super.sendEvent(outboundEndpoint, event);
+    super.sendEvent(outboundEndpoint, event);
   }
 }

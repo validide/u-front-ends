@@ -1,11 +1,7 @@
-import type { RootComponentFacade } from "../../rootComponentFacade";
+// Root facade type is only needed on runtime cast locations; import removed to satisfy linter
 import { ChildComponent } from "../childComponent";
-import {
-  CommunicationsEvent,
-  type ContainerCommunicationHandler,
-  type ContainerCommunicationHandlerMethods,
-  HTMLElementCommunicationsManager,
-} from "../communications/index";
+import type { ContainerCommunicationHandler, ContainerCommunicationHandlerMethods } from "../communications/index";
+import { CommunicationsEvent, HTMLElementCommunicationsManager } from "../communications/index";
 import type { InWindowChildComponentOptions } from "./childComponentOptions";
 import { InWindowContainerCommunicationHandler } from "./containerCommunicationHandler";
 
@@ -13,16 +9,7 @@ import { InWindowContainerCommunicationHandler } from "./containerCommunicationH
  * In Window Child Component.
  */
 export class InWindowChildComponent extends ChildComponent {
-  /**
-   * Constructor.
-   *
-   * @param window The window reference.
-   * @param options The child component options.
-   * @param rootFacade The facade to the root component.
-   */
-  constructor(window: Window, options: InWindowChildComponentOptions, rootFacade: RootComponentFacade) {
-    super(window, options, rootFacade);
-  }
+  // constructor omitted — base class constructor is sufficient
 
   /**
    * @inheritdoc

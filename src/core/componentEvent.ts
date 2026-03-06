@@ -29,7 +29,7 @@ export class ComponentEvent {
   public parentEl: HTMLElement;
   public error: Error | null;
   public timestamp: Date;
-  public data: any;
+  public data: unknown;
 
   /**
    * Constructor.

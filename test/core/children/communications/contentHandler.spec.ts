@@ -1,17 +1,5 @@
-/* eslint-disable @typescript-eslint/restrict-template-expressions */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unused-expressions */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-return */
-/* eslint-disable no-underscore-dangle */
-
-/* eslint-disable @typescript-eslint/naming-convention */
-/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
-/* eslint-disable prefer-arrow/prefer-arrow-functions */
-
 import { JSDOM } from "jsdom";
-import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { createCustomEvent } from "../../../../src/dom/document/createCustomEvent";
 import {
   CommunicationsEvent,
@@ -65,7 +53,7 @@ describe("ContentCommunicationHandler", () => {
   it("should not fail if calling dispose multiple times", () => {
     expect(() => _handler.dispose()).not.to.throw();
     expect(() => _handler.dispose()).not.to.throw();
-    (_handler as any).disposed = false;
+    (_handler as unknown as { disposed?: boolean }).disposed = false;
     expect(() => _handler.dispose()).not.to.throw();
   });
 
@@ -150,8 +138,8 @@ describe("ContentCommunicationHandler", () => {
     const e = new CommunicationsEvent(CommunicationsEventKind.Data);
     e.data = data;
 
-    let receivedData: any = null;
-    _methods.handleDataEvent = (d: any) => (receivedData = d);
+    let receivedData: unknown = null;
+    _methods.handleDataEvent = (d: unknown) => (receivedData = d);
     _handler.handleEventCore(e);
 
     expect(receivedData).not.to.be.null;

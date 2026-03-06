@@ -164,7 +164,6 @@ export class CrossWindowChildComponent extends ChildComponent {
     if (!embed) throw new Error(`No iframe with "${this.embeddedId}" id found.`);
 
     if (!embed.contentWindow)
-      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
       throw new Error(
         `The iframe with "${this.embeddedId}" id does not have a "contentWindow"(${embed.contentWindow}).`,
       );

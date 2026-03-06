@@ -2,6 +2,6 @@ import { type CommunicationsEvent, ContainerCommunicationHandler } from "../../s
 
 export class MockContainerCommunicationHandler extends ContainerCommunicationHandler {
   public handleEventCore(e: CommunicationsEvent): void {
-    return super.handleEventCore(e);
+    super.handleEventCore(e);
   }
 }

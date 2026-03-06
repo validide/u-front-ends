@@ -176,7 +176,7 @@ export abstract class CommunicationsManagerOf<TEndpoint> extends CommunicationsM
   /**
    * @inheritdoc
    */
-  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+
   public setEventReceivedCallback(callback: (event: CommunicationsEvent) => void) {
     this.onEventReceived = callback;
   }

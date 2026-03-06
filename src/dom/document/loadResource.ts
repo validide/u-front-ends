@@ -7,7 +7,7 @@
  * @param skipLoading Function to determine if the resource should not be loaded.
  * @param attributes Extra attributes to add on the HTML element before attaching it to the document.
  */
-// eslint-disable-next-line prefer-arrow/prefer-arrow-functions
+
 export function loadResource(
   document: Document,
   url: string,
@@ -15,7 +15,7 @@ export function loadResource(
   skipLoading?: () => boolean,
   attributes?: { [key: string]: string },
 ): Promise<void> {
-  if (skipLoading && skipLoading()) return Promise.resolve();
+  if (skipLoading?.()) return Promise.resolve();
 
   return new Promise<void>((resolve, reject) => {
     let resource: HTMLScriptElement | HTMLLinkElement;

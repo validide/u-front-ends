@@ -44,7 +44,7 @@ export class CommunicationsEvent {
   /**
    * Event data.
    */
-  public data: any;
+  public data: unknown;
 
   /**
    * Constructor.
@@ -54,7 +54,7 @@ export class CommunicationsEvent {
   constructor(kind: CommunicationsEventKind) {
     this.kind = kind;
     this.uuid = getUuidV4();
-    this.timestamp = new Date().getTime();
+    this.timestamp = Date.now();
     this.contentId = "";
   }
 }

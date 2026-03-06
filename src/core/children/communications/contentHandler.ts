@@ -13,7 +13,7 @@ export class ContentCommunicationHandlerMethods {
   /**
    * Method to dispose the content.
    */
-  public handleDataEvent: (data: any) => void = noop;
+  public handleDataEvent: (data: unknown) => void = noop;
 }
 
 /**
@@ -91,10 +91,10 @@ export abstract class ContentCommunicationHandler {
   /**
    * Dispatch event to signal mounting finished.
    */
-  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-  public sendData(data: any): void {
+
+  public sendData(data: unknown): void {
     const evt = new CommunicationsEvent(CommunicationsEventKind.Data);
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+
     evt.data = data;
     this.send(evt);
   }

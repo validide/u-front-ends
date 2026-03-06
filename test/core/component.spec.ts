@@ -1,24 +1,11 @@
-/* eslint-disable @typescript-eslint/restrict-template-expressions */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unused-expressions */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-return */
-/* eslint-disable no-underscore-dangle */
-
-/* eslint-disable @typescript-eslint/naming-convention */
-/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
-/* eslint-disable prefer-arrow/prefer-arrow-functions */
-
 import { type AbortablePromise, type FetchOptions, JSDOM, ResourceLoader } from "jsdom";
-import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { ComponentEventHandlers, ComponentOptions } from "../../src/core/componentOptions";
 import { Component, type ComponentEvent, ComponentEventType, ResourceConfiguration } from "../../src/index";
 import { getDelayPromise, values_falsies } from "../utils";
 
 class CustomResourceLoader extends ResourceLoader {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  fetch(url: string, options: FetchOptions): AbortablePromise<Buffer> | null {
+  fetch(_url: string, _options: FetchOptions): AbortablePromise<Buffer> | null {
     // return Promise.resolve(Buffer.from(`console.log('${url}');`));
     return Promise.resolve(Buffer.from("")) as AbortablePromise<Buffer>;
   }
@@ -54,7 +41,7 @@ class StubComponent extends Component {
   }
 
   public callHandler(type: ComponentEventType): void {
-    return super.callHandler(type);
+    super.callHandler(type);
   }
 
   protected async initializeCore(): Promise<void> {
@@ -120,13 +107,13 @@ describe("Component", () => {
   });
 
   describe("Constructor", () => {
-    values_falsies.forEach((f: any) => {
+    values_falsies.forEach((f: unknown) => {
       it(`passing a falsie as the "window" argument throws - ${f}`, () => {
         expect(() => new StubComponent(f as unknown as Window, _options)).to.throw('Missing "window" argument.');
       });
     });
 
-    values_falsies.forEach((f: any) => {
+    values_falsies.forEach((f: unknown) => {
       it(`passing a falsie as the "options" argument throws - ${f}`, () => {
         expect(() => new StubComponent(_win, f as unknown as ComponentOptions)).to.throw('Missing "options" argument.');
       });
@@ -278,16 +265,18 @@ describe("Component", () => {
       it(`Throws if the parent is missing: ${f}`, async () => {
         const options = new ComponentOptions();
         let err: Error | null = null;
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        let errHandlerCalled = true;
+
+        let _errHandlerCalled = true;
         options.parent = f as unknown as string;
         options.handlers.error = () => {
-          // eslint-disable-next-line @typescript-eslint/no-unused-vars
-          errHandlerCalled = true;
+          _errHandlerCalled = true;
         };
-        (_win as any).console.log = (msg: any) => {
-          err = msg as Error;
-        };
+        const _winConsole = _win as unknown as { console?: Console };
+        if (_winConsole.console) {
+          _winConsole.console.log = (msg: unknown) => {
+            err = msg as Error;
+          };
+        }
         const comp = new StubComponent(_win, options);
 
         await comp.initialize();
@@ -418,7 +407,7 @@ describe("Component", () => {
       const comp = new StubComponent(_win, opt);
 
       // INITIALIZE
-      let prom: Promise<any> = comp.initialize();
+      let prom: Promise<Component | undefined> = comp.initialize() as unknown as Promise<Component | undefined>;
 
       expect(events[ComponentEventType.BeforeCreate.toString()].length).to.eq(1);
       expect(timesCallHandlerCalled).to.eq(1);
@@ -451,7 +440,8 @@ describe("Component", () => {
       expect(timesCallHandlerCalled).to.eq(6);
 
       // DISPOSE
-      prom = comp.dispose();
+      // dispose returns Promise<void> so widen the promise type to include undefined
+      prom = comp.dispose() as unknown as Promise<Component | undefined>;
 
       expect(events[ComponentEventType.BeforeDestroy.toString()].length).to.eq(1);
       expect(timesCallHandlerCalled).to.eq(7);
@@ -465,7 +455,7 @@ describe("Component", () => {
 
   describe("Misc", () => {
     it('if error handler fails we log using the "log" method', async () => {
-      const consoleLog: any[] = [];
+      const consoleLog: { message?: unknown; optionalParams?: unknown[] }[] = [];
       const options = new ComponentOptions();
       const err = new Error("Error Handler Error");
       const comp = new StubComponent(_win, options);
@@ -474,9 +464,14 @@ describe("Component", () => {
         throw err;
       };
       comp.throwError = true;
-      (_win as any).console.log = (message?: any, ...optionalParams: any[]) => {
-        consoleLog.push({ message: message, optionalParams: optionalParams });
-      };
+      {
+        const _winConsole = _win as unknown as { console?: Console };
+        if (_winConsole.console) {
+          _winConsole.console.log = (message?: unknown, ...optionalParams: unknown[]) => {
+            consoleLog.push({ message, optionalParams });
+          };
+        }
+      }
 
       await comp.dispose();
 
@@ -486,14 +481,19 @@ describe("Component", () => {
     });
 
     it('if error is not registered we log using the "log" method - 1', async () => {
-      const consoleLog: any[] = [];
+      const consoleLog: { message?: unknown; optionalParams?: unknown[] }[] = [];
       const options = new ComponentOptions();
       const comp = new StubComponent(_win, options);
       options.handlers = options.handlers || new ComponentEventHandlers();
       comp.throwError = true;
-      (_win as any).console.log = (message?: any, ...optionalParams: any[]) => {
-        consoleLog.push({ message: message, optionalParams: optionalParams });
-      };
+      {
+        const _winConsole = _win as unknown as { console?: Console };
+        if (_winConsole.console) {
+          _winConsole.console.log = (message?: unknown, ...optionalParams: unknown[]) => {
+            consoleLog.push({ message, optionalParams });
+          };
+        }
+      }
 
       await comp.dispose();
 
@@ -503,14 +503,19 @@ describe("Component", () => {
     });
 
     it('if error is not registered we log using the "log" method - 2', async () => {
-      const consoleLog: any[] = [];
+      const consoleLog: { message?: unknown; optionalParams?: unknown[] }[] = [];
       const options = new ComponentOptions();
       options.handlers = undefined as unknown as ComponentEventHandlers;
       const comp = new StubComponent(_win, options);
       comp.throwError = true;
-      (_win as any).console.log = (message?: any, ...optionalParams: any[]) => {
-        consoleLog.push({ message: message, optionalParams: optionalParams });
-      };
+      {
+        const _winConsole = _win as unknown as { console?: Console };
+        if (_winConsole.console) {
+          _winConsole.console.log = (message?: unknown, ...optionalParams: unknown[]) => {
+            consoleLog.push({ message, optionalParams });
+          };
+        }
+      }
 
       await comp.dispose();
 
@@ -522,7 +527,7 @@ describe("Component", () => {
     it('doe not fail in log method if "log" method is missing', async () => {
       const comp = new StubComponent(_win, _options);
       comp.throwError = true;
-      (_win as any).console.log = undefined;
+      (_win as unknown as { console?: Console | undefined }).console = undefined;
 
       await comp.dispose();
 
@@ -532,7 +537,7 @@ describe("Component", () => {
     it('doe not fail in log method if "console" is missing', async () => {
       const comp = new StubComponent(_win, _options);
       comp.throwError = true;
-      (_win as any).console = undefined;
+      (_win as unknown as { console?: Console | undefined }).console = undefined;
 
       await comp.dispose();
 
@@ -542,7 +547,7 @@ describe("Component", () => {
     it('doe not fail in log method if "window" is missing', async () => {
       const comp = new StubComponent(_win, _options);
       comp.throwError = true;
-      (comp as any).window = undefined;
+      (comp as unknown as { window?: Window | null }).window = undefined;
 
       await comp.dispose();
 

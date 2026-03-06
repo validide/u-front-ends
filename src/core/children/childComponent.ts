@@ -46,7 +46,7 @@ export abstract class ChildComponent extends Component {
     methods.mounted = () => this.callHandler(ComponentEventType.Mounted);
     methods.beforeUpdate = () => this.callHandler(ComponentEventType.BeforeUpdate);
     methods.updated = () => this.callHandler(ComponentEventType.Updated);
-    methods.data = (data: any) => this.callHandler(ComponentEventType.Data, data);
+    methods.data = (data: unknown) => this.callHandler(ComponentEventType.Data, data as unknown);
     methods.beforeDispose = () => this.contentBeginDisposed();
     methods.disposed = () => this.contentDisposed();
     return this.getCommunicationHandlerCore(methods);
@@ -90,7 +90,7 @@ export abstract class ChildComponent extends Component {
       new Promise<void>((resolver) => {
         this.contentDisposePromiseResolver = resolver;
       }),
-      new Promise<void>((resolveTimeout, rejectTimeout) => {
+      new Promise<void>((_resolveTimeout, rejectTimeout) => {
         this.getWindow().setTimeout(
           () => rejectTimeout(new Error("Child dispose timeout.")),
           this.getOptions().contentDisposeTimeout,
@@ -143,8 +143,8 @@ export abstract class ChildComponent extends Component {
    *
    * @param data The data to send.
    */
-  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-  public sendData(data: any): void {
+
+  public sendData(data: unknown): void {
     this.communicationHandler?.sendData(data);
   }
 }

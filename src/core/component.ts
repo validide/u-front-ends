@@ -63,10 +63,7 @@ export abstract class Component {
       }
     }
 
-    if (!parent)
-      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-      // eslint-disable-next-line @typescript-eslint/no-base-to-string
-      throw new Error(`Failed to find parent "${String(opt.parent)}".`);
+    if (!parent) throw new Error(`Failed to find parent "${String(opt.parent)}".`);
 
     return parent;
   }
@@ -159,8 +156,8 @@ export abstract class Component {
    *
    * @param type The type of handler to call.
    */
-  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-  protected callHandler(type: ComponentEventType, data?: any): void {
+
+  protected callHandler(type: ComponentEventType, data?: unknown): void {
     if (type === ComponentEventType.Error)
       throw new Error(`For calling the "${ComponentEventType.Error}" handler use the "callErrorHandler" method.`);
 
@@ -169,7 +166,7 @@ export abstract class Component {
     if (handler) {
       try {
         const event = new ComponentEvent(this.id, type, this.rootElement, this.getParentElement(), null);
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+
         event.data = data;
         handler(event);
       } catch (error) {
@@ -184,16 +181,11 @@ export abstract class Component {
    * @param message The message.
    * @param optionalParams Optional parameters.
    */
-  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-  protected log(message?: any, ...optionalParams: any[]): void {
-    /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-    /* eslint-disable @typescript-eslint/no-unsafe-member-access */
-    const logMethod = (this.window as any)?.console?.log;
-    if (logMethod)
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-      logMethod(message, optionalParams);
-    /* eslint-enable @typescript-eslint/no-unsafe-member-access */
-    /* eslint-enable @typescript-eslint/no-unsafe-assignment */
+
+  protected log(message?: unknown, ...optionalParams: unknown[]): void {
+    const win = this.window as unknown as { console?: Console } | null;
+    const logMethod = win?.console?.log;
+    if (logMethod) logMethod(message, ...optionalParams);
   }
 
   /**

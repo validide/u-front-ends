@@ -84,7 +84,7 @@ export class CrossWindowContentCommunicationHandler extends ContentCommunication
       // Phase 1 of the handshake - we got the hash so send it back.
       const response = new CommunicationsEvent(CommunicationsEventKind.Mounted);
       response.contentId = this.iframeId;
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+
       response.data = e.data;
       this.send(response);
     }

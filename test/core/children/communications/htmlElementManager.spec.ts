@@ -1,17 +1,5 @@
-/* eslint-disable @typescript-eslint/restrict-template-expressions */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unused-expressions */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-return */
-/* eslint-disable no-underscore-dangle */
-
-/* eslint-disable @typescript-eslint/naming-convention */
-/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
-/* eslint-disable prefer-arrow/prefer-arrow-functions */
-
 import { JSDOM } from "jsdom";
-import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { createCustomEvent } from "../../../../src/dom/document/createCustomEvent";
 import { CommunicationsEvent, CommunicationsEventKind } from "../../../../src/index";
 import { MockHTMLElementCommunicationsManager } from "../../../mocks/mockHTMLElementCommunicationsManager";
@@ -89,7 +77,7 @@ describe("HTMLElementCommunicationsManager", () => {
     const evt = new CommunicationsEvent(CommunicationsEventKind.BeforeDispose);
 
     expect(_mngr.readEvent(_win.document.createEvent("MouseEvent"))).to.be.null;
-    expect(_mngr.readEvent(createCustomEvent(_win.document, _eventType + "_wrong_type", { detail: evt }))).to.be.null;
+    expect(_mngr.readEvent(createCustomEvent(_win.document, `${_eventType}_wrong_type`, { detail: evt }))).to.be.null;
     expect(_mngr.readEvent(createCustomEvent(_win.document, _eventType, { detail: evt }))).to.eq(evt);
   });
 

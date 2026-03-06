@@ -21,18 +21,18 @@ export class MockCrossWindowCommunicationsManager extends CrossWindowCommunicati
   public startReceiving(inboundEndpoint: Window, handler: (e: Event) => void): void {
     this.handler = handler;
     this.inboundEndpointRef = inboundEndpoint;
-    return super.startReceiving(inboundEndpoint, handler);
+    super.startReceiving(inboundEndpoint, handler);
   }
 
   public stopReceiving(inboundEndpoint: Window, handler: (e: Event) => void): void {
     this.handler = null;
     this.inboundEndpointRef = null;
-    return super.stopReceiving(inboundEndpoint, handler);
+    super.stopReceiving(inboundEndpoint, handler);
   }
 
   public sendEvent(outboundEndpoint: Window, event: CommunicationsEvent): void {
     this.sentEvents.push(event);
-    return super.sendEvent(outboundEndpoint, event);
+    super.sendEvent(outboundEndpoint, event);
   }
 
   public simulateReceiveEvent(e: Event): Promise<void> {
