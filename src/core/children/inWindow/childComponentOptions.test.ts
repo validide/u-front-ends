@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { ChildComponentType, InWindowChildComponentOptions } from "../../../..";
+import { ChildComponentType, InWindowChildComponentOptions } from "./../index";
 
 describe("ChildComponentOptions", () => {
   it("should have the following properties and default values", () => {
