@@ -1,6 +1,30 @@
+import type { Plugin } from "vite";
 import { defineConfig } from "vitest/config";
 
+const demoHtmlModuleTransformPlugin: Plugin = {
+  name: "demo-html-module-transform",
+  apply: "serve" as const,
+  transformIndexHtml(html: string, context: { path: string }) {
+    const pathname = context.path.split("?")[0].split("#")[0];
+    if (!/^\/docs\/public\/demo\/[^/]+\.html$/.test(pathname)) {
+      return html;
+    }
+
+    return html
+      .replace(
+        /<script\s+src="\.\/lib\/bundle\/index\.js"><\/script>/g,
+        '<script type="module" src="/docs/public/demo/js/dev-bundle-module.js"></script>',
+      )
+      .replace(
+        /<script(?![^>]*\btype=)([^>]*?)\s+src="\.\/([^"]+)"([^>]*)><\/script>/g,
+        '<script type="module"$1 src="./$2"$3></script>',
+      )
+      .replace(/<script(?![^>]*\b(?:src|type)\b)([^>]*)>([\s\S]*?)<\/script>/g, '<script type="module"$1>$2</script>');
+  },
+};
+
 export default defineConfig({
+  plugins: [demoHtmlModuleTransformPlugin],
   build: {
     emptyOutDir: false,
     lib: {

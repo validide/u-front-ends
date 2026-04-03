@@ -25,3 +25,10 @@ Naming stuff is one of the hardest things in programming so:
 * [Demo](https://validide.github.io/u-front-ends/demo/#_/)
 * [Documentation](https://validide.github.io/u-front-ends/)
 * [Browser API manual tests](https://validide.github.io/u-front-ends/demo/browser-tests.html)
+
+## Local development
+
+* `npm run dev` starts a local Vite server and opens the demo page at `/docs/public/demo/index.html`.
+* In dev mode, demo HTML pages are transformed to use `type="module"` scripts and load the library from source (`src/index.ts`).
+* Browser API manual tests are available at `/docs/public/demo/browser-tests.html` when the dev server is running.
+* `npm run docs:dev` still exists for the full docs + typedoc workflow.

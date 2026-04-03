@@ -28,6 +28,7 @@
   },
   "scripts": {
     "clean": "node -e \"const { rmSync } = require('fs'); rmSync('./dist', { recursive: true, force: true }); rmSync('./docs/dist', { recursive: true, force: true });\"",
+    "dev": "vite --open /docs/public/demo/index.html",
     "prebuild": "npm run clean",
     "build": "tsc && vite build",
     "test": "vitest run --coverage",
