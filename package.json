@@ -14,17 +14,17 @@
     }
   },
   "devDependencies": {
-    "@biomejs/biome": "2.5.0",
+    "@biomejs/biome": "2.5.7",
     "@types/jsdom": "28.0.3",
     "@types/node": "25.9.3",
-    "@vitest/coverage-v8": "4.1.8",
+    "@vitest/coverage-v8": "4.1.10",
     "glob": "13.0.6",
     "jsdom": "29.1.1",
     "typedoc": "0.28.20",
-    "typescript": "6.0.3",
+    "typescript": "7.0.2",
     "vite": "8.0.16",
     "vitepress": "1.6.4",
-    "vitest": "4.1.8"
+    "vitest": "4.1.10"
   },
   "scripts": {
     "clean": "node -e \"const { rmSync } = require('fs'); rmSync('./dist', { recursive: true, force: true }); rmSync('./docs/dist', { recursive: true, force: true });\"",
